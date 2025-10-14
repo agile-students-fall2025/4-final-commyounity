@@ -4,6 +4,9 @@ This document explains how our team works together and how others can contribute
 We believe in open communication, accountability, and proactive teamwork, so please review this document before getting started.
 
 
+This document explains how our team works together and how others can contribute effectively. It reflects our team values, collaboration norms, and coding practices — serving as a guide for all contributors.
+We believe in open communication, accountability, and proactive teamwork, so please review this document before getting started.
+
 
 ## Team Norms
 

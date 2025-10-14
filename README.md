@@ -1,19 +1,76 @@
-# Project Repository
+# CommYOUnity
 
-This repository will be used for team projects.
+## Product Vision Statement
 
-Several sets of instructions are included in this repository. They should each be treated as separate assignments with their own due dates and sets of requirements.
+CommYOUnity is a social app designed to connect internstional students and people seeking cultural connections in the NYC area. CommYOUnity helps them find and join commYOUnity boards centered on shared heritage and interests. 
 
-1. See the [App Map & Wireframes](instructions-0a-app-map-wireframes.md) and [Prototyping](./instructions-0b-prototyping.md) instructions for the requirements of the initial user experience design of the app.
+### MVP
 
-1. Delete the contents of this file and replace with the contents of a proper README.md, as described in the [project setup instructions](./instructions-0c-project-setup.md)
+The MVP will focus on enabling users to sign up/log in, join or create commYOUnity boards, and interact within commYOUnity boards. 
 
-1. See the [Sprint Planning instructions](instructions-0d-sprint-planning.md) for the requirements of Sprint Planning for each Sprint.
+### Themes
 
-1. See the [Front-End Development instructions](./instructions-1-front-end.md) for the requirements of the initial Front-End Development.
+1. User Access and Onboarding: Users must be able to sign up, long in, and create a profile.
+2. CommYOUnity Discovery: Users must be able to browse existing commYOUnity boards and view existing members. 
+3. CommYOUnity Participation: Users must be able to join, post, and leave commYOUnity boards.
+4. CommYOUnity Creation and Management: Users must be able to create new boards, and invite new members to join.
+5. Profile Management: Users must be able to manage their profiles.
 
-1. See the [Back-End Development instructions](./instructions-2-back-end.md) for the requirements of the initial Back-End Development.
+### Features per Theme
 
-1. See the [Database Integration instructions](./instructions-3-database.md) for the requirements of integrating a database into the back-end.
+1. User Access and Onboarding
+- Necessary Features: Sign Up/Log In
+- Nice to Have: Add interests, and user bio
+2. CommYOUnity Discovery
+- Necessary Features: browse a list of commYOUnity boards, view brief descriptions of each board, view the list of members in each board
+- Nice to Have: filter based on interest/culture, search for a specific commYOUnity
+3. CommYOUnity Participation 
+- Necessary Features: join a board, post messages and events, leave a board
+- Nice to Have: private messaging
+4. CommYOUnity Creation and Management
+- Necessary Features: create a new board (add board description and basic "features" of the board, such as culture and shared interests)
+- Nice to Have: board analytics
+5. Profile Management: 
+- Necessary Features: change photo, change password, update contact info, view setting menu (where you can make changes to privacy and notifications), delete profile
+- Nice to have: profile analytics
 
-1. See the [Deployment instructions](./instructions-4-deployment.md) for the requirements of deploying an app.
+### User Stories
+
+1. User Access and Onboarding:
+- As a *new user*, I want to *sign up using my email address,* so that I can create an account quickly.
+- As an *existing user,* I want to *log in securely,* so that I can access my commYOUnities.
+
+2. CommYOUnity Discovery:
+- As a *user,* I want to *browse available CommmYOUnity Boards,* so that I can find commYOUnities that match my background or interests.
+- As a *user,* I want to *view the members of a board,* so that I know who is the group before joining.
+
+
+3. CommYOUnity Discovery:
+- As a *user*, I want to *join a CommYOUnity Board*, so that I can connect with others who share my heritage.
+- As a *commYOUnity board member,* I want to *post messages or events,* so that I can share updates with my community.
+- As a *commYOUnity board member,* I want to *be able to leave a CommYOUnity Board,* so that I can manage which communities I’m part of.
+
+4. CommYOUnity Creation and Management:
+- As a *user,* I want to *create a new CommYOUnity Board,* so that I can bring together others from my culture or background.
+- As a *CommYOUnity Board creator,* I want to *invite members,* so that my board can grow and stay active.
+
+5. Profile Management:
+- As a *user,* I want to *update my profile info, such as my photo and contact details,* so that my community sees accurate, up-to-date information about me.
+- As a *user,* I want to *change my password,* so that I can keep my account secure.
+- As a *user,* I want to *manage my privacy and notification preferences,* so that I control my visibility, contact, and data.
+- As a *user,* I want to *be able to delete my profile,* so that I can remove all my personal data from the app.
+
+## Core Team Members:
+- Carina Ilie
+    - [GitHub account](https://github.com/carinutza)
+    - [LinkedIN](https://www.linkedin.com/in/carina-ilie-73659a240/)
+- Lovinsh
+- Vincent
+- Varun
+- Leo Fu
+
+## Short History & Contibutions
+
+This project was designed by interational students for internstional students. We have noticed that most international students have a hard time when they first move abroad for their studies. To ease this transition, we cam up wit CommYOUnity - an app that can bring "home" closer. 
+
+If you wish to contibute to this project, please visit the [CONTRIBUTING.md](./CONTRIBUTING.md) document.
