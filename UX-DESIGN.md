@@ -3,9 +3,8 @@
 ## Prototype
 Published in the later sprints!
 
-
 ## App Map
-![App Map](./App%20Map.png)
+![App Map](ux-design/App%20Map.png)
 This app map shows the overall navigation structure of CommYOUnity, including the relationships between key features such as user profiles, boards, friends, and notifications.
 
 ---
@@ -13,56 +12,113 @@ This app map shows the overall navigation structure of CommYOUnity, including th
 ## Wireframes
 
 ### Login
-![Login](./Login.png)
+![Login](ux-design/Login.png)
 Screen where users log into their accounts using email and password.
 
 ### Sign Up
-![SignUp](./SignUp.png)
+![SignUp](ux-design/SignUp.png)
 Screen for new users to create an account and join the community.
 
 ### Home
-![Home](./Home.png)
+![Home](ux-design/Home.png)
 Main feed showing boards, posts, and quick access to other community features.
 
 ### Profile
-![Profile](./Profile.png)
-Displays the user’s profile details and privacy options.
+![Profile](ux-design/Profile.png)
+Displays the user’s profile details, bio, and account information.
 
 ### Edit Profile
-![Edit Profile](./Edit%20Profile.png)
-Allows users to update their profile info, including photo and bio.
+![Edit Profile](ux-design/Edit%20Profile.png)
+Allows users to update their profile information and profile photo.
+
+### Profile Privacy
+![Profile Privacy](ux-design/Profile%20Privacy.png)
+Screen for adjusting privacy settings for profile visibility and posts.
 
 ### Create New Board
-![Create New Board](./Create%20New%20Board.png)
-Screen for users to create and name a new community board.
+![Create New Board](ux-design/Create%20New%20Board.png)
+Form to create and name a new community board.
+
+### View Your CommYOUnity Boards
+![View Your CommYOUnity Boards](ux-design/View%20Your%20CommYOUnity%20Boards.png)
+Shows all community boards the user is part of or has created.
 
 ### View Board
-![View Board](./View%20Board.png)
-Displays posts within a selected community board.
+![View Board](ux-design/View%20Board.png)
+Displays posts and interactions within a selected community board.
 
 ### Create New Post
-![Create New Post](./Create%20New%20Post.png)
-Form for creating a new post inside a community board.
+![Create New Post](ux-design/Create%20New%20Post.png)
+Allows users to add a new post to a community board.
+
+### Browse CommYOUnity Boards
+![Browse CommYOUnity Boards](ux-design/Browse%20CommYOUnity%20Boards.png)
+Screen to browse all available boards in the community.
 
 ### Friend List
-![Friend List](./Friend%20List.png)
-Shows all of the user’s friends and allows viewing their profiles.
+![Friend List](ux-design/Friend%20List.png)
+Shows all friends of the user and allows access to their profiles.
+
+### Friends
+![Friends](ux-design/Friends.png)
+A simplified overview of friends for quick navigation.
+
+### Friend Requests
+![Friend Requests](ux-design/Friend%20Requests.png)
+Lists incoming and outgoing friend requests for management.
+
+### Invite Friends
+![Invite Friends](ux-design/Invite%20Friends.png)
+Screen for sending friend invites via email or username.
+
+### Invite Members
+![Invite Members](ux-design/Invite%20Members.png)
+Allows inviting other users to join a specific board.
+
+### Join
+![Join](ux-design/Join.png)
+Screen to request joining a public or private board.
+
+### Manage Members
+![Manage Members](ux-design/Manage%20Members.png)
+Allows board admins to manage members, roles, and permissions.
+
+### Members
+![Members](ux-design/Members.png)
+List of all members in a board with basic info.
+
+### View Members
+![View Members](ux-design/View%20Members.png)
+Displays detailed info about members in a board.
+
+### View Profile
+![View Profile](ux-design/View%20Profile.png)
+Shows another user's profile details for viewing or interaction.
+
+### Send Invite
+![Send Invite](ux-design/Send%20Invite.png)
+Screen for sending invitations to users for boards or events.
 
 ### Notification
-![Notification](./Notification.png)
+![Notification](ux-design/Notification.png)
 Lists notifications such as invites, post replies, or friend requests.
 
-### Settings
-![Setting](./Setting.png)
-User settings for notifications, privacy, and account management.
+### Edit Board
+![Edit Board](ux-design/Edit%20Board.png)
+Allows admins to update board settings, description, and members.
 
-### App Flow Summary
-Additional wireframes (like Invite Friends, Manage Members, etc.) show the full user flow through community interactions.
+### Delete Profile
+![Delete Profile](ux-design/Delete%20Profile.png)
+Screen for confirming deletion of the user account.
+
+### Settings
+![Setting](ux-design/Setting.png)
+User settings for notifications, privacy, and account management.
 
 ---
 
 ## Notes
 All wireframes are designed mobile-first with consistent layout, spacing, and element placement across screens.
 
+- [Prototype instructions](instructions-0b-prototyping.md)
 
-- [prototype instructions](instructions-0b-prototyping.md)
