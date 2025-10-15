@@ -1,4 +1,5 @@
-Welcome to our project!  
+# Welcome to our project! 
+
 This document explains how our team works together and how others can contribute effectively. It reflects our team values, collaboration norms, and coding practices — serving as a guide for all contributors.
 
 We believe in open communication, accountability, and proactive teamwork, so please review this document before getting started.
@@ -115,9 +116,8 @@ We follow a straightforward Git workflow to keep our development organized:
 1. **Fork** the repository and **clone** your copy.  
 2. Create a new **feature branch** (`git checkout -b feature-name`).  
 3. Make your changes and **test** them thoroughly.  
-4. Submit a **pull request (PR)** describing what you changed and why.  
-5. Wait for a **peer review** and approval before merging.  
-6. Once approved, your changes can be merged into the main branch.
+4. Wait for a **peer review** and approval before merging.  
+5. Once approved, your changes can be merged into the main branch.
 
 
 
