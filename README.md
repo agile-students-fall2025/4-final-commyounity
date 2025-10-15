@@ -64,10 +64,14 @@ The MVP will focus on enabling users to sign up/log in, join or create commYOUni
 - Carina Ilie
     - [GitHub account](https://github.com/carinutza)
     - [LinkedIn](https://www.linkedin.com/in/carina-ilie-73659a240/)
-- Lovinsh
-- Vincent
-- Varun
+- Lovinsh Julka
+    - [GitHub account](https://github.com/Lovnish2145)
+- Vincent Su
+    - [GitHub account](https://github.com/Vincent08199)
+- Varun Pandian
+    - [GitHub account](https://github.com/V-run64)
 - Leo Fu
+    - [GitHub account](https://github.com/LeoFYH)
 
 ## Short History & Contibutions
 
