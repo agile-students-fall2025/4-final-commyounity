@@ -63,7 +63,7 @@ The MVP will focus on enabling users to sign up/log in, join or create commYOUni
 ## Core Team Members:
 - Carina Ilie
     - [GitHub account](https://github.com/carinutza)
-    - [LinkedIN](https://www.linkedin.com/in/carina-ilie-73659a240/)
+    - [LinkedIn](https://www.linkedin.com/in/carina-ilie-73659a240/)
 - Lovinsh
 - Vincent
 - Varun

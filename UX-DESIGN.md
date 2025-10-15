@@ -1,7 +1,9 @@
 # CommYOUnity UX Design
 
 ## Prototype
-Published in the later sprints!
+Our prototype features interactive buttons and navigation through all the proposed App Map/Wireframe screens. 
+
+If you want to view ou prototypr, click on this [link](https://www.figma.com/proto/ys860yHtOerx2W7UtIyJOV/Wireframe?page-id=0%3A1&node-id=9-21&viewport=-2245%2C282%2C0.47&t=x2KDAitqEAcYH3AT-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=9%3A21&show-proto-sidebar=1).
 
 ## App Map
 ![App Map](ux-design/App%20Map.png)
@@ -160,5 +162,4 @@ Lists incoming friend requests for management.
 ## Notes
 All wireframes are designed mobile-first with consistent layout, spacing, and element placement across screens.
 
-- [Prototype instructions](instructions-0b-prototyping.md)
 
