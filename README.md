@@ -4,9 +4,13 @@
 
 CommYOUnity is a social app designed to connect internstional students and people seeking cultural connections in the NYC area. CommYOUnity helps them find and join commYOUnity boards centered on shared heritage and interests. 
 
+---
+
 ### MVP
 
-The MVP will focus on enabling users to sign up/log in, join or create commYOUnity boards, and interact within commYOUnity boards. 
+The MVP will focus on enabling users to sign up/log in, join or create CommYOUnity boards, interact within those boards, and manage their profiles.
+
+--- 
 
 ### Themes
 
@@ -15,24 +19,64 @@ The MVP will focus on enabling users to sign up/log in, join or create commYOUni
 3. CommYOUnity Participation: Users must be able to join, post, and leave commYOUnity boards.
 4. CommYOUnity Creation and Management: Users must be able to create new boards, and invite new members to join.
 5. Profile Management: Users must be able to manage their profiles.
+6. Friends & Connections: 
+   Users can find, add, and manage friends to extend their community connections.
 
 ### Features per Theme
 
 1. User Access and Onboarding
-- Necessary Features: Sign Up/Log In
-- Nice to Have: Add interests, and user bio
+- Necessary Features:
+  - Sign Up / Log In  
+- Nice to Have:  
+  - Add photos
+
 2. CommYOUnity Discovery
-- Necessary Features: browse a list of commYOUnity boards, view brief descriptions of each board, view the list of members in each board
-- Nice to Have: filter based on interest/culture, search for a specific commYOUnity
+- Necessary Features: 
+  - Browse a list of CommYOUnity boards  
+  - View brief descriptions of each board  
+  - View the list of members in each board  
+- Nice to Have: 
+  - Filter based on interest/culture  
+  - Search for specific CommYOUnities
+
 3. CommYOUnity Participation 
-- Necessary Features: join a board, post messages and events, leave a board
-- Nice to Have: private messaging
+- Necessary Features:  
+  - Join a board  
+  - View a board and see posts/events  
+  - Post updates or messages  
+  - Leave a board  
+- Nice to Have: 
+  - Private messaging between board members 
+
 4. CommYOUnity Creation and Management
-- Necessary Features: create a new board (add board description and basic "features" of the board, such as culture and shared interests)
-- Nice to Have: board analytics
+- Necessary Features: 
+  - Create a new board (add board description, culture, and interests)  
+  - Edit an existing board  
+  - Invite and manage members  
+- Nice to Have:  
+  - Board analytics (e.g., member count, engagement stats)
+
 5. Profile Management: 
-- Necessary Features: change photo, change password, update contact info, view setting menu (where you can make changes to privacy and notifications), delete profile
-- Nice to have: profile analytics
+- Necessary Features: 
+  - Change photo  
+  - Change password  
+  - Update contact info  
+  - Access settings (privacy, notifications)  
+  - Delete profile  
+- Nice to Have: 
+  - Profile analytics or engagement tracking  
+
+6. Friends & Connections
+- Necessary Features:
+  - Find and add friends  
+  - Accept or decline friend requests  
+  - View friend list  
+  - Remove friends  
+- Nice to Have: 
+  - Mutual friends view  
+  - Shared boards or cultural match suggestions 
+
+--- 
 
 ### User Stories
 
@@ -59,6 +103,14 @@ The MVP will focus on enabling users to sign up/log in, join or create commYOUni
 - As a *user,* I want to *change my password,* so that I can keep my account secure.
 - As a *user,* I want to *manage my privacy and notification preferences,* so that I control my visibility, contact, and data.
 - As a *user,* I want to *be able to delete my profile,* so that I can remove all my personal data from the app.
+
+6. Friends & Connections 
+- As a *user*, I want to *search for and add friends* so that I can connect beyond boards.  
+- As a *user*, I want to *accept or reject friend requests* so that I can control my connections.  
+- As a *user*, I want to *view and manage my friend list* so that I can stay in touch with people I know.  
+- As a *user*, I want to *remove a friend* so that I can control my social circle.  
+
+---
 
 ## Core Team Members:
 - Carina Ilie
