@@ -1,1 +1,1 @@
-This is a link to our [prototype](https://www.figma.com/proto/ys860yHtOerx2W7UtIyJOV/Wireframe?page-id=0%3A1&node-id=9-21&viewport=-2245%2C282%2C0.47&t=x2KDAitqEAcYH3AT-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=9%3A21&show-proto-sidebar=1).
+This is a link to our [prototype](https://drive.google.com/file/d/1l-_9agVdzB0AQ_QnYdtXnzsqeP_-oqas/view?usp=sharing).

@@ -3,7 +3,7 @@
 ## Prototype
 Our prototype features interactive buttons and navigation through all the proposed App Map/Wireframe screens. 
 
-If you want to view ou prototypr, click on this [link](https://www.figma.com/proto/ys860yHtOerx2W7UtIyJOV/Wireframe?page-id=0%3A1&node-id=9-21&viewport=-2245%2C282%2C0.47&t=x2KDAitqEAcYH3AT-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=9%3A21&show-proto-sidebar=1).
+If you want to view ou prototypr, click on this [link](https://drive.google.com/file/d/1l-_9agVdzB0AQ_QnYdtXnzsqeP_-oqas/view?usp=sharing).
 
 ## App Map
 ![App Map](ux-design/App%20Map.png)
@@ -71,17 +71,12 @@ Screen for confirming deletion of the user account.
 
 Form to create and name a new community board.
 
-### 5.1 Invite Members
-![Invite Members](ux-design/Invite%20Members.png)
-
-Allows inviting other users to join your new board (either friends or finding other members).
-
-### 5.1.1 Send Invite
+### 5.1 Send Invite
 ![Send Invite](ux-design/Send%20Invite.png)
 
 Screen for sending invitations to users for boards.
 
-### 5.1.2 Invite Friends
+### 5.2 Invite Friends
 ![Invite Friends](ux-design/Invite%20Friends.png)
 
 Screen for sending friend invites.
