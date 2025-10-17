@@ -3,7 +3,7 @@
 ## Prototype
 Our prototype features interactive buttons and navigation through all the proposed App Map/Wireframe screens. 
 
-If you want to view ou prototypr, click on this [link](https://drive.google.com/file/d/1l-_9agVdzB0AQ_QnYdtXnzsqeP_-oqas/view?usp=sharing).
+If you want to view ou prototype, click on this [link to download a copy](https://drive.google.com/file/d/1l-_9agVdzB0AQ_QnYdtXnzsqeP_-oqas/view?usp=sharing) or click on this [link for a Figma presentation](https://www.figma.com/proto/ys860yHtOerx2W7UtIyJOV/CommYOUnity?page-id=0%3A1&node-id=9-21&p=f&viewport=-352%2C406%2C0.19&t=oYlcZWyhDUKYkGKR-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=9%3A21&show-proto-sidebar=1).
 
 ## App Map
 ![App Map](ux-design/App%20Map.png)
