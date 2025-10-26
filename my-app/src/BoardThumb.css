@@ -1,0 +1,12 @@
+.BoardThumb {
+    flex: 1 0 40%; /* shorthand for: flex-grow flex-shrink flex-basis settings */
+    text-align: center;
+    border: 1px solid black;
+    border-left-width: 1px;
+    padding: 40px 0;
+  }
+  
+  .BoardThumb img,
+  .BoardThumb h2 {
+  }
+  
