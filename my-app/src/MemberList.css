@@ -1,0 +1,80 @@
+.MemberList {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 24px;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    color: #222;
+    background: #fafafa;
+    text-align: center;
+  }
+  
+  /* Back button at the top */
+  .MemberList .back-button {
+    background-color: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 30px;
+    transition: all 0.2s ease-in-out;
+  }
+  .MemberList .back-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+  
+  /* ✅ Grid layout for multiple cards per row */
+  .MemberList .member-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* auto adjust */
+    gap: 20px;
+    justify-items: center;
+    margin-top: 20px;
+  }
+  
+  /* ✅ Uniform card styling */
+  .MemberList .member-card {
+    width: 100%;
+    max-width: 280px;
+    height: 220px; /* consistent height */
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .MemberList .member-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Avatar */
+  .MemberList .member-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 12px;
+  }
+  
+  /* Name + username */
+  .MemberList .member-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .MemberList .member-card p {
+    margin: 6px 0 0;
+    font-size: 0.95rem;
+    color: #555;
+  }

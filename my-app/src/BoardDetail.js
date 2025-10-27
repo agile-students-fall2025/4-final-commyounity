@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './BoardDetail.css';
+import { Link } from 'react-router-dom';
 
 const BoardDetail = () => {
   const { id } = useParams();            
@@ -34,10 +35,7 @@ const BoardDetail = () => {
 
   const imageSrc = `https://picsum.photos/800/400?seed=board-${board.id}`;
 
-  const description =
-    board.descriptionLong ||
-    board.descriptionShort ||
-    'No description provided.';
+  const description =board.descriptionLong;
 
   return (
     <div className="BoardDetail">
@@ -48,9 +46,17 @@ const BoardDetail = () => {
           <div className="details">
             <p className="description">{description}</p>
             <p><strong>Members:</strong> {board.memberCount}</p>
+            <div className="buttons">
+            <Link to={`/boards/${board.id}/members`}>
+              <button className="members-button">View Members</button>
+            </Link>
+            <button className="edit-button" onClick={() => alert("Edit coming soon!")}>
+              Edit Board
+            </button>
             <button className="back-button" onClick={() => window.history.back()}>
               ← Back to Boards
             </button>
+          </div>
           </div>
         </article>
       </section>
