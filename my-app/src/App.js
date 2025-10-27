@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 // import './App.css';
 import ViewBoard from './ViewBoard';
 import BoardDetail from "./BoardDetail";
+import MembersList from './MembersList';
 
 function App() {
   return (
@@ -11,10 +12,9 @@ function App() {
       <Router>
           <Routes>
 
-            {/*Carina added a route to see content about me*/}
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
-
+            <Route path="/boards/:id/members" element={<MembersList />} />
           </Routes>
       </Router>
     </div>
