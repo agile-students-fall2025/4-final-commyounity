@@ -50,17 +50,29 @@ const BoardDetail = () => {
             <p className="description">{description}</p>
             <p><strong>Members:</strong> {board.memberCount}</p>
             <div className="buttons">
-            <Link to={`/boards/${board.id}/members`} state={{ isBoardOwner: board.isOwner }}>
-              <button className="members-button">View Members</button>
-            </Link>
+            <button
+              className="members-button"
+              onClick={() =>
+                navigate(`/boards/${board.id}/members`, {
+                  state: { isBoardOwner: board.isOwner },
+                })
+              }
+            >
+              View Members
+            </button>
             {board.isOwner && (
-              <Link  to={`/boards/${board.id}/edit`} state={{ board }}>
-                <button className="edit-button"
-                 onClick={() => alert("If you are seeing this button in the 'Not Your Boards' section that is because Mockaroo has refreshed the data and the isOwner field is now set to true. This app doesn't yet have a back-end, but this will be fixed once the back-end is set up. Please disregard!")}>
-                  Edit Board
-                </button>
-                </Link>
-              )}
+              <button
+                className="edit-button"
+                onClick={() => {
+                  alert(
+                    "If you are seeing this button in the 'Not Your Boards' section that is because Mockaroo has refreshed the data and the isOwner field is now set to true. This app doesn't yet have a back-end, but this will be fixed once the back-end is set up. Please disregard!"
+                  );
+                  navigate(`/boards/${board.id}/edit`, { state: { board } });
+                }}
+              >
+                Edit Board
+              </button>
+            )}
             <button className="back-button" onClick={() => navigate(`/viewboards`)} >
               ← Back to Boards
             </button>
