@@ -56,7 +56,7 @@ const EditScreen = () => {
           <p className="char-limit">• max 500 characters</p>
 
           <div className="member-actions">
-            <button type="button" className="invite">
+            <button type="button" className="invite" onClick={() => navigate(`/boards/${board.id}/invite`)}>
               Invite Friends
             </button>
             <button type="button" className="manage">
