@@ -57,7 +57,6 @@ const BoardList = props => {
     <div className="BoardList">
       <h3 style = {{ 'paddingLeft' : '20px'}}>Your Boards:</h3>
       <section className="yourBoards">
-        {/* show a thumbnail for each animal */}
         {data
              .filter(item => item.isOwner)        
              .map(item => (                      
@@ -67,7 +66,6 @@ const BoardList = props => {
       </section>
       <h3 style = {{ 'paddingLeft' : '20px'}}>Boards Your Are a Member Of:</h3>
       <section className="NotYourBoards">
-        {/* show a thumbnail for each animal */}
         {data
              .filter(item => !item.isOwner)        
              .map(item => (                      

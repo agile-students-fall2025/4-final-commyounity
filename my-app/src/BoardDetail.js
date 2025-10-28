@@ -73,6 +73,15 @@ const BoardDetail = () => {
                 Edit Board
               </button>
             )}
+            <button
+              className="leave-button"
+              onClick={() => {
+                alert("You are leaving this board! (pretend)");
+                navigate("/viewboards");
+              }}
+            >
+              Leave Board
+            </button>
             <button className="back-button" onClick={() => navigate(`/viewboards`)} >
               ← Back to Boards
             </button>
