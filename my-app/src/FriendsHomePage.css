@@ -1,0 +1,24 @@
+.FriendsHomePage {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 40px;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    color: #222;
+    text-align: center;
+    position: relative;
+    /* Removed background, border-radius, and box-shadow */
+}
+
+.FriendsHomePage-Logotext {
+    position: fixed; /* Position the logo in the top-left corner of the webpage */
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.FriendsHomePage-textLogoText img {
+    width: 300px; /* Match the width from ViewBoard.js */
+    height: 200px; /* Match the height from ViewBoard.js */
+    object-fit: contain;
+}
