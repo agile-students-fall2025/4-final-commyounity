@@ -50,9 +50,11 @@ const BoardDetail = () => {
             <Link to={`/boards/${board.id}/members`}>
               <button className="members-button">View Members</button>
             </Link>
+            <Link to={`/boards/${board.id}/edit`}>
             <button className="edit-button" onClick={() => alert("Edit coming soon!")}>
               Edit Board
             </button>
+            </Link>
             <button className="back-button" onClick={() => window.history.back()}>
               ← Back to Boards
             </button>
