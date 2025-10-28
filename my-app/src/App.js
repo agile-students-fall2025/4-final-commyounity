@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ViewBoard from './ViewBoard';
 import BoardDetail from "./BoardDetail";
 import MembersList from './MembersList';
+import EditScreen from './EditScreen'
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
+            <Route path="/boards/:id/edit" element={<EditScreen />} />
+            
           </Routes>
       </Router>
     </div>
