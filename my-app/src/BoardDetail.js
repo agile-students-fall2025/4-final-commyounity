@@ -3,10 +3,12 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './BoardDetail.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const BoardDetail = () => {
   const { id } = useParams();            
   const [board, setBoard] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('https://my.api.mockaroo.com/mock_boards_data.json', {
@@ -24,6 +26,7 @@ const BoardDetail = () => {
         id: 1,
         title: 'Your Cool Board',
         memberCount: 10,
+        isOwner: true,
         coverPhotoURL: 'https://picsum.photos/800/400?seed=fallback',
         descriptionLong:
           'Fallback description: sample long text about this board.',
@@ -58,7 +61,7 @@ const BoardDetail = () => {
                 </button>
                 </Link>
               )}
-            <button className="back-button" onClick={() => window.history.back()}>
+            <button className="back-button" onClick={() => navigate(`/viewboards`)} >
               ← Back to Boards
             </button>
           </div>
