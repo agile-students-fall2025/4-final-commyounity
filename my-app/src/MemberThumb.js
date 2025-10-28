@@ -1,10 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import './MemberThumb.css'
 
 
 const MemberThumb = props => {
-  // inject a random placeholder image if avatar missing
   const imgSrc = props.details.avatar || `https://i.pravatar.cc/100?u=${props.details.id}`
 
   return (

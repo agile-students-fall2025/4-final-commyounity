@@ -3,12 +3,7 @@ import { Link } from 'react-router-dom'
 import './BoardThumb.css'
 
 const BoardThumb = props => {
-  // console.log(props);
-
-  // inject a random placeholder image from the Lorem Picsum API
-  // the mockaroo API we're using doesn't include this
-  // ultimately, this data would come from the API
-  const imgSrc = `https://picsum.photos/200?id=${props.details.id}` // tack on this animal's id to the query
+  const imgSrc = `https://picsum.photos/200?id=${props.details.id}` 
 
   return (
     <article className="BoardThumb">
@@ -21,5 +16,4 @@ const BoardThumb = props => {
   )
 }
 
-// make this function available to be imported into another module
 export default BoardThumb

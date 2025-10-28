@@ -4,6 +4,7 @@ import axios from 'axios'
 import './BoardList.css'
 import BoardThumb from './BoardThumb'
 
+
 const BoardList = props => {
   // start a state varaible with a blank array
   const [data, setData] = useState([])
@@ -12,7 +13,7 @@ const BoardList = props => {
   useEffect(() => {
     // fetch some mock data about animals for sale
     console.log('fetching 10 random boards...')
-    axios('https://my.api.mockaroo.com/mock_boards_data.json?key=dc8ece40')
+    axios(axios(`https://my.api.mockaroo.com/mock_boards_data.json?key=dc8ece40`))
       .then(response => {
         // extract the data from the server response
         setData(response.data)
@@ -57,7 +58,6 @@ const BoardList = props => {
     <div className="BoardList">
       <h3 style = {{ 'paddingLeft' : '20px'}}>Your Boards:</h3>
       <section className="yourBoards">
-        {/* show a thumbnail for each animal */}
         {data
              .filter(item => item.isOwner)        
              .map(item => (                      
@@ -67,7 +67,6 @@ const BoardList = props => {
       </section>
       <h3 style = {{ 'paddingLeft' : '20px'}}>Boards Your Are a Member Of:</h3>
       <section className="NotYourBoards">
-        {/* show a thumbnail for each animal */}
         {data
              .filter(item => !item.isOwner)        
              .map(item => (                      
