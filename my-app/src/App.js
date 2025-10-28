@@ -8,13 +8,14 @@ import MembersList from './MembersList';
 import EditScreen from './EditScreen'
 import InviteFriendsList from './InviteFriendsList';
 import FindMembers from "./FindMembers";
+import ProfilePage from "./ProfilePage";
 
 function App() {
   return (
     <div className="App">
       <Router>
           <Routes>
-
+             <Route path="/profilepage" element={<ProfilePage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
