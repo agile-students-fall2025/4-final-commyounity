@@ -3,10 +3,12 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './BoardDetail.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const BoardDetail = () => {
   const { id } = useParams();            
   const [board, setBoard] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('https://my.api.mockaroo.com/mock_boards_data.json', {
@@ -24,6 +26,7 @@ const BoardDetail = () => {
         id: 1,
         title: 'Your Cool Board',
         memberCount: 10,
+        isOwner: true,
         coverPhotoURL: 'https://picsum.photos/800/400?seed=fallback',
         descriptionLong:
           'Fallback description: sample long text about this board.',
@@ -47,16 +50,30 @@ const BoardDetail = () => {
             <p className="description">{description}</p>
             <p><strong>Members:</strong> {board.memberCount}</p>
             <div className="buttons">
-            <Link to={`/boards/${board.id}/members`} state={{ isBoardOwner: board.isOwner }}>
-              <button className="members-button">View Members</button>
-            </Link>
+            <button
+              className="members-button"
+              onClick={() =>
+                navigate(`/boards/${board.id}/members`, {
+                  state: { isBoardOwner: board.isOwner },
+                })
+              }
+            >
+              View Members
+            </button>
             {board.isOwner && (
-                <button className="edit-button"
-                 onClick={() => alert("If you are seeing this button in the 'Not Your Boards' section that is because Mockaroo has refreshed the data and the isOwner field is now set to true. This app doesn't yet have a back-end, but this will be fixed once the back-end is set up. Please disregard!")}>
-                  Edit Board
-                </button>
-              )}
-            <button className="back-button" onClick={() => window.history.back()}>
+              <button
+                className="edit-button"
+                onClick={() => {
+                  alert(
+                    "If you are seeing this button in the 'Not Your Boards' section that is because Mockaroo has refreshed the data and the isOwner field is now set to true. This app doesn't yet have a back-end, but this will be fixed once the back-end is set up. Please disregard!"
+                  );
+                  navigate(`/boards/${board.id}/edit`, { state: { board } });
+                }}
+              >
+                Edit Board
+              </button>
+            )}
+            <button className="back-button" onClick={() => navigate(`/viewboards`)} >
               ← Back to Boards
             </button>
           </div>

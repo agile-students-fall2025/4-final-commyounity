@@ -6,6 +6,8 @@ import ViewBoard from './ViewBoard';
 import BoardDetail from "./BoardDetail";
 import MembersList from './MembersList';
 import EditScreen from './EditScreen'
+import InviteFriendsList from './InviteFriendsList';
+import FindMembers from "./FindMembers";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
             <Route path="/boards/:id/edit" element={<EditScreen />} />
+            <Route path="/boards/:id/invite" element={<InviteFriendsList />} />
+            <Route path="/boards/:id/findmembers" element={<FindMembers />} />
             
           </Routes>
       </Router>

@@ -33,7 +33,7 @@ const EditScreen = () => {
 
   return (
     <div className="EditScreen">
-      <button className="back-button" onClick={() => window.history.back()}>
+      <button className="back-button" onClick={() => navigate(`/boards/${board.id}`)}>
         ← Back
       </button>
 
@@ -56,13 +56,10 @@ const EditScreen = () => {
           <p className="char-limit">• max 500 characters</p>
 
           <div className="member-actions">
-            <button type="button" className="invite">
+            <button type="button" className="invite" onClick={() => navigate(`/boards/${board.id}/invite`)}>
               Invite Friends
             </button>
-            <button type="button" className="manage">
-              Manage Members
-            </button>
-            <button type="button" className="find">
+            <button type="button" className="find" onClick={() => navigate(`/boards/${board.id}/findmembers`)}>
               Find Members
             </button>
           </div>
