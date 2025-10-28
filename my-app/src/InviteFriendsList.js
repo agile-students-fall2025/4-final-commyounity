@@ -11,7 +11,7 @@ const InviteFriendsList = () => {
 
   useEffect(() => {
     axios
-      .get("https://my.api.mockaroo.com/friends.json?key=${process.env.REACT_APP_MOCKAROO_KEY}", {
+      .get("https://my.api.mockaroo.com/friends.json?key=dc8ece40", {
         headers: { "X-API-Key": "dc8ece40", Accept: "application/json" },
         params: { count: 10 },
       })

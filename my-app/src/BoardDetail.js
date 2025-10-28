@@ -14,7 +14,7 @@ const BoardDetail = () => {
 
   useEffect(() => {
     axios.get('https://my.api.mockaroo.com/mock_boards_data.json', {
-      headers: { 'X-API-Key': API_KEY, Accept: 'application/json' },
+      headers: { 'X-API-Key': "dc8ece40", Accept: 'application/json' },
       params: { count: 50 }            
     })
     .then(res => {
