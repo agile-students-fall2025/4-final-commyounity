@@ -8,7 +8,6 @@
     text-align: center;
   }
   
-  /* Back button at the top */
   .MemberList .back-button {
     background-color: #111;
     color: #fff;
@@ -25,20 +24,19 @@
     transform: translateY(-2px);
   }
   
-  /* ✅ Grid layout for multiple cards per row */
   .MemberList .member-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* auto adjust */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
     justify-items: center;
     margin-top: 20px;
   }
   
-  /* ✅ Uniform card styling */
+
   .MemberList .member-card {
     width: 100%;
     max-width: 280px;
-    height: 220px; /* consistent height */
+    height: 220px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -56,7 +54,6 @@
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
   }
   
-  /* Avatar */
   .MemberList .member-card img {
     width: 80px;
     height: 80px;
@@ -65,7 +62,6 @@
     margin-bottom: 12px;
   }
   
-  /* Name + username */
   .MemberList .member-card h3 {
     margin: 0;
     font-size: 1.1rem;
