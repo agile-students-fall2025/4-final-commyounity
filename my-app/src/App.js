@@ -6,13 +6,14 @@ import ViewBoard from './ViewBoard';
 import BoardDetail from "./BoardDetail";
 import MembersList from './MembersList';
 import EditScreen from './EditScreen'
+import FriendsHomePage from "./FriendsHomePage";
 
 function App() {
   return (
     <div className="App">
       <Router>
           <Routes>
-
+            <Route path="/friends" element={<FriendsHomePage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />

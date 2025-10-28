@@ -1,9 +1,10 @@
 import React from "react";
+import "./FriendsHomePage.css";
 
 function FriendsHomePage() {
   return (
-    <div>
-      <h1>Friends Page</h1>
+    <div className="friends-home">
+      <h1>Friends Home Page</h1>
     </div>
   );
 }
