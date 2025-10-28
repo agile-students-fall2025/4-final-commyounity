@@ -50,3 +50,18 @@
     color: #444;
     max-width: 400px;
   }
+  .MemberThumb .kick-button {
+    margin-top: 12px;
+    padding: 8px 14px;
+    background-color: #e63946;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .MemberThumb .kick-button:hover {
+    background-color: #c62828;
+  }

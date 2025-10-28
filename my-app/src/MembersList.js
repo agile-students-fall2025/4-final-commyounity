@@ -3,10 +3,18 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./MemberList.css";
 import MemberThumb from "./MemberThumb";
+import { useLocation } from 'react-router-dom';
+
+
+
+
+
 
 const MembersList = () => {
   const { id } = useParams();
+  const { state } = useLocation();
   const [members, setMembers] = useState([]);
+  const canKick = !!(state && state.isBoardOwner);
 
   useEffect(() => {
     axios
@@ -50,7 +58,7 @@ const MembersList = () => {
       <h1>Board Members</h1>
       <section className="member-grid">
         {members.map((member) => (
-          <MemberThumb key={member.id} details={member} />
+          <MemberThumb key={member.id} details={member} canKick={canKick} />
         ))}
       </section>
     </div>

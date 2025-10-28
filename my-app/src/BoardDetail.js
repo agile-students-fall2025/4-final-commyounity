@@ -47,7 +47,7 @@ const BoardDetail = () => {
             <p className="description">{description}</p>
             <p><strong>Members:</strong> {board.memberCount}</p>
             <div className="buttons">
-            <Link to={`/boards/${board.id}/members`}>
+            <Link to={`/boards/${board.id}/members`} state={{ isBoardOwner: board.isOwner }}>
               <button className="members-button">View Members</button>
             </Link>
             {board.isOwner && (
