@@ -5,10 +5,7 @@ import "./MemberList.css";
 import MemberThumb from "./MemberThumb";
 import { useLocation } from 'react-router-dom';
 
-
-
-
-
+const API_KEY = process.env.REACT_APP_MOCKAROO_KEY;
 
 const MembersList = () => {
   const { id } = useParams();
@@ -18,8 +15,8 @@ const MembersList = () => {
 
   useEffect(() => {
     axios
-      .get("https://my.api.mockaroo.com/members.json?key=dc8ece40", {
-        headers: { "X-API-Key": "dc8ece40", Accept: "application/json" },
+      .get("https://my.api.mockaroo.com/members.json?key=${process.env.REACT_APP_MOCKAROO_KEY}", {
+        headers: { "X-API-Key": API_KEY , Accept: "application/json" },
         params: { count: 10 },
       })
       .then((res) => {

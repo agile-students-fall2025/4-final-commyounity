@@ -9,7 +9,7 @@ const EditScreen = () => {
 
   useEffect(() => {
     axios
-      .get('https://my.api.mockaroo.com/mock_boards_data.json?key=dc8ece40')
+      .get('https://my.api.mockaroo.com/mock_boards_data.json?key=${process.env.REACT_APP_MOCKAROO_KEY}')
       .then(response => {
         const data = Array.isArray(response.data) ? response.data[0] : response.data
         setBoard(data)

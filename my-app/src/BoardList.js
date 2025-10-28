@@ -4,6 +4,7 @@ import axios from 'axios'
 import './BoardList.css'
 import BoardThumb from './BoardThumb'
 
+
 const BoardList = props => {
   // start a state varaible with a blank array
   const [data, setData] = useState([])
@@ -12,7 +13,7 @@ const BoardList = props => {
   useEffect(() => {
     // fetch some mock data about animals for sale
     console.log('fetching 10 random boards...')
-    axios('https://my.api.mockaroo.com/mock_boards_data.json?key=dc8ece40')
+    axios(axios(`https://my.api.mockaroo.com/mock_boards_data.json?key=${process.env.REACT_APP_MOCKAROO_KEY}`))
       .then(response => {
         // extract the data from the server response
         setData(response.data)

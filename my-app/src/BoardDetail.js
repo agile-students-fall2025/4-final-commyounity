@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './BoardDetail.css';
-import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
+import BoardFeed from "./BoardFeed";
+
+const API_KEY = process.env.REACT_APP_MOCKAROO_KEY;
 
 const BoardDetail = () => {
   const { id } = useParams();            
@@ -12,7 +14,7 @@ const BoardDetail = () => {
 
   useEffect(() => {
     axios.get('https://my.api.mockaroo.com/mock_boards_data.json', {
-      headers: { 'X-API-Key': 'dc8ece40', Accept: 'application/json' },
+      headers: { 'X-API-Key': API_KEY, Accept: 'application/json' },
       params: { count: 50 }            
     })
     .then(res => {
@@ -89,6 +91,7 @@ const BoardDetail = () => {
           </div>
         </article>
       </section>
+      <BoardFeed boardId={board.id} isOwner={board.isOwner} />
     </div>
   );
 };
