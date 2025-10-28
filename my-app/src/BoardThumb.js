@@ -15,6 +15,7 @@ const BoardThumb = props => {
       <Link to={`/boards/${props.details.id}`}>
         <img alt={props.details.title} src={imgSrc} />
         <h2>{props.details.title}</h2>
+
       </Link>
     </article>
   )

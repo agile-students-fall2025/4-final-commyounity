@@ -50,11 +50,12 @@ const BoardDetail = () => {
             <Link to={`/boards/${board.id}/members`}>
               <button className="members-button">View Members</button>
             </Link>
-            <Link to={`/boards/${board.id}/edit`}>
-            <button className="edit-button" onClick={() => alert("Edit coming soon!")}>
-              Edit Board
-            </button>
-            </Link>
+            {board.isOwner && (
+                <button className="edit-button"
+                 onClick={() => alert("If you are seeing this button in the 'Not Your Boards' section that is because Mockaroo has refreshed the data and the isOwner field is now set to true. This app doesn't yet have a back-end, but this will be fixed once the back-end is set up. Please disregard!")}>
+                  Edit Board
+                </button>
+              )}
             <button className="back-button" onClick={() => window.history.back()}>
               ← Back to Boards
             </button>
