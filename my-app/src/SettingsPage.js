@@ -14,9 +14,9 @@ export default function SettingsPage() {
       </header>
 
       {/* Settings blocks */}
-      <div className="settings-block">
+      <Link to="/settings/notifications" className="settings-block settings-link">
         Notification
-      </div>
+      </Link>
 
       <div className="settings-block">
         Profile Privacy
