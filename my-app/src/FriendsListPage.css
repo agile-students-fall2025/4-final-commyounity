@@ -21,6 +21,13 @@
   object-fit: contain;
 }
 
+.friendslist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+}
+
 .back-btn {
   display: inline-flex;
   align-items: center;

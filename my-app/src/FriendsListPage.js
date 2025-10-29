@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./FriendsListPage.css";
 import Logo from "./logo.svg";
+import FriendThumb from "./FriendThumb";
+import mockFriends from "./mockFriends";
 
 const FriendsList = () => {
   return (
@@ -18,8 +20,16 @@ const FriendsList = () => {
         </Link>
       </header>
 
-      <h1>Friends List </h1>
-      <p><i>See your friends!</i></p>
+      <h1>Friends List</h1>
+      <p>
+        <i>Here are your friends.</i>
+      </p>
+
+      <section className="friendslist-list">
+        {mockFriends.map((friend) => (
+          <FriendThumb key={friend.id} details={friend} variant="list" />
+        ))}
+      </section>
     </div>
   );
 };
