@@ -22,6 +22,7 @@ import NotificationSettingsPage from "./NotificationSettingsPage";
 import PrivacySettingsPage from "./PrivacySettingsPage";
 import DeleteProfilePage from "./DeleteProfilePage";
 import CreateBoard from "./CreateBoard";
+import ChangePasswordPage from "./ChangePasswordPage";
 
 
 
@@ -49,6 +50,7 @@ function App() {
             <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
             <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
             <Route path="/delete-profile" element={<DeleteProfilePage />} />
+            <Route path="/settings/change-password" element={<ChangePasswordPage />} />
             <Route path="/viewboards" element={<ViewBoard />} />
             <Route path="/browse" element={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
