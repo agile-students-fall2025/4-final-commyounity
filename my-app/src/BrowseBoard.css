@@ -1,0 +1,9 @@
+.Logotext{
+    display: flex ;
+}
+.textLogoText{
+    display: flex ;
+    align-items: center;
+    font-weight: bolder;
+    font-size:xx-large;
+}

@@ -1,5 +1,5 @@
 import Logo from "./logo.svg"
-import "./ViewBoard.css"
+import "./BrowseBoard.css"
 import BrowseBoardList from "./BrowseBoardList";
 
 const BrowseBoard = () => {
