@@ -2,15 +2,19 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import './BoardThumb.css'
 
-const BoardThumb = props => {
-  const imgSrc = `https://picsum.photos/200?id=${props.details.id}` 
+const BoardThumb = ({ details }) => {
+  const imgSrc = `https://picsum.photos/200?id=${details.id}` 
+
+  // Decide route based on whether user has joined the board
+  const linkPath = details.isJoined
+    ? `/boards/${details.id}`
+    : `/joinboards/${details.id}`
 
   return (
     <article className="BoardThumb">
-      <Link to={`/boards/${props.details.id}`}>
-        <img alt={props.details.title} src={imgSrc} />
-        <h2>{props.details.title}</h2>
-
+      <Link to={linkPath}>
+        <img alt={details.title} src={imgSrc} />
+        <h2>{details.title}</h2>
       </Link>
     </article>
   )
