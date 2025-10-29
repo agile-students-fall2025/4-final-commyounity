@@ -24,6 +24,20 @@
   color: #4b5563;
 }
 
+.request-loading {
+  margin-top: 40px;
+  color: #555;
+}
+
+.request-error {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background-color: #fdf2f2;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
 .friendrequests-header {
   display: flex;
   align-items: center;
@@ -121,8 +135,38 @@
 
 .request-empty {
   margin-top: 40px;
-  padding: 32px 24px;
-  color: #666;
+  padding: 40px 32px;
+  color: #444;
+  background-color: #fafafa;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.request-empty h2 {
+  margin: 0;
+}
+
+.request-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: #000;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.request-empty-cta:hover,
+.request-empty-cta:focus-visible {
+  background-color: #333;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {

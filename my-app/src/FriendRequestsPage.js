@@ -2,13 +2,63 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
 import Logo from "./logo.svg";
-import mockFriendRequests from "./mockFriendRequests";
 import mockFriends from "./mockFriends";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 
 const FriendRequestsPage = () => {
-  const [requests, setRequests] = useState(() => mockFriendRequests);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchRequests = async () => {
+      const applyRequests = (incoming) => {
+        if (!isMounted) return;
+        const normalized = Array.isArray(incoming) ? incoming : [incoming];
+        setRequests(normalized);
+        setError(null);
+      };
+
+      try {
+        const response = await fetch(
+          "https://my.api.mockaroo.com/friend_requests.json?count=6",
+          {
+            headers: {
+              "X-API-Key": "dc8ece40",
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Mockaroo responded with ${response.status}`);
+        }
+
+        const data = await response.json();
+        applyRequests(data);
+      } catch (err) {
+        if (!isMounted) return;
+        console.warn("Unable to load friend requests from Mockaroo.", err);
+        setRequests([]);
+        setError(
+          "We couldn't load new requests right now. Try refreshing the page."
+        );
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchRequests();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!feedback) {
@@ -109,52 +159,71 @@ const FriendRequestsPage = () => {
         </div>
       )}
 
-      {requests.length > 0 ? (
-        <section className="request-list">
-          {requests.map((request) => {
-            const fullName = `${request.first_name} ${request.last_name}`;
-            return (
-              <article key={request.id} className="request-card">
-                <div className="request-user">
-                  <img
-                    className="request-avatar"
-                    src={request.avatar}
-                    alt={`${fullName}'s avatar`}
-                  />
-                  <div>
-                    <h2>{fullName}</h2>
-                    <div className="request-meta">@{request.username}</div>
-                    <div className="request-meta">
-                      {request.mutualFriends} mutual friend
-                      {request.mutualFriends === 1 ? "" : "s"}
-                    </div>
-                  </div>
-                </div>
-                {request.message && (
-                  <p className="request-message">{request.message}</p>
-                )}
-                <div className="request-buttons">
-                  <button
-                    className="accept"
-                    onClick={() => handleAccept(request)}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    className="decline"
-                    onClick={() => handleDecline(request)}
-                  >
-                    Decline
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </section>
+      {loading ? (
+        <div className="request-loading">Loading your friend requests…</div>
       ) : (
-        <div className="request-empty">
-          <p>You’re all caught up—no pending requests right now.</p>
-        </div>
+        <>
+          {error && (
+            <div className="request-error" role="alert">
+              {error}
+            </div>
+          )}
+
+          {requests.length > 0 ? (
+            <section className="request-list">
+              {requests.map((request) => {
+                const fullName = `${request.first_name} ${request.last_name}`;
+                return (
+                  <article key={request.id} className="request-card">
+                    <div className="request-user">
+                      <img
+                        className="request-avatar"
+                        src={request.avatar}
+                        alt={`${fullName}'s avatar`}
+                      />
+                      <div>
+                        <h2>{fullName}</h2>
+                        <div className="request-meta">@{request.username}</div>
+                        <div className="request-meta">
+                          {request.mutualFriends} mutual friend
+                          {request.mutualFriends === 1 ? "" : "s"}
+                        </div>
+                      </div>
+                    </div>
+                    {request.message && (
+                      <p className="request-message">{request.message}</p>
+                    )}
+                    <div className="request-buttons">
+                      <button
+                        className="accept"
+                        onClick={() => handleAccept(request)}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        className="decline"
+                        onClick={() => handleDecline(request)}
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </section>
+          ) : (
+            <div className="request-empty">
+              <h2>No pending requests</h2>
+              <p>
+                You’re all caught up for now. Check back later or keep building
+                your commYOUnity.
+              </p>
+              <Link to="/friends/find" className="request-empty-cta">
+                Find Friends
+              </Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
