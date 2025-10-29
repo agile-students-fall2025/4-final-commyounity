@@ -21,7 +21,7 @@ export default function ProfilePage() {
         {/* The back button. Right now it just links to /viewboards as a placeholder. */}
         <button
           className="back-button"
-          onClick={() => navigate("/viewboards")}
+          onClick={() => navigate(-1)}
         >
           ←
         </button>
