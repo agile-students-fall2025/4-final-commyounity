@@ -1,52 +1,99 @@
+/* ===== Theme for consistency ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #6b7280;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --shadow: 0 10px 28px rgba(16, 24, 40, 0.1);
+  --radius: 16px;
+}
+
+/* ===== Page container ===== */
 .home-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  padding: 20px;
+  background: var(--bg);
+  padding: 40px 20px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
 }
 
+/* ===== Header ===== */
 .home-header {
   text-align: center;
-  color: #000000;
-  margin-bottom: 50px;
+  color: var(--text);
+  margin-bottom: 60px;
 }
 
 .home-header h1 {
-  font-size: 3rem;
-  margin: 0;
-  margin-bottom: 10px;
-  font-weight: bold;
+  font-size: 2.75rem;
+  margin: 0 0 12px 0;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #111;
 }
 
 .home-header p {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  color: var(--muted);
   margin: 0;
-  color: #000000;
+  line-height: 1.4;
 }
 
+/* ===== Menu buttons container ===== */
 .home-menu {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  align-items: center;
+  gap: 22px;
   width: 100%;
   max-width: 400px;
 }
 
+/* ===== Buttons ===== */
 .menu-button {
-  padding: 20px 30px;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: white;
-  background: #000000;
+  width: 100%;
+  padding: 18px 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--brand);
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  box-shadow: 0 8px 20px rgba(47, 109, 246, 0.25);
 }
 
 .menu-button:hover {
-  background: #333333;
+  background: var(--brand-dark);
+  transform: translateY(-2px);
+}
+
+.menu-button:active {
+  transform: scale(0.98);
+}
+
+/* ===== Optional subtle hover animation ===== */
+.menu-button:focus-visible {
+  outline: 3px solid rgba(47, 109, 246, 0.3);
+}
+
+/* ===== Responsive tweaks ===== */
+@media (max-width: 480px) {
+  .home-header h1 {
+    font-size: 2.2rem;
+  }
+  .home-header p {
+    font-size: 1rem;
+  }
+  .menu-button {
+    font-size: 1rem;
+    padding: 16px 20px;
+  }
 }

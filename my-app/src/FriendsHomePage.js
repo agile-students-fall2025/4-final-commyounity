@@ -26,6 +26,12 @@ const FriendsHomePage = () => {
         <div className="FriendsHomePage-textLogoText">
           <img src={Logo} alt="App Logo" className="app-logo" />
         </div>
+        <button
+          className="back-home-btn"
+          onClick={() => navigate("/home")}
+        >
+          ← Back to Home
+        </button>
       </div>
 
       <div className="friends-homepage">

@@ -29,7 +29,7 @@ const Home = () => {
         
         <button 
           className="menu-button"
-          onClick={() => navigate('/profile')}
+          onClick={() => navigate('/profilepage')}
         >
           My Profile
         </button>

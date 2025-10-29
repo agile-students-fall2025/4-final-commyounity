@@ -1,31 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./SettingsPage.css";
+import { useNavigate } from "react-router-dom";
 
 export default function SettingsPage() {
+  const navigate = useNavigate();
   return (
     <div className="SettingsPage">
-
-      {/* Top bar with back arrow */}
       <header className="settings-header">
-        <Link to="/profilepage" className="settings-back">
+        <button className="settings-back" onClick={() => navigate("/profilepage")}>
           ←
-        </Link>
+        </button>
       </header>
 
-      {/* Settings blocks */}
-      <Link to="/settings/notifications" className="settings-block settings-link">
-        Notification
-      </Link>
+      <div className="settings-buttons">
+        <Link to="/settings/notifications" className="settings-block">
+          Notification
+        </Link>
 
-      {/* Go to Privacy subpage */}
-      <Link
-        to="/settings/privacy"
-        className="settings-block settings-link"
-      >
-        Profile Privacy
-      </Link>
-
+        <Link to="/settings/privacy" className="settings-block">
+          Profile Privacy
+        </Link>
+      </div>
     </div>
   );
 }

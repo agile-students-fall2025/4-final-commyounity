@@ -1,55 +1,128 @@
-.FriendsHomePage {
-    max-width: 1000px;
-    margin: 60px auto;
-    padding: 40px;
-    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
-    color: #222;
+/* ===== Theme variables for consistency ===== */
+:root {
+    --brand: #2f6df6;
+    --brand-dark: #2057cc;
+    --text: #1b1b1f;
+    --muted: #6b7280;
+    --bg: #f7f7f8;
+    --card: #ffffff;
+    --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    --radius: 16px;
+  }
+  
+  /* ===== Main Container ===== */
+  .FriendsHomePage {
+    max-width: 960px;
+    margin: 80px auto;
+    padding: 48px 24px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--bg);
     text-align: center;
     position: relative;
-    
-}
-
-.FriendsHomePage-Logotext {
-    position: fixed; /* Position the logo in the top-left corner of the webpage */
-    top: 8px;
-    left: 12px;
+  }
+  
+  /* ===== Fixed Logo in Top-Left Corner ===== */
+  .FriendsHomePage-Logotext {
+    position: fixed;
+    top: 16px;
+    left: 20px;
     display: flex;
-    align-items: center;
-}
-
-.FriendsHomePage-textLogoText img {
-    width: 300px; /* Match the width from ViewBoard.js */
-    height: 200px; /* Match the height from ViewBoard.js */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    z-index: 100;
+  }
+  
+  .FriendsHomePage-textLogoText img {
+    width: 160px;
+    height: auto;
     object-fit: contain;
-}
-
-.button-container {
-    display: flex;
-    flex-direction: column; /* Arrange buttons vertically */
-    align-items: center; /* Center align the buttons */
-    gap: 30px; /* Increase spacing between buttons */
-    margin-top: 40px; /* Add more spacing between the first button and the text above */
-}
-
-.friends-btn {
-    width: 200px; /* Make the buttons larger */
-    padding: 15px 20px; /* Add padding for a bigger button */
-    font-size: 16px; /* Increase font size */
-    font-weight: bold;
-    background-color: black; /* Black background */
-    color: white; /* White text */
-    border: none; /* Remove border */
-    border-radius: 8px; /* Add rounded corners */
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+  
+  /* ===== Back to Home Button (BLACK) ===== */
+  .back-home-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.friends-btn:hover {
-    background-color: #333; /* Slightly lighter black on hover */
-    transform: scale(1.05); /* Slightly enlarge on hover */
-}
-
-.friends-btn.active {
-    background-color: #444; /* Darker black for active state */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: all 0.25s ease;
+  }
+  
+  .back-home-btn:hover {
+    background: #222;
     transform: translateY(-2px);
-}
+  }
+  
+  .back-home-btn:active {
+    transform: scale(0.97);
+  }
+  
+  /* ===== Buttons container ===== */
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+    margin-top: 60px;
+  }
+  
+  /* ===== Friends page buttons ===== */
+  .friends-btn {
+    width: 260px;
+    padding: 16px 22px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--brand);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 6px 20px rgba(47, 109, 246, 0.25);
+  }
+  
+  .friends-btn:hover {
+    background: var(--brand-dark);
+    transform: translateY(-2px);
+  }
+  
+  .friends-btn:active {
+    transform: scale(0.98);
+  }
+  
+  .friends-btn.active {
+    background: #1e40af;
+  }
+  
+  /* ===== Optional subtle hover pulse ===== */
+  .friends-btn:focus-visible {
+    outline: 3px solid black;
+  }
+  
+  /* ===== Responsive tweaks ===== */
+  @media (max-width: 720px) {
+    .FriendsHomePage {
+      padding: 32px 16px;
+    }
+  
+    .FriendsHomePage-textLogoText img {
+      width: 120px;
+    }
+  
+    .back-home-btn {
+      font-size: 0.85rem;
+      padding: 8px 14px;
+    }
+  
+    .friends-btn {
+      width: 220px;
+      font-size: 1rem;
+    }
+  }

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./PrivacySettingsPage.css";
 
 export default function PrivacySettingsPage() {
+  const navigate = useNavigate();
   // State variables for each setting
   // 1. Profile Visibility (toggle between "Private" and "Public")
   const [visibility, setVisibility] = useState("Private");
@@ -32,9 +33,12 @@ export default function PrivacySettingsPage() {
     <div className="PrivacyPage">
       {/* Back arrow at top */}
       <header className="privacy-header">
-        <Link to="/settings" className="privacy-back">
-          ←
-        </Link>
+        <button
+            className="privacy-back"
+            onClick={() => navigate("/settings")}
+          >
+            ←
+        </button>
       </header>
 
       {/* Row: Profile Visibility */}
