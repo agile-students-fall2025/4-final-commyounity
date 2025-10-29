@@ -1,7 +1,7 @@
 import React from "react";
 import "./FriendThumb.css";
 
-const FriendThumb = ({ details, variant = "card" }) => {
+const FriendThumb = ({ details, variant = "card", onUnfriend }) => {
   const imgSrc = `https://i.pravatar.cc/100?u=${details.id}`;
   const isOnline = Boolean(details.online);
   const statusText = isOnline ? "Online" : "Offline";
@@ -10,7 +10,9 @@ const FriendThumb = ({ details, variant = "card" }) => {
     const confirmed = window.confirm("Are you sure?");
     if (confirmed) {
       console.log(`Unfriend confirmed for ${details.first_name}`);
-      // Placeholder: actual unfriend logic will be added later
+      if (typeof onUnfriend === "function") {
+        onUnfriend(details.id);
+      }
     }
   };
 

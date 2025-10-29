@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendsListPage.css";
 import Logo from "./logo.svg";
@@ -6,6 +6,14 @@ import FriendThumb from "./FriendThumb";
 import mockFriends from "./mockFriends";
 
 const FriendsList = () => {
+  const [friends, setFriends] = useState(mockFriends);
+
+  const handleUnfriend = (friendId) => {
+    setFriends((prevFriends) =>
+      prevFriends.filter((friend) => friend.id !== friendId)
+    );
+  };
+
   return (
     <div className="FriendsList">
       <header className="friendslist-header">
@@ -26,8 +34,13 @@ const FriendsList = () => {
       </p>
 
       <section className="friendslist-list">
-        {mockFriends.map((friend) => (
-          <FriendThumb key={friend.id} details={friend} variant="list" />
+        {friends.map((friend) => (
+          <FriendThumb
+            key={friend.id}
+            details={friend}
+            variant="list"
+            onUnfriend={handleUnfriend}
+          />
         ))}
       </section>
     </div>
