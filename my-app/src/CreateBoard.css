@@ -1,124 +1,180 @@
+/* ===== Theme (align with other pages) ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #6b7280;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+/* ===== Page container ===== */
 .CreateBoard {
-    max-width: 400px;
-    margin: 40px auto;
-    padding: 20px;
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 30px;
-  }
-  
-  .header .back-button {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    margin-top: 50px;
-    border: #111;
-    border: 2px solid #000; 
-    border-radius: 4px;     
-    padding: 6px 10px;    
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  max-width: 960px;
+  margin: 80px auto;
+  padding: 48px 24px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
 
-  }
+/* ===== Header: back chip + logo + title ===== */
+.header {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
 
-  .back-button:hover {
-    background-color: #f2f2f2;
-  }
-  
-  .header .logo {
-    width: 300px;
-    height: auto;
-  }
-  
-  .header h1 {
-    font-weight: 700;
-    font-size: 1.5rem;
-  }
-  
-  .upload-section {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .photo-upload {
-    text-align: center;
-  }
-  
-  .photo-placeholder,
-  .photo-preview {
-    width: 200px;
-    height: 120px;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    background-color: #f2f2f2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-    object-fit: cover;
-  }
-  
-  .upload-button {
-    display: inline-block;
-    background-color: #f2f2f2;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  
-  .text-input {
-    width: 100%;
-    border: 2px solid #000;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 1rem;
-    margin-bottom: 20px;
-  }
-  
-  .text-input.description {
-    height: 100px;
-    resize: none;
-  }
-  
-  .button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-  }
-  
-  .secondary-button,
-  .primary-button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  
-  .secondary-button {
-    background-color: #000;
-    color: #fff;
-  }
-  
-  .primary-button {
-    background-color: #111;
-    color: #fff;
-  }
-  
+.header .back-button {
+  width: 48px;
+  height: 48px;
+  display: inline-grid;
+  place-items: center;
+  border: none;
+  background: #111;
+  color: #fff;
+  font-size: 22px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .15s ease, opacity .15s ease;
+}
+.header .back-button:hover { transform: translateY(-1px); opacity: .9; }
+
+.header .logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  justify-self: start;
+}
+
+.header h1 {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+/* ===== Card that holds the form ===== */
+.form-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+/* ===== Upload area ===== */
+.upload-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.photo-upload { text-align: center; }
+
+.photo-placeholder,
+.photo-preview {
+  width: 320px;
+  height: 180px;
+  border: 1px dashed #cfd4dc;
+  border-radius: var(--radius-sm);
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  object-fit: cover;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.upload-button {
+  display: inline-block;
+  background: #eef2ff;
+  color: #1e40af;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(47,109,246,.15);
+  transition: transform .15s ease, opacity .15s ease;
+}
+.upload-button:hover { transform: translateY(-1px); opacity: .95; }
+
+/* ===== Inputs ===== */
+.text-input {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(47, 109, 246, .15);
+}
+
+.text-input.description {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* ===== Buttons row ===== */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Primary = blue, Secondary = subtle gray/black text */
+.primary-button,
+.secondary-button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform .15s ease, opacity .15s ease, background .15s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+
+.primary-button {
+  background: var(--brand);
+  color: #fff;
+}
+.primary-button:hover { background: var(--brand-dark); transform: translateY(-2px); }
+
+.secondary-button {
+  background: #f3f4f6;
+  color: #111;
+}
+.secondary-button:hover { transform: translateY(-2px); opacity: .95; }
+
+/* ===== Responsive ===== */
+@media (max-width: 720px) {
+  .CreateBoard { padding: 32px 16px; margin: 48px auto; }
+
+  .header { grid-template-columns: 48px 1fr; }
+
+  .header .logo { width: 140px; }
+
+  .photo-placeholder, .photo-preview { width: 100%; max-width: 420px; }
+
+  .button-group { flex-direction: column; }
+}

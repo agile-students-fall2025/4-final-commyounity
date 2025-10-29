@@ -8,21 +8,31 @@
     text-align: center;
   }
   
-  .InviteFriendsList .back-button {
-    background-color: #111;
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #111;
     color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
     border: none;
     border-radius: 8px;
-    padding: 45px 50px;
-    font-size: 15px;
-    cursor: pointer;
+    padding: 10px 16px;
     margin-bottom: 30px;
-    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   }
   
-  .InviteFriendsList .back-button:hover {
-    opacity: 0.9;
+  .back-button:hover {
+    background: #333;
     transform: translateY(-2px);
+  }
+  
+  .back-button:active {
+    transform: scale(0.98);
   }
   
   .friend-grid {
