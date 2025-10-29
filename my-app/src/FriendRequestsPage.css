@@ -1,0 +1,191 @@
+.FriendRequestsPage {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 32px 32px;
+  font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+  color: #222;
+  text-align: center;
+}
+
+.request-feedback {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.request-feedback.success {
+  background-color: #e8faf1;
+  color: #1e9c5e;
+}
+
+.request-feedback.info {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.request-loading {
+  margin-top: 40px;
+  color: #555;
+}
+
+.request-error {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background-color: #fdf2f2;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.friendrequests-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.friendrequests-logo img {
+  width: 300px;
+  height: 200px;
+  object-fit: contain;
+}
+
+.request-list {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.request-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #fff;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.request-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.request-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
+.request-card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.request-card .request-meta {
+  color: #555;
+}
+
+.request-message {
+  margin: 0;
+  color: #444;
+  line-height: 1.5;
+}
+
+.request-card .request-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.request-card button {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.request-card button.accept {
+  background-color: #000;
+  color: #fff;
+}
+
+.request-card button.accept:hover {
+  background-color: #333;
+}
+
+.request-card button.decline {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.request-card button.decline:hover {
+  background-color: #e0e0e0;
+}
+
+.request-empty {
+  margin-top: 40px;
+  padding: 40px 32px;
+  color: #444;
+  background-color: #fafafa;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.request-empty h2 {
+  margin: 0;
+}
+
+.request-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: #000;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.request-empty-cta:hover,
+.request-empty-cta:focus-visible {
+  background-color: #333;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .FriendRequestsPage {
+    margin: 40px 16px;
+    padding: 32px 24px;
+  }
+
+  .friendrequests-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .friendrequests-logo img {
+    width: 200px;
+    height: auto;
+  }
+
+  .request-card button {
+    padding: 12px;
+  }
+}
