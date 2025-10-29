@@ -83,9 +83,9 @@ export default function ProfilePage() {
 
       {/* ===== Account actions ===== */}
       <section className="profile-action-area">
-        <button className="wide-button settings-btn">
+        <Link to="/settings" className="wide-button settings-btn">
           Settings
-        </button>
+        </Link>
 
         <button className="wide-button delete-btn">
           Delete Profile
