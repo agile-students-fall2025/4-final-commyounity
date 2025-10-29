@@ -9,13 +9,15 @@ import EditScreen from './EditScreen'
 import InviteFriendsList from './InviteFriendsList';
 import FindMembers from "./FindMembers";
 import ProfilePage from "./ProfilePage";
+import EditProfilePage from "./EditProfilePage";
 
 function App() {
   return (
     <div className="App">
       <Router>
           <Routes>
-             <Route path="/profilepage" element={<ProfilePage />} />
+            <Route path="/profilepage" element={<ProfilePage />} />
+            <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
