@@ -2,6 +2,9 @@ import logo from './logo.svg';
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 // import './App.css';
+import LoginPage from './LoginPage';
+import SignUpPage from './SignUpPage';
+import Home from './Home';
 import ViewBoard from './ViewBoard';
 import BoardDetail from "./BoardDetail";
 import MembersList from './MembersList';
@@ -32,6 +35,10 @@ function App() {
     <div className="App">
       <Router>
           <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/friends" element={<FriendsHomePage />} />
             <Route path="/friends/list" element={<FriendsListPage />} />
             <Route path="/friends/requests" element={<FriendRequestsPage />} />
@@ -42,7 +49,8 @@ function App() {
             <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
             <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
             <Route path="/delete-profile" element={<DeleteProfilePage />} />
-            <Route path="/viewboards" element ={<ViewBoard />} />
+            <Route path="/viewboards" element={<ViewBoard />} />
+            <Route path="/browse" element={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/joinboards/:id" element={<JoinBoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
