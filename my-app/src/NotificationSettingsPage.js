@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./NotificationSettingsPage.css";
 
 export default function NotificationSettingsPage() {
+  const navigate = useNavigate();
   // Local toggle states for each notification type
   const [boardUpdatesOn, setBoardUpdatesOn] = useState(true);
   const [messagesOn, setMessagesOn] = useState(true);
@@ -12,9 +13,9 @@ export default function NotificationSettingsPage() {
     <div className="NotifPage">
       {/* Back arrow at top */}
       <header className="notif-header">
-        <Link to="/settings" className="notif-back">
+        <button className="notif-back" onClick={() => navigate("/settings")}>
           ←
-        </Link>
+        </button>
       </header>
 
       {/* Row: Board Updates */}

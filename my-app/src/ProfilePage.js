@@ -1,7 +1,6 @@
 import React from "react";
 import "./ProfilePage.css";
-import { Link } from "react-router-dom";
-import logo from "./logo.svg";
+import { useNavigate } from "react-router-dom";
 
 
 export default function ProfilePage() {
@@ -11,26 +10,23 @@ export default function ProfilePage() {
   // - User info (name, handle, profile picture + Edit Profile button)
   // - About Me / Background / Interests fields
   // - Settings + Delete Profile buttons
+  const navigate = useNavigate();
+  const randomImage = `https://picsum.photos/160/120?random=${Math.floor(Math.random() * 1000)}`;
+
 
   return (
     <div className="ProfilePage">
-
       {/* ===== Top bar: back button + logo + "Login" ===== */}
       <header className="profile-header-bar">
         {/* The back button. Right now it just links to /viewboards as a placeholder. */}
-        <Link to="/viewboards" className="back-button">
+        <button
+          className="back-button"
+          onClick={() => navigate("/viewboards")}
+        >
           ←
-        </Link>
-
-        <div className="header-right">
-          {/* App logo from public/logo192.png */}
-          <img
-            src={logo}
-            alt="App Logo"
-            className="app-logo"
-          />
-          <div className="header-text">Login</div>
-        </div>
+        </button>
+        
+        
       </header>
 
       {/* ===== User top card: name/handle + profile picture area ===== */}
@@ -43,13 +39,20 @@ export default function ProfilePage() {
 
         {/* Profile picture and "Edit Profile" button on the right */}
         <div className="user-photo-block">
-          <div className="photo-placeholder">
-            Profile Picture
-          </div>
-
-          <Link to="/edit-profile" className="edit-profile-btn">
+          <img
+            src={randomImage}
+            alt="Profile"
+            className="photo-placeholder"
+          />
+          <button
+            className="edit-profile-btn"
+            onClick={() => {
+              alert("Editing profile not yet connected to backend. Pretend it worked!");
+              navigate("/edit-profile");
+            }}
+          >
             Edit Profile
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -81,17 +84,30 @@ export default function ProfilePage() {
         />
       </section>
 
-      {/* ===== Account actions ===== */}
+      {/* ===== Buttons ===== */}
       <section className="profile-action-area">
-        <Link to="/settings" className="wide-button settings-btn">
+        <button
+          className="wide-button settings-btn"
+          onClick={() => {
+            alert("Opening settings (pretend)!");
+            navigate("/settings");
+          }}
+        >
           Settings
-        </Link>
+        </button>
 
-        <Link to="/delete-profile" className="wide-button delete-btn">
+        <button
+          className="wide-button delete-btn"
+          onClick={() => {
+            if (window.confirm("Are you sure you want to delete your profile? (pretend)")) {
+              alert("Profile deleted (pretend).");
+              navigate("/viewboards");
+            }
+          }}
+        >
           Delete Profile
-        </Link>
-      </section>
-
+        </button>
+        </section>
     </div>
   );
 }

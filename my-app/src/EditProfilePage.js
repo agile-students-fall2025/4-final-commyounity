@@ -1,25 +1,33 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import "./EditProfilePage.css";
+import { useNavigate } from "react-router-dom";
 
 export default function EditProfilePage() {
+  const navigate = useNavigate();
   return (
     <div className="EditProfilePage">
 
       {/* Top bar: back button + title */}
       <header className="edit-header">
-        <Link to="/profilepage" className="edit-back-button">
+      <button
+          className="edit-back-button"
+          onClick={() => navigate("/profilepage")}
+        >
           ←
-        </Link>
+        </button>
 
         <h1 className="edit-title">Edit Profile</h1>
       </header>
 
       {/* Profile Picture block */}
       <div className="edit-photo-section">
-        <div className="edit-photo-placeholder">
-          Profile Picture
-        </div>
+      <img
+          src={`https://picsum.photos/220/160?random=${Math.floor(
+            Math.random() * 1000
+          )}`}
+          alt="Profile"
+          className="edit-photo-placeholder"
+        />
       </div>
 
       <form className="edit-form">
