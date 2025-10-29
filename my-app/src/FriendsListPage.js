@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./FriendsListPage.css";
 import Logo from "./logo.svg";
 import FriendThumb from "./FriendThumb";
@@ -7,6 +7,7 @@ import mockFriends from "./mockFriends";
 
 const FriendsList = () => {
   const [friends, setFriends] = useState(mockFriends);
+  const navigate = useNavigate();
 
   const handleUnfriend = (friendId) => {
     setFriends((prevFriends) =>
@@ -33,16 +34,28 @@ const FriendsList = () => {
         <i>Here are your friends.</i>
       </p>
 
-      <section className="friendslist-list">
-        {friends.map((friend) => (
-          <FriendThumb
-            key={friend.id}
-            details={friend}
-            variant="list"
-            onUnfriend={handleUnfriend}
-          />
-        ))}
-      </section>
+      {friends.length > 0 ? (
+        <section className="friendslist-list">
+          {friends.map((friend) => (
+            <FriendThumb
+              key={friend.id}
+              details={friend}
+              variant="list"
+              onUnfriend={handleUnfriend}
+            />
+          ))}
+        </section>
+      ) : (
+        <div className="friendslist-empty">
+          <p>You have no friends yet.</p>
+          <button
+            className="find-friends-btn"
+            onClick={() => navigate("/friends/find")}
+          >
+            Find Friends
+          </button>
+        </div>
+      )}
     </div>
   );
 };

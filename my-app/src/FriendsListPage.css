@@ -7,6 +7,37 @@
   text-align: center;
 }
 
+.friendslist-empty {
+  margin-top: 40px;
+  padding: 40px 24px;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  background-color: #fafafa;
+  font-size: 1.1rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.find-friends-btn {
+  padding: 10px 24px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.find-friends-btn:hover,
+.find-friends-btn:focus-visible {
+  background-color: #333;
+  transform: translateY(-2px);
+}
+
 .friendslist-header {
   display: flex;
   align-items: center;
