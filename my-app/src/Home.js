@@ -26,6 +26,14 @@ const Home = () => {
         >
           Browse Boards
         </button>
+
+        <button 
+          className="menu-button"
+          onClick={() => navigate('/createboard')}
+        >
+          Create Board
+        </button>
+        
         
         <button 
           className="menu-button"
