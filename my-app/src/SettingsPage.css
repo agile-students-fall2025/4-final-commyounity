@@ -11,6 +11,13 @@
   margin-bottom: 24px;
 }
 
+.settings-link {
+  text-decoration: none;
+  color: #000;
+  display: block;
+}
+
+
 .settings-back {
   display: inline-flex;
   justify-content: center;

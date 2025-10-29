@@ -11,6 +11,8 @@ import FindMembers from "./FindMembers";
 import ProfilePage from "./ProfilePage";
 import EditProfilePage from "./EditProfilePage";
 import SettingsPage from "./SettingsPage";
+import NotificationSettingsPage from "./NotificationSettingsPage";
+
 
 
 function App() {
@@ -21,6 +23,7 @@ function App() {
             <Route path="/profilepage" element={<ProfilePage />} />
             <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
