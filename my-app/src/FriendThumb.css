@@ -1,56 +1,174 @@
 .FriendThumb {
-    flex: 1 0 100%; 
-    display: flex;
+  flex: 1 0 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 10px 0;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.FriendThumb:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.FriendThumb-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.FriendThumb img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
+.FriendThumb-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.FriendThumb h2 {
+  font-size: 1.1rem;
+  color: #222;
+  margin: 0;
+}
+
+.FriendThumb .username {
+  color: #555;
+  font-style: italic;
+}
+
+.FriendThumb .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.FriendThumb .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #aaa;
+}
+
+.FriendThumb .status.online {
+  color: #1e9c5e;
+}
+
+.FriendThumb .status.online .status-indicator {
+  background-color: #1e9c5e;
+}
+
+.FriendThumb .status.offline {
+  color: #888;
+}
+
+.FriendThumb .status.offline .status-indicator {
+  background-color: #888;
+}
+
+.FriendThumb-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.FriendThumb .invite-button,
+.FriendThumb .unfriend-button,
+.FriendThumb .view-profile-button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+  font-weight: 600;
+}
+
+.FriendThumb .invite-button {
+  background-color: limegreen;
+  color: white;
+}
+
+.FriendThumb .invite-button:hover {
+  background-color: #1e9c5e;
+}
+
+.FriendThumb .view-profile-button {
+  background-color: #000;
+  color: #fff;
+}
+
+.FriendThumb .view-profile-button:hover {
+  background-color: #333;
+}
+
+.FriendThumb .unfriend-button {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.FriendThumb .unfriend-button:hover {
+  background-color: #e0e0e0;
+}
+
+.FriendThumb--list {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  padding: 16px 24px;
+}
+
+.FriendThumb--list .FriendThumb-main {
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  width: auto;
+}
+
+.FriendThumb--list img {
+  margin: 0;
+}
+
+.FriendThumb--list .FriendThumb-info {
+  align-items: flex-start;
+}
+
+.FriendThumb--list .FriendThumb-actions {
+  margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  .FriendThumb--list {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 20px;
-    margin: 10px 0;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    align-items: flex-start;
+    text-align: left;
+    gap: 16px;
   }
-  
-  .FriendThumb:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+
+  .FriendThumb--list .FriendThumb-main {
+    width: 100%;
   }
-  
-  .FriendThumb img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%; 
-    object-fit: cover;
-    margin-bottom: 10px;
-    border: 2px solid #eee;
+
+  .FriendThumb--list .FriendThumb-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
-  
-  .FriendThumb h2 {
-    font-size: 1.1rem;
-    color: #222;
-    margin-bottom: 6px;
-  }
-  
-  .FriendThumb .username {
-    color: #555;
-    font-style: italic;
-    margin-bottom: 4px;
-  }
-  
-  .FriendThumb .invite-button {
-    margin-top: 12px;
-    padding: 8px 14px;
-    background-color: limegreen;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s ease;
-  }
-  
-  .FriendThumb .invite-button:hover {
-    background-color: limegreen;
-  }
+}

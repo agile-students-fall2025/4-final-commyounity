@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./InviteFriendsList.css";
 import FriendThumb from "./FriendThumb";
+// import mockFriends from "./mockFriends";
 
 const InviteFriendsList = () => {
   const { id } = useParams();
@@ -20,10 +21,7 @@ const InviteFriendsList = () => {
       })
       .catch((err) => {
         console.error("Mockaroo limit reached, using backup data:", err);
-        setFriends([
-          { id: 1, first_name: "Sherwin", last_name: "Peverell", username: "speverell0", avatar: "https://i.pravatar.cc/100?img=1" },
-          { id: 2, first_name: "Anna", last_name: "Petrova",  username: "apetrova",   avatar: "https://i.pravatar.cc/100?img=2" },
-        ]);
+        // setFriends(mockFriends);
       });
   }, [id]);
 
