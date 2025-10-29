@@ -8,6 +8,14 @@ import MembersList from './MembersList';
 import EditScreen from './EditScreen'
 import InviteFriendsList from './InviteFriendsList';
 import FindMembers from "./FindMembers";
+import ProfilePage from "./ProfilePage";
+import EditProfilePage from "./EditProfilePage";
+import SettingsPage from "./SettingsPage";
+import NotificationSettingsPage from "./NotificationSettingsPage";
+import PrivacySettingsPage from "./PrivacySettingsPage";
+
+
+
 import BrowseBoard from './BrowseBoard';
 import JoinBoardDetail from './JoinBoardDetail';
 
@@ -16,7 +24,11 @@ function App() {
     <div className="App">
       <Router>
           <Routes>
-
+            <Route path="/profilepage" element={<ProfilePage />} />
+            <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
+            <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/joinboards/:id" element={<JoinBoardDetail />} />
