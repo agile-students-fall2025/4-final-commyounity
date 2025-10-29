@@ -70,7 +70,7 @@ const CreateBoard = () => {
           />
     
          <div className="button-group">
-            <button onClick={() => navigate("/findmembers")} className="secondary-button">
+            <button onClick={() => navigate("/boards/:id/findmembers")} className="secondary-button">
               Find Members
             </button>
             <button onClick={() => navigate("/friends/list")} className="secondary-button">

@@ -5,10 +5,11 @@ import './BoardThumb.css'
 const BoardThumb = ({ details }) => {
   const imgSrc = `https://picsum.photos/200?id=${details.id}` 
 
-  // Decide route based on whether user has joined the board
-  const linkPath = details.isJoined
-    ? `/boards/${details.id}`
+  const linkPath =
+  details.isOwner || details.isJoined
+    ? `/boards/${details.id}`    
     : `/joinboards/${details.id}`
+
 
   return (
     <article className="BoardThumb">
