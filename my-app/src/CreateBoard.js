@@ -6,7 +6,7 @@ import Logo from "./logo.svg";
 const CreateBoard = () => {
     const [boardName, setBoardName] = useState("");
     const [description, setDescription] = useState("");
-    const [photo, setPhoto] = useState(null);
+    const [photo, setPhoto] = useState(`https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/600/300`);
     const navigate = useNavigate();
 
     const handlePhotoUpload = (event) => {
