@@ -1,0 +1,58 @@
+.DeletePageOuter {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #fff;
+  color: #000;
+}
+
+.DeletePageInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  max-width: 400px;
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+}
+
+/* Big black button */
+.delete-confirm-btn {
+  border: 1px solid #000;
+  background: #000;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.4;
+  min-width: 270px;
+  padding: 16px;
+  cursor: pointer;
+}
+
+.delete-confirm-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* "Return to Home" link */
+.return-wrapper {
+  margin-top: 8px;
+}
+
+.return-link {
+  text-decoration: underline;
+  color: #000;
+  font-size: 0.9rem;
+}
+
+/* developer note text */
+.dev-hint {
+  font-size: 0.7rem;
+  color: #444;
+  max-width: 260px;
+  line-height: 1.3;
+}
