@@ -22,7 +22,7 @@ const Home = () => {
         
         <button 
           className="menu-button"
-          onClick={() => navigate('/browse')}
+          onClick={() => navigate('/browseboards')}
         >
           Browse Boards
         </button>
