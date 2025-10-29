@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
 import Logo from "./logo.svg";
 import mockFriends from "./mockFriends";
+import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 
 const FriendRequestsPage = () => {
@@ -24,7 +25,7 @@ const FriendRequestsPage = () => {
 
       try {
         const response = await fetch(
-          "https://my.api.mockaroo.com/friend_requests.json?count=6",
+          "https://my.api.mockaroo.com/friends.json?key=dc8ece40&count=6",
           {
             headers: {
               "X-API-Key": "dc8ece40",
@@ -42,9 +43,15 @@ const FriendRequestsPage = () => {
       } catch (err) {
         if (!isMounted) return;
         console.warn("Unable to load friend requests from Mockaroo.", err);
-        setRequests([]);
+        /**
+         * We fall back to a tiny, human-readable set of mock requests so that:
+         * 1) Stakeholders still see how the screen behaves when the API quota is exhausted.
+         * 2) It's painfully obvious this is temporary—the UI message below calls it out.
+         * Remove this fallback once the real back-end is wired up.
+         */
+        setRequests(mockFriendRequestsFallback);
         setError(
-          "We couldn't load new requests right now. Try refreshing the page."
+          "Showing backup sample requests because the live mock API hit its daily limit."
         );
       } finally {
         if (isMounted) {
