@@ -20,6 +20,8 @@ import PrivacySettingsPage from "./PrivacySettingsPage";
 
 
 
+import BrowseBoard from './BrowseBoard';
+import JoinBoardDetail from './JoinBoardDetail';
 
 function App() {
   return (
@@ -37,10 +39,14 @@ function App() {
             <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
+            <Route path="/joinboards/:id" element={<JoinBoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
             <Route path="/boards/:id/edit" element={<EditScreen />} />
             <Route path="/boards/:id/invite" element={<InviteFriendsList />} />
             <Route path="/boards/:id/findmembers" element={<FindMembers />} />
+            <Route path="/browseboards" element ={<BrowseBoard />} />
+
+    
             
           </Routes>
       </Router>
