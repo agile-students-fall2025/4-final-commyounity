@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 // import logo from './logo.svg';
-import './BoardList.css'
+import "./BrowseBoardList.css"
 import BoardThumb from './BoardThumb'
 
 
@@ -73,15 +73,6 @@ const BrowseBoardList = props => {
       <section className="yourBoards">
         {data
              .filter(item => !item.isJoined)        
-             .map(item => (                      
-              <BoardThumb key={item.id} details={item} />
-            ))
-        }
-      </section>
-      <h3 style = {{ 'paddingLeft' : '20px'}}>Boards Your Are a Member Of:</h3>
-      <section className="NotYourBoards">
-        {data
-             .filter(item => item.isJoined)        
              .map(item => (                      
               <BoardThumb key={item.id} details={item} />
             ))
