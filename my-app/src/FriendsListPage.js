@@ -1,12 +1,36 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./FriendsListPage.css";
 import Logo from "./logo.svg";
 import FriendThumb from "./FriendThumb";
 import mockFriends from "./mockFriends";
+import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 
 const FriendsList = () => {
-  const [friends, setFriends] = useState(mockFriends);
+  const [friends, setFriends] = useState(() => {
+    if (typeof window === "undefined") {
+      return mockFriends;
+    }
+
+    try {
+      const stored = window.localStorage.getItem(FRIENDS_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } else {
+        window.localStorage.setItem(
+          FRIENDS_STORAGE_KEY,
+          JSON.stringify(mockFriends)
+        );
+      }
+    } catch (error) {
+      console.warn("Unable to read stored friends, falling back to defaults.", error);
+    }
+
+    return mockFriends;
+  });
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -16,6 +40,21 @@ const FriendsList = () => {
       prevFriends.filter((friend) => friend.id !== friendId)
     );
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        FRIENDS_STORAGE_KEY,
+        JSON.stringify(friends)
+      );
+    } catch (error) {
+      console.warn("Unable to persist friends list.", error);
+    }
+  }, [friends]);
 
   const filteredFriends = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();

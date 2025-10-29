@@ -7,6 +7,23 @@
   text-align: center;
 }
 
+.request-feedback {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.request-feedback.success {
+  background-color: #e8faf1;
+  color: #1e9c5e;
+}
+
+.request-feedback.info {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
 .friendrequests-header {
   display: flex;
   align-items: center;
