@@ -21,10 +21,6 @@
   object-fit: contain;
 }
 
-.request-actions {
-  margin-top: 32px;
-}
-
 .request-list {
   margin-top: 24px;
   display: grid;
@@ -43,6 +39,20 @@
   gap: 12px;
 }
 
+.request-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.request-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
 .request-card h2 {
   margin: 0;
   font-size: 1.1rem;
@@ -50,6 +60,12 @@
 
 .request-card .request-meta {
   color: #555;
+}
+
+.request-message {
+  margin: 0;
+  color: #444;
+  line-height: 1.5;
 }
 
 .request-card .request-buttons {
@@ -84,6 +100,12 @@
 
 .request-card button.decline:hover {
   background-color: #e0e0e0;
+}
+
+.request-empty {
+  margin-top: 40px;
+  padding: 32px 24px;
+  color: #666;
 }
 
 @media (max-width: 768px) {
