@@ -29,6 +29,7 @@ const BoardList = props => {
             id: 1,
             title: 'Your Cool Boards',
             isOwner: true,
+            isJoined:true, 
             memberCount: 10,
             coverPhotoURL: 'http://dummyimage.com/236x100.png/cc0000/ffffff',
             descriptionShort:
@@ -40,6 +41,7 @@ const BoardList = props => {
             id: 2,
             title: 'Not Your Cool Boards',
             isOwner: false,
+            isJoined: true, 
             memberCount: 10,
             coverPhotoURL: 'http://dummyimage.com/236x100.png/cc0000/ffffff',
             descriptionShort:

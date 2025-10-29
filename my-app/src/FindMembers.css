@@ -20,10 +20,10 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 10px 22px;
+    padding: 45px 50px;
     font-size: 15px;
     cursor: pointer;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     transition: all 0.2s ease-in-out;
   }
   .FindMembers .back-button:hover {
