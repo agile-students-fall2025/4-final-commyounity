@@ -57,14 +57,6 @@
   opacity: 0.9;
 }
 
-/* Center logo — big and confident */
-.app-logo {
-  height: auto;           /* was 70px */
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.15));
-  margin: 0 auto;
-}
 
 /* Back button */
 .profile-header-bar .back-button {
