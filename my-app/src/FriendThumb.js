@@ -6,6 +6,14 @@ const FriendThumb = ({ details, variant = "card" }) => {
   const isOnline = Boolean(details.online);
   const statusText = isOnline ? "Online" : "Offline";
 
+  const handleUnfriendClick = () => {
+    const confirmed = window.confirm("Are you sure?");
+    if (confirmed) {
+      console.log(`Unfriend confirmed for ${details.first_name}`);
+      // Placeholder: actual unfriend logic will be added later
+    }
+  };
+
   return (
     <article
       className={`FriendThumb${variant === "list" ? " FriendThumb--list" : ""}`}
@@ -40,9 +48,7 @@ const FriendThumb = ({ details, variant = "card" }) => {
             </button>
             <button
               className="unfriend-button"
-              onClick={() =>
-                alert(`You just unfriended ${details.first_name} (pretend)!`)
-              }
+              onClick={handleUnfriendClick}
             >
               Unfriend
             </button>
