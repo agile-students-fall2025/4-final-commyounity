@@ -12,6 +12,8 @@ import ProfilePage from "./ProfilePage";
 import EditProfilePage from "./EditProfilePage";
 import SettingsPage from "./SettingsPage";
 import NotificationSettingsPage from "./NotificationSettingsPage";
+import PrivacySettingsPage from "./PrivacySettingsPage";
+
 
 
 
@@ -24,6 +26,7 @@ function App() {
             <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
+            <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />

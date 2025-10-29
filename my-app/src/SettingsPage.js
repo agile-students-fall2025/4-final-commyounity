@@ -18,9 +18,13 @@ export default function SettingsPage() {
         Notification
       </Link>
 
-      <div className="settings-block">
+      {/* Go to Privacy subpage */}
+      <Link
+        to="/settings/privacy"
+        className="settings-block settings-link"
+      >
         Profile Privacy
-      </div>
+      </Link>
 
     </div>
   );
