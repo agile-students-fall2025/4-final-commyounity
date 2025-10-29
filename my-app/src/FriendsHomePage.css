@@ -1,0 +1,55 @@
+.FriendsHomePage {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 40px;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    color: #222;
+    text-align: center;
+    position: relative;
+    
+}
+
+.FriendsHomePage-Logotext {
+    position: fixed; /* Position the logo in the top-left corner of the webpage */
+    top: 8px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.FriendsHomePage-textLogoText img {
+    width: 300px; /* Match the width from ViewBoard.js */
+    height: 200px; /* Match the height from ViewBoard.js */
+    object-fit: contain;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column; /* Arrange buttons vertically */
+    align-items: center; /* Center align the buttons */
+    gap: 30px; /* Increase spacing between buttons */
+    margin-top: 40px; /* Add more spacing between the first button and the text above */
+}
+
+.friends-btn {
+    width: 200px; /* Make the buttons larger */
+    padding: 15px 20px; /* Add padding for a bigger button */
+    font-size: 16px; /* Increase font size */
+    font-weight: bold;
+    background-color: black; /* Black background */
+    color: white; /* White text */
+    border: none; /* Remove border */
+    border-radius: 8px; /* Add rounded corners */
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.friends-btn:hover {
+    background-color: #333; /* Slightly lighter black on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.friends-btn.active {
+    background-color: #444; /* Darker black for active state */
+    transform: translateY(-2px);
+}
