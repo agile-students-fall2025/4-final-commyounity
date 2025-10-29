@@ -7,6 +7,9 @@ import BoardDetail from "./BoardDetail";
 import MembersList from './MembersList';
 import EditScreen from './EditScreen'
 import FriendsHomePage from "./FriendsHomePage";
+import FriendsListPage from "./FriendsListPage";
+import FriendRequestsPage from "./FriendRequestsPage";
+import FindFriendsPage from "./FindFriendsPage";
 
 function App() {
   return (
@@ -14,6 +17,9 @@ function App() {
       <Router>
           <Routes>
             <Route path="/friends" element={<FriendsHomePage />} />
+            <Route path="/friends/list" element={<FriendsListPage />} />
+            <Route path="/friends/requests" element={<FriendRequestsPage />} />
+            <Route path="/friends/find" element={<FindFriendsPage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />
