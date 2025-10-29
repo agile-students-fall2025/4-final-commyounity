@@ -29,7 +29,7 @@ const InviteFriendsList = () => {
 
   return (
     <div className="InviteFriendsList">
-      <button className="back-button" onClick={() => navigate(`/boards/${id}/edit`)}>
+      <button className="back-button" onClick={() => navigate(-1)}>
         ← Back to Board
       </button>
 
