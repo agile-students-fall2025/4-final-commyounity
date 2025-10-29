@@ -1,0 +1,68 @@
+.FindMembers {
+    max-width: 600px;
+    margin: 80px auto;
+    padding: 24px;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    color: #222;
+    background: #fafafa;
+    text-align: center;
+  }
+  
+  .FindMembers h1 {
+    margin-bottom: 24px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .FindMembers .back-button {
+    background-color: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.2s ease-in-out;
+  }
+  .FindMembers .back-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+  
+  .FindMembers .search-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .FindMembers input[type="text"] {
+    width: 70%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  
+  .FindMembers input[type="text"]:focus {
+    border-color: #007bff;
+  }
+  
+  .FindMembers button[type="submit"] {
+    padding: 10px 18px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .FindMembers button[type="submit"]:hover {
+    background-color: #005fcc;
+  }

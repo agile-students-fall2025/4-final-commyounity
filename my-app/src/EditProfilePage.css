@@ -1,0 +1,129 @@
+.EditProfilePage {
+  max-width: 400px;
+  margin: 24px auto 80px auto;
+  padding: 16px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #000;
+}
+
+/* Header row: back button on the left, title below it */
+.edit-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Back button square box with arrow */
+.edit-back-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.edit-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000;
+}
+
+/* Profile picture placeholder area */
+.edit-photo-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.edit-photo-placeholder {
+  width: 180px;
+  height: 140px;
+  background: #d9d9d9;
+  border: 1px solid #000;
+  color: #000;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Form layout */
+.edit-form {
+  display: grid;
+  row-gap: 20px;
+}
+
+.edit-field {
+  display: grid;
+  row-gap: 8px;
+}
+
+.edit-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.edit-input {
+  border: 1px solid #000;
+  padding: 10px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: #000;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.aboutme-wrapper {
+  display: grid;
+  row-gap: 4px;
+}
+
+.edit-textarea {
+  border: 1px solid #000;
+  padding: 10px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: #000;
+  width: 100%;
+  min-height: 140px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.char-hint {
+  font-size: 0.75rem;
+  color: #000;
+  text-align: right;
+  padding-right: 4px;
+}
+
+/* Save button */
+.save-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.save-button {
+  border: 1px solid #000;
+  background: #000;
+  color: #fff;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 180px;
+  text-align: center;
+}

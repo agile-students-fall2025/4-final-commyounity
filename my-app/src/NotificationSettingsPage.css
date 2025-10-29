@@ -1,0 +1,57 @@
+.NotifPage {
+  max-width: 400px;
+  margin: 24px auto 80px auto;
+  padding: 16px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #000;
+}
+
+/* back arrow box */
+.notif-header {
+  margin-bottom: 24px;
+}
+
+.notif-back {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  font-size: 20px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+/* Each notification row */
+.notif-row {
+  border: 1px solid #000;
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Text on the left ("Board Updates", etc.) */
+.notif-label {
+  font-size: 1rem;
+  color: #000;
+}
+
+/* Toggle button on the right ("On"/"Off") */
+.notif-toggle {
+  min-width: 80px;
+  border: 1px solid #000;
+  background: #000;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 12px 16px;
+  text-align: center;
+  cursor: pointer;
+}

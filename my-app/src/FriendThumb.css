@@ -1,4 +1,4 @@
-.MemberThumb {
+.FriendThumb {
     flex: 1 0 100%; 
     display: flex;
     flex-direction: column;
@@ -13,12 +13,12 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   
-  .MemberThumb:hover {
+  .FriendThumb:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
   }
   
-  .MemberThumb img {
+  .FriendThumb img {
     width: 100px;
     height: 100px;
     border-radius: 50%; 
@@ -27,33 +27,22 @@
     border: 2px solid #eee;
   }
   
-  .MemberThumb h2 {
+  .FriendThumb h2 {
     font-size: 1.1rem;
     color: #222;
     margin-bottom: 6px;
   }
   
-  .MemberThumb .username {
+  .FriendThumb .username {
     color: #555;
     font-style: italic;
     margin-bottom: 4px;
   }
   
-  .MemberThumb .country {
-    font-weight: 500;
-    color: #0073e6;
-    margin-bottom: 8px;
-  }
-  
-  .MemberThumb .description {
-    font-size: 0.9rem;
-    color: #444;
-    max-width: 400px;
-  }
-  .MemberThumb .kick-button {
+  .FriendThumb .invite-button {
     margin-top: 12px;
     padding: 8px 14px;
-    background-color: #e63946;
+    background-color: limegreen;
     color: white;
     border: none;
     border-radius: 8px;
@@ -62,6 +51,6 @@
     transition: background-color 0.2s ease;
   }
   
-  .MemberThumb .kick-button:hover {
-    background-color: #c62828;
+  .FriendThumb .invite-button:hover {
+    background-color: limegreen;
   }

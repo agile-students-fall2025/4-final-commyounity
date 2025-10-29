@@ -1,0 +1,88 @@
+.BoardFeed {
+    margin-top: 28px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+    padding: 18px 20px;
+  }
+  
+  .BoardFeed h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #111;
+  }
+  
+  .BoardFeed .composer {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 12px 0 16px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .BoardFeed .composer .avatar {
+    width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+  }
+  
+  .BoardFeed .composer textarea {
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font: inherit;
+    line-height: 1.5;
+    outline: none;
+  }
+  
+  .BoardFeed .composer textarea:focus {
+    border-color: #2f6df6;
+    box-shadow: 0 0 0 3px rgba(47,109,246,.12);
+  }
+  
+  .BoardFeed .composer .composer-actions {
+    grid-column: 2 / 3;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 8px;
+  }
+  
+  .BoardFeed .composer .count { color: #777; font-size: 12px; }
+  
+  .BoardFeed .composer button {
+    background: #2f6df6; color: #fff; border: 0;
+    padding: 10px 16px; border-radius: 10px; font-weight: 700;
+    cursor: pointer; transition: background .15s ease, transform .15s ease;
+  }
+  .BoardFeed .composer button:disabled { opacity: .55; cursor: not-allowed; }
+  .BoardFeed .composer button:not(:disabled):hover { background: #2057cc; transform: translateY(-1px); }
+  
+  /* Posts */
+  .BoardFeed .post-list { list-style: none; padding: 0; margin: 14px 0 0; }
+  .BoardFeed .post {
+    display: grid; grid-template-columns: 48px 1fr; gap: 12px;
+    padding: 14px 0; border-bottom: 1px solid #f0f0f0;
+  }
+  .BoardFeed .post:last-child { border-bottom: 0; }
+  
+  .BoardFeed .post .avatar {
+    width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+  }
+  
+  .BoardFeed .post .meta {
+    color: #555; font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+  }
+  .BoardFeed .post .meta .dot { opacity: .6; }
+  
+  .BoardFeed .post .message { margin: 0 0 10px; color: #222; line-height: 1.6; }
+  
+  .BoardFeed .post .actions { display: flex; gap: 10px; }
+  .BoardFeed .post .actions .like {
+    background: #f3f4f8; border: 0; border-radius: 8px; padding: 6px 10px; cursor: pointer;
+  }
+  .BoardFeed .post .actions .delete {
+    background: #ffe6e6; color: #b00020; border: 0; border-radius: 8px; padding: 6px 10px; cursor: pointer;
+  }
+  .BoardFeed .empty { padding: 18px; color: #666; text-align: center; }

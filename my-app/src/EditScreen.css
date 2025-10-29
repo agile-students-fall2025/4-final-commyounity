@@ -56,7 +56,6 @@
     color: #666;
   }
   
-  /* Button row with three colored buttons */
 .EditScreen .member-actions {
     display: flex;
     justify-content: center;
@@ -79,21 +78,20 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
-  /* Different colors for each button */
+
   .EditScreen .member-actions .invite {
-    background-color: #007bff; /* Blue */
+    background-color: #007bff; 
   }
   
   .EditScreen .member-actions .manage {
-    background-color: #ffc107; /* Yellow */
+    background-color: #ffc107; 
     color: #333;
   }
   
   .EditScreen .member-actions .find {
-    background-color: #28a745; /* Green */
+    background-color: #28a745; 
   }
   
-  /* Hover effect */
   .EditScreen .member-actions button:hover {
     transform: translateY(-2px);
     opacity: 0.9;
