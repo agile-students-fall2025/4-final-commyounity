@@ -13,6 +13,8 @@ import EditProfilePage from "./EditProfilePage";
 import SettingsPage from "./SettingsPage";
 import NotificationSettingsPage from "./NotificationSettingsPage";
 import PrivacySettingsPage from "./PrivacySettingsPage";
+import DeleteProfilePage from "./DeleteProfilePage";
+
 
 
 
@@ -27,6 +29,7 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
             <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
+            <Route path="/delete-profile" element={<DeleteProfilePage />} />
             <Route path="/viewboards" element ={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />

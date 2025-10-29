@@ -87,9 +87,9 @@ export default function ProfilePage() {
           Settings
         </Link>
 
-        <button className="wide-button delete-btn">
+        <Link to="/delete-profile" className="wide-button delete-btn">
           Delete Profile
-        </button>
+        </Link>
       </section>
 
     </div>
