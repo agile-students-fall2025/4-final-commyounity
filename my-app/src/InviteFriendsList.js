@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./InviteFriendsList.css";
 import FriendThumb from "./FriendThumb";
-// import mockFriends from "./mockFriends";
+import mockFriends from "./mockFriends";
 
 const InviteFriendsList = () => {
   const { id } = useParams();
@@ -22,6 +22,37 @@ const InviteFriendsList = () => {
       .catch((err) => {
         console.error("Mockaroo limit reached, using backup data:", err);
         // setFriends(mockFriends);
+        const fallbackFriends = [
+          {
+            id: 1,
+            first_name: "Emma",
+            last_name: "Chen",
+            username: "emma_chen",
+            mutualCount: 12,
+            profilePhotoURL: "https://picsum.photos/seed/emma/200/200",
+            bio: "Loves art museums, matcha lattes, and weekend hikes 🌿",
+            online: true,
+          },
+          {
+            id: 2,
+            first_name: "Liam",
+            last_name: "Patel",
+            username: "liam.codes",
+            mutualCount: 8,
+            profilePhotoURL: "https://picsum.photos/seed/liam/200/200",
+            online: false,
+          },
+          {
+            id: 3,
+            first_name: "Sofia",
+            last_name: "Reyes",
+            username: "sofiareyes",
+            mutualCount: 5,
+            profilePhotoURL: "https://picsum.photos/seed/sofia/200/200",
+            online: true,
+          },
+        ];
+        setFriends(fallbackFriends);
       });
   }, [id]);
 
