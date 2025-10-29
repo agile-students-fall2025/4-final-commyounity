@@ -1,0 +1,124 @@
+.CreateBoard {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  
+  .header .back-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin-top: 50px;
+    border: #111;
+    border: 2px solid #000; 
+    border-radius: 4px;     
+    padding: 6px 10px;    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  .back-button:hover {
+    background-color: #f2f2f2;
+  }
+  
+  .header .logo {
+    width: 300px;
+    height: auto;
+  }
+  
+  .header h1 {
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  
+  .upload-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .photo-upload {
+    text-align: center;
+  }
+  
+  .photo-placeholder,
+  .photo-preview {
+    width: 200px;
+    height: 120px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #f2f2f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    object-fit: cover;
+  }
+  
+  .upload-button {
+    display: inline-block;
+    background-color: #f2f2f2;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .text-input {
+    width: 100%;
+    border: 2px solid #000;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  
+  .text-input.description {
+    height: 100px;
+    resize: none;
+  }
+  
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .secondary-button,
+  .primary-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .secondary-button {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  .primary-button {
+    background-color: #111;
+    color: #fff;
+  }
+  

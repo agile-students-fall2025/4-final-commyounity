@@ -18,6 +18,8 @@ import SettingsPage from "./SettingsPage";
 import NotificationSettingsPage from "./NotificationSettingsPage";
 import PrivacySettingsPage from "./PrivacySettingsPage";
 import DeleteProfilePage from "./DeleteProfilePage";
+import CreateBoard from "./CreateBoard";
+
 
 
 
@@ -48,6 +50,8 @@ function App() {
             <Route path="/boards/:id/invite" element={<InviteFriendsList />} />
             <Route path="/boards/:id/findmembers" element={<FindMembers />} />
             <Route path="/browseboards" element ={<BrowseBoard />} />
+            <Route path="/createboard" element={<CreateBoard />} />
+
 
     
             
