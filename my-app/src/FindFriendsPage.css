@@ -52,9 +52,25 @@
   cursor: default;
 }
 
+.findfriends-search button.info {
+  background-color: #444;
+}
+
 .findfriends-demo-card {
   margin-top: 48px;
   color: #666;
+}
+
+.findfriends-demo-card.success {
+  color: #1e9c5e;
+}
+
+.findfriends-demo-card.info {
+  color: #555;
+}
+
+.findfriends-demo-card.error {
+  color: #b3261e;
 }
 
 @media (max-width: 768px) {
