@@ -47,9 +47,9 @@ export default function ProfilePage() {
             Profile Picture
           </div>
 
-          <button className="edit-profile-btn">
+          <Link to="/edit-profile" className="edit-profile-btn">
             Edit Profile
-          </button>
+          </Link>
         </div>
       </section>
 
