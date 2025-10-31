@@ -57,13 +57,16 @@ const InviteFriendsList = () => {
         setFriends(fallbackFriends);
       });
   }, [id]);
+  const handleBack = () => {
+    window.history.back();
+  };
 
   return (
     <>
     <Header title="Invite Friends" />
-    <button className="back-button" onClick={() => navigate(-1)}>
-        ← Back
-      </button>
+    <button className="back-btn" onClick={handleBack}>
+      ← Back
+    </button>
     <div className="InviteFriendsList">
       <section className="friend-grid">
         {friends.map((friend) => (

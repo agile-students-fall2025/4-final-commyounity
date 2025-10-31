@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './JoinBoardDetail.css';
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -47,6 +48,9 @@ const JoinBoardDetail = () => {
 
  return (
   <><Header title={board.title} />
+  <Link to="/browseboards" className="back-btn">
+          ← Back
+  </Link>
    <div className="JoinBoardDetail">
      <section className="main-content">
        <article className="board" key={board.id}>
@@ -75,14 +79,6 @@ const JoinBoardDetail = () => {
                }}
              >
                Join Board
-             </button>
-
-
-             <button
-               className="back-button"
-               onClick={() => navigate('/browseboards')}
-             >
-               ← Back to Browse Boards
              </button>
            </div>
          </div>

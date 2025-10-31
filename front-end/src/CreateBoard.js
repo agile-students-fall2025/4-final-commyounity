@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./CreateBoard.css";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -28,11 +29,10 @@ const CreateBoard = () => {
       return (
         <>
         <Header title="Create a CommYOUnity Board" />
+        <Link to="/home" className="back-btn">
+            ← Back
+          </Link> 
         <div className="CreateBoard">
-            <button className="back-button" onClick={() => navigate(-1)}>
-              ← Back
-            </button>   
-    
           <div className="upload-section">
             <div className="photo-upload">
               {photo ? (

@@ -6,6 +6,7 @@ import MemberThumb from "./MemberThumb";
 import { useLocation } from 'react-router-dom';
 import Header from "./Header";
 import Footer from "./Footer";
+import { Link } from 'react-router-dom';
 
 const MembersList = () => {
   const { id } = useParams();
@@ -46,13 +47,16 @@ const MembersList = () => {
         ]);
       });
   }, [id]);
+  const handleBack = () => {
+    window.history.back();
+  };
 
   return (
     <>
     <Header title="Members" />
-    <button className="back-button" onClick={() => window.history.back()}>
-        ← Back
-      </button>
+    <button className="back-btn" onClick={handleBack}>
+      ← Back
+    </button>
     <div className="MemberList">
       <section className="member-grid">
         {members.map((member) => (

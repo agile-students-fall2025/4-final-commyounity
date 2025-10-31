@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./NotificationSettingsPage.css";
 import Header from "./Header";
 
@@ -12,14 +13,10 @@ export default function NotificationSettingsPage() {
 
   return (
     <><Header title="Notifications Settings" />
-    <div className="NotifPage">
-      {/* Back arrow at top */}
-      <header className="notif-header">
-        <button className="notif-back" onClick={() => navigate("/settings")}>
+    <Link to="/settings" className="back-btn">
           ← Back
-        </button>
-      </header>
-
+    </Link>
+    <div className="NotifPage">
       {/* Row: Board Updates */}
       <div className="notif-row">
         <div className="notif-label">Board Updates</div>

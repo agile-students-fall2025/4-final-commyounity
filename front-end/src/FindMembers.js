@@ -10,12 +10,14 @@ const FindMembers = () => {
     e.preventDefault();
     alert(`Searching for "${query}" (pretend backend)!`);
   };
-
+  const handleBack = () => {
+    window.history.back();
+  };
   return (
     <><Header title="Find Members" />
-    <button className="back-button" onClick={() => window.history.back()}>
-        ← Back
-      </button>
+    <button className="back-btn" onClick={handleBack}>
+      ← Back
+    </button>
     <div className="FindMembers">
       <form className="search-form" onSubmit={handleSearch}>
         <input

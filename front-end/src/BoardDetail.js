@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './BoardDetail.css';
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import BoardFeed from "./BoardFeed";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -44,6 +45,9 @@ const BoardDetail = () => {
 
   return (
     <><Header title={board.title} />
+    <Link to="/viewboards" className="back-btn">
+          ← Back
+    </Link>
     <div className="BoardDetail">
       <section className="main-content">
         <article className="board" key={board.id}>
@@ -83,9 +87,6 @@ const BoardDetail = () => {
               }}
             >
               Leave Board
-            </button>
-            <button className="back-button" onClick={() => navigate(`/viewboards`)} >
-              ← Back to Boards
             </button>
           </div>
           </div>
