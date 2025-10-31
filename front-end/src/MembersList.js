@@ -5,6 +5,7 @@ import "./MemberList.css";
 import MemberThumb from "./MemberThumb";
 import { useLocation } from 'react-router-dom';
 import Header from "./Header";
+import Footer from "./Footer";
 
 const MembersList = () => {
   const { id } = useParams();
@@ -59,6 +60,7 @@ const MembersList = () => {
         ))}
       </section>
     </div>
+    <Footer />
     </>
   );
 };

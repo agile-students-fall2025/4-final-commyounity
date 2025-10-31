@@ -3,6 +3,8 @@ import "./ViewBoard.css"
 import BoardList from "./BoardList";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
+import Footer from "./Footer";
+
 
 const ViewBoard = () => {
     const navigate = useNavigate();
@@ -20,6 +22,7 @@ const ViewBoard = () => {
     <div className="view-board-content">
         <BoardList /> 
     </div>
+    <Footer /> 
     </>
 }
 

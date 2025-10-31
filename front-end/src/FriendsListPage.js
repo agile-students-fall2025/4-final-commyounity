@@ -6,6 +6,7 @@ import FriendThumb from "./FriendThumb";
 import mockFriends from "./mockFriends";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const FriendsList = () => {
   const [friends, setFriends] = useState(() => {
@@ -133,6 +134,7 @@ const FriendsList = () => {
         </div>
       )}
     </div>
+    <Footer/>
     </>
   );
 };

@@ -4,6 +4,7 @@ import axios from "axios";
 import "./InviteFriendsList.css";
 import FriendThumb from "./FriendThumb";
 import Header from "./Header";
+import Footer from "./Footer";
 
 
 const InviteFriendsList = () => {
@@ -70,6 +71,7 @@ const InviteFriendsList = () => {
         ))}
       </section>
     </div>
+    <Footer/>
     </>
   );
 };

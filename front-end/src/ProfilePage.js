@@ -2,7 +2,7 @@ import React from "react";
 import "./ProfilePage.css";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-
+import Footer from "./Footer";
 
 export default function ProfilePage() {
   // This component is the Profile Page feature.
@@ -104,7 +104,7 @@ export default function ProfilePage() {
           onClick={() => {
             if (window.confirm("Are you sure you want to delete your profile? (pretend)")) {
               alert("Profile deleted (pretend).");
-              navigate("/viewboards");
+              navigate("/");
             }
           }}
         >
@@ -112,6 +112,7 @@ export default function ProfilePage() {
         </button>
         </section>
     </div>
+    <Footer />
     </>
   );
 }

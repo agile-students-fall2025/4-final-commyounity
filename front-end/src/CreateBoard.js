@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import "./CreateBoard.css";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const CreateBoard = () => {
     const [boardName, setBoardName] = useState("");
@@ -79,6 +80,7 @@ const CreateBoard = () => {
             </button>
           </div>
         </div>
+        <Footer />
         </>
       );
     };

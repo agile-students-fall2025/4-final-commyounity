@@ -4,6 +4,7 @@ import "./FindFriendsPage.css";
 import Logo from "./logo.svg";
 import mockFriends from "./mockFriends";
 import Header from "./Header";
+import Footer from "./Footer";
 
 
 const FindFriendsPage = () => {
@@ -91,6 +92,7 @@ const FindFriendsPage = () => {
         <p>{messageDetails.text}</p>
       </section>
     </div>
+    <Footer />
     </>
   );
 };
