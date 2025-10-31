@@ -1,67 +1,121 @@
+/* ===== Theme Tokens (consistent with rest of app) ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #6b7280;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --danger: #e63946;
+  --danger-dark: #c62828;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+/* ===== Member Card (Outer Container) ===== */
 .MemberThumb {
-    flex: 1 0 100%; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 20px;
-    margin: 10px 0;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex: 1 0 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  margin: 12px 0;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.MemberThumb:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== Avatar ===== */
+.MemberThumb img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 14px;
+  border: 3px solid #f3f4f6;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Text Info ===== */
+.MemberThumb h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.MemberThumb .username {
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+.MemberThumb .country {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--brand);
+  margin-bottom: 8px;
+}
+
+.MemberThumb .description {
+  font-size: 0.9rem;
+  color: #444;
+  max-width: 380px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+/* ===== Kick Button ===== */
+.MemberThumb .kick-button {
+  padding: 10px 16px;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 6px 18px rgba(230, 57, 70, 0.25);
+}
+
+.MemberThumb .kick-button:hover {
+  background: var(--danger-dark);
+  transform: translateY(-2px);
+}
+
+/* ===== Responsive Tweaks ===== */
+@media (max-width: 700px) {
+  .MemberThumb {
+    padding: 20px 16px;
   }
-  
-  .MemberThumb:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-  }
-  
+
   .MemberThumb img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%; 
-    object-fit: cover;
-    margin-bottom: 10px;
-    border: 2px solid #eee;
+    width: 84px;
+    height: 84px;
   }
-  
+
   .MemberThumb h2 {
-    font-size: 1.1rem;
-    color: #222;
-    margin-bottom: 6px;
+    font-size: 1rem;
   }
-  
-  .MemberThumb .username {
-    color: #555;
-    font-style: italic;
-    margin-bottom: 4px;
-  }
-  
-  .MemberThumb .country {
-    font-weight: 500;
-    color: #0073e6;
-    margin-bottom: 8px;
-  }
-  
+
   .MemberThumb .description {
-    font-size: 0.9rem;
-    color: #444;
-    max-width: 400px;
+    font-size: 0.85rem;
+    max-width: 100%;
   }
+
   .MemberThumb .kick-button {
-    margin-top: 12px;
-    padding: 8px 14px;
-    background-color: #e63946;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s ease;
+    width: 100%;
   }
-  
-  .MemberThumb .kick-button:hover {
-    background-color: #c62828;
-  }
+}

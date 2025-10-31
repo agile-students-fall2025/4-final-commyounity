@@ -1,23 +1,49 @@
+/* ===== Theme tokens (keeps your app-wide look) ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #6b7280;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --shadow: 0 8px 24px rgba(0,0,0,.08);
+  --shadow-hover: 0 12px 28px rgba(0,0,0,.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+
+  /* Accent for “Invite” action: switch to --brand if you want blue */
+  --accent: #22c55e;        /* green */
+  --accent-dark: #1e9c5e;   /* green hover */
+  /* To use brand blue instead, uncomment:
+  --accent: var(--brand);
+  --accent-dark: var(--brand-dark);
+  */
+}
+
+/* ===== Base card ===== */
 .FriendThumb {
   flex: 1 0 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+
+  background-color: var(--card);
+  color: var(--text);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius);
   padding: 20px;
   margin: 10px 0;
-  background-color: #fff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .FriendThumb:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-hover);
 }
 
+/* main stack */
 .FriendThumb-main {
   display: flex;
   flex-direction: column;
@@ -26,14 +52,17 @@
   width: 100%;
 }
 
+/* avatar */
 .FriendThumb img {
-  width: 100px;
-  height: 100px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #eee;
+  border: 3px solid #eee;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 
+/* text block */
 .FriendThumb-info {
   display: flex;
   flex-direction: column;
@@ -42,22 +71,28 @@
 }
 
 .FriendThumb h2 {
-  font-size: 1.1rem;
-  color: #222;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: .2px;
   margin: 0;
 }
 
 .FriendThumb .username {
-  color: #555;
+  color: var(--muted);
   font-style: italic;
+  font-weight: 500;
 }
 
+/* status */
 .FriendThumb .status {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
+  font-weight: 700;
   margin-top: 4px;
+  font-size: .9rem;
+  color: var(--muted);
 }
 
 .FriendThumb .status-indicator {
@@ -67,84 +102,76 @@
   background-color: #aaa;
 }
 
-.FriendThumb .status.online {
-  color: #1e9c5e;
-}
+.FriendThumb .status.online { color: #1e9c5e; }
+.FriendThumb .status.online .status-indicator { background-color: #1e9c5e; }
 
-.FriendThumb .status.online .status-indicator {
-  background-color: #1e9c5e;
-}
+.FriendThumb .status.offline { color: #9ca3af; }
+.FriendThumb .status.offline .status-indicator { background-color: #9ca3af; }
 
-.FriendThumb .status.offline {
-  color: #888;
-}
-
-.FriendThumb .status.offline .status-indicator {
-  background-color: #888;
-}
-
+/* actions row */
 .FriendThumb-actions {
   display: flex;
   gap: 12px;
   margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .FriendThumb .invite-button,
 .FriendThumb .unfriend-button,
 .FriendThumb .view-profile-button {
-  padding: 8px 14px;
+  padding: 10px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s ease;
-  font-weight: 600;
+  font-weight: 800;
+  transition: transform .15s ease, opacity .15s ease, background-color .15s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
 }
 
 .FriendThumb .invite-button {
-  background-color: limegreen;
-  color: white;
+  background-color: var(--accent);
+  color: #fff;
 }
-
 .FriendThumb .invite-button:hover {
-  background-color: #1e9c5e;
+  background-color: var(--accent-dark);
+  transform: translateY(-2px);
 }
 
 .FriendThumb .view-profile-button {
-  background-color: #000;
+  background-color: #111;
   color: #fff;
 }
-
 .FriendThumb .view-profile-button:hover {
   background-color: #333;
+  transform: translateY(-2px);
 }
 
 .FriendThumb .unfriend-button {
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: #f3f4f6;
+  color: #111;
 }
-
 .FriendThumb .unfriend-button:hover {
-  background-color: #e0e0e0;
+  opacity: .95;
+  transform: translateY(-2px);
 }
 
+/* ===== List variant (horizontal) ===== */
 .FriendThumb--list {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   text-align: left;
-  padding: 16px 24px;
+  padding: 16px 20px;
+  gap: 16px;
 }
 
 .FriendThumb--list .FriendThumb-main {
   flex-direction: row;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   width: auto;
-}
-
-.FriendThumb--list img {
-  margin: 0;
 }
 
 .FriendThumb--list .FriendThumb-info {
@@ -155,12 +182,26 @@
   margin-top: 0;
 }
 
+/* ===== Focus states (keyboard users ❤️) ===== */
+.FriendThumb .invite-button:focus-visible,
+.FriendThumb .view-profile-button:focus-visible,
+.FriendThumb .unfriend-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47,109,246,.25);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 720px) {
+  .FriendThumb {
+    padding: 16px;
+  }
+}
+
 @media (max-width: 600px) {
   .FriendThumb--list {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     text-align: left;
-    gap: 16px;
   }
 
   .FriendThumb--list .FriendThumb-main {
@@ -170,5 +211,6 @@
   .FriendThumb--list .FriendThumb-actions {
     width: 100%;
     justify-content: flex-start;
+    flex-wrap: wrap;
   }
 }

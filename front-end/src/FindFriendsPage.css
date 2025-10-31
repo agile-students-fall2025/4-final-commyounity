@@ -14,22 +14,23 @@
 /* ===== Page Container ===== */
 .FindFriendsPage {
   max-width: 960px;
-  margin: 80px auto;
-  padding: 48px 24px;
+  margin: 72px auto;
+  padding: 40px 24px;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--text);
   background: var(--bg);
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* ===== Header (Logo + Back) ===== */
 .findfriends-header {
   display: flex;
-  flex-direction: column;           /* stack logo over back */
+  flex-direction: column;         /* stack logo over back */
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 
 .findfriends-logo img {
@@ -54,17 +55,22 @@
   font-size: 0.95rem;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
   box-shadow: 0 6px 18px rgba(47, 109, 246, 0.25);
 }
 .findfriends-back:hover { background: var(--brand-dark); transform: translateY(-2px); }
+.findfriends-back:active { transform: scale(0.98); }
+.findfriends-back:focus-visible {
+  outline: 3px solid rgba(47, 109, 246, 0.35);
+  outline-offset: 2px;
+}
 
-/* Optional page title / subtitle (if present in JSX) */
+/* Optional page title / subtitle */
 .findfriends-title {
   font-size: 2rem;
   font-weight: 800;
   color: #111;
-  margin: 8px 0 6px;
+  margin: 8px 0 4px;
 }
 .findfriends-subtitle {
   color: var(--muted);
@@ -78,15 +84,15 @@
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  margin: 60px auto 40px;
+  margin: 40px auto 32px;
   background: var(--card);
   border-radius: var(--radius);
-  padding: 40px;
+  padding: 32px;
   box-shadow: var(--shadow);
 }
 
 .findfriends-search input {
-  width: min(420px, 90%);
+  width: min(440px, 92%);
   padding: 14px 16px;
   font-size: 1rem;
   border-radius: var(--radius-sm);
@@ -99,9 +105,9 @@
   box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.15);
 }
 
-/* Buttons (primary + optional info variant) */
+/* Buttons */
 .findfriends-search button {
-  width: min(220px, 100%);
+  width: min(240px, 100%);
   padding: 14px 20px;
   font-size: 1rem;
   font-weight: 700;
@@ -110,32 +116,36 @@
   color: #fff;
   background: var(--brand);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
   box-shadow: 0 6px 20px rgba(47, 109, 246, 0.25);
 }
 .findfriends-search button:hover { background: var(--brand-dark); transform: translateY(-2px); }
-.findfriends-search button:disabled { opacity: 0.5; cursor: not-allowed; }
-.findfriends-search button.info { background-color: #555; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.findfriends-search button:active { transform: scale(0.98); }
+.findfriends-search button:disabled { opacity: 0.55; cursor: not-allowed; }
+.findfriends-search button.info {
+  background-color: #555;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
 
-/* ===== Demo Card / Results Placeholder ===== */
+/* ===== Demo / Results Placeholder ===== */
 .findfriends-demo-card {
-  margin-top: 40px;
+  margin-top: 28px;
   font-size: 1rem;
   font-weight: 500;
   color: var(--muted);
   background: var(--card);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 20px;
   box-shadow: var(--shadow);
 }
 .findfriends-demo-card.success { color: #1e9c5e; }
-.findfriends-demo-card.info { color: #2563eb; }
-.findfriends-demo-card.error { color: #dc2626; }
+.findfriends-demo-card.info    { color: #2563eb; }
+.findfriends-demo-card.error   { color: #dc2626; }
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .FindFriendsPage {
-    padding: 32px 16px;
+    padding: 28px 16px;
     margin: 40px 0;
   }
 
