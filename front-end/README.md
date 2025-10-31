@@ -1,8 +1,80 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Front-End Development — *CommYOUnity*
 
-## Available Scripts
+This repository contains the **front-end implementation** of the *CommYOUnity* web application, developed using **React.js** as part of the Agile Development & DevOps course sprint for front-end delivery.  
+
+The front-end demonstrates the full user interface flow of the application — including all key screens, navigation, and mock dynamic functionality — adhering to the project’s clickable prototype and clean, contemporary design.
+
+---
+
+## Project Overview
+
+**CommYOUnity** is a modern social platform designed to help users:
+
+- Create and manage community boards  
+- Connect and interact with friends  
+- Manage profile privacy and notifications  
+- Customize their personal information and interests  
+
+All dynamic content (friends, boards, and user data) is currently **mocked** via APIs such as [Mockaroo](https://mockaroo.com/), [Picsum](https://picsum.photos/),and [i.pravatar](https://i.pravatar.cc/) for back-end integration.
+
+---
+
+## Technical Implementation
+
+| Requirement | Implementation |
+|--------------|----------------|
+| **React.js front-end** | Built entirely in React with functional components |
+| **Functional components only** | All components use React Hooks (`useState`, `useEffect`, `useNavigate`) |
+| **JSX syntax** | All UI is defined using JSX, not plain JavaScript |
+| **Custom contemporary UI** | Clean blue/white/black design theme, soft shadows, rounded corners, consistent typography (Inter font) |
+| **Mock images via Picsum and i.pravatar** | All profile and board images pulled dynamically from [picsum.photos](https://picsum.photos/) and [i.pravatar](https://i.pravatar.cc/)|
+| **Mock data via Mockaroo** | Friends list and user data populated with mock API responses |
+---
+
+## Technologies Used
+
+| Category | Tool / Library |
+|-----------|----------------|
+| Framework | React.js (Create React App) |
+| Routing | React Router DOM |
+| Styling | Modular CSS (per-page), optional Tailwind-compatible |
+| Mock Data | Mockaroo API |
+| Mock Images | Picsum Photos and i.pravatar |
+| State | useState, useEffect |
+| Icons | Minimal Unicode arrows |
+| Version Control | Git + GitHub (Feature Branch workflow) |
+
+---
+
+---
+
+## Setup & Run Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone <https://github.com/agile-students-fall2025/4-final-commyounity.git>
+cd front-end
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the development server
+
+```bash
+npm start
+```
+
+This launches the app on http://localhost:3000
+
+The page reloads automatically when you edit files. 
+
+## Read More About Available Scripts
 
 In the project directory, you can run:
 
@@ -44,27 +116,3 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
