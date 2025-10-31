@@ -11,6 +11,7 @@ const EditScreen = () => {
   const { id } = useParams();  
   const [board, setBoard] = useState(null)
   const navigate = useNavigate();
+  const [photoUrl, setPhotoUrl] = useState("");
 
   useEffect(() => {
     axios
@@ -30,7 +31,12 @@ const EditScreen = () => {
       })
   }, [])
 
-  
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPhotoUrl(url);
+  };
 
   if (!board) return <div>Loading...</div>
 
@@ -45,14 +51,31 @@ const EditScreen = () => {
       
 
       <div className="edit-content">
-        <div className="board-photo">
-          <img
-            src= {imageSrc}
-            alt={board.title}
-            className="board-image"
-          />
-          <h2>{board.title}</h2>
-        </div>
+      <div className="board-photo">
+            <img src={imageSrc} alt={board.title} className="board-image" />
+            <h2>{board.title}</h2>
+            <div className="upload-wrap">
+              <label htmlFor="board-photo-input" className="upload-button">
+                Upload Board Photo
+              </label>
+              <input
+                id="board-photo-input"
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                style={{ display: "none" }}
+              />
+              {photoUrl && (
+                <button
+                  type="button"
+                  className="clear-upload"
+                  onClick={() => setPhotoUrl("")}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
 
         <form className="edit-form">
           <label>Board Name</label>
