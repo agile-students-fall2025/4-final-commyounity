@@ -177,3 +177,38 @@
     width: 100%;
   }
 }
+
+/* Center the image + button and give spacing */
+.profile-photo-uploader{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Make it a clean circular avatar (or change to 16px radius if you prefer a rounded rectangle) */
+.profile-photo{
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;         /* circle */
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  border: 3px solid #eee;
+}
+
+/* Blue pill button like the rest of the app */
+.upload-photo-btn{
+  background: #2f6df6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(47,109,246,.25);
+  transition: transform .15s ease, opacity .15s ease, background .15s ease;
+}
+.upload-photo-btn:hover{
+  background: #2057cc;
+  transform: translateY(-2px);
+}

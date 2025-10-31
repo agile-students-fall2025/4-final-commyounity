@@ -1,9 +1,23 @@
 import React from "react";
 import "./EditProfilePage.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
+import { useState } from "react";
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
+  const [photoUrl, setPhotoUrl] = useState("");
+
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPhotoUrl(url);
+  };
+
+  const imageSrc =
+    photoUrl ||
+    `https://picsum.photos/200/200?seed=profile-${Math.floor(Math.random() * 1000)}`;
+
   return (
     <div className="EditProfilePage">
 
@@ -21,14 +35,26 @@ export default function EditProfilePage() {
 
       {/* Profile Picture block */}
       <div className="edit-photo-section">
-      <img
-          src={`https://picsum.photos/220/160?random=${Math.floor(
-            Math.random() * 1000
-          )}`}
+      <div className="profile-photo-uploader">
+        <img
+          src={imageSrc}
           alt="Profile"
-          className="edit-photo-placeholder"
+          className="profile-photo"
+        />
+
+        {/* Visible button that triggers the hidden file input */}
+        <label htmlFor="profile-photo-input" className="upload-photo-btn">
+          Upload Profile Photo
+        </label>
+        <input
+          id="profile-photo-input"
+          type="file"
+          accept="image/*"
+          onChange={handlePhotoUpload}
+          hidden
         />
       </div>
+    </div>
 
       <form className="edit-form">
         {/* Username */}
