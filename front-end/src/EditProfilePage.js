@@ -2,6 +2,9 @@ import React from "react";
 import "./EditProfilePage.css";
 import { useNavigate} from "react-router-dom";
 import { useState } from "react";
+import Header from "./Header";
+import Footer from "./Footer";
+
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
@@ -19,19 +22,15 @@ export default function EditProfilePage() {
     `https://picsum.photos/200/200?seed=profile-${Math.floor(Math.random() * 1000)}`;
 
   return (
+    <><Header title="Edit Profile" />
+    <button
+        className="back-home-btn"
+        onClick={() => navigate("/profilepage")}
+        style={{ marginTop: "20px" }}
+      >
+        ← Back
+      </button>
     <div className="EditProfilePage">
-
-      {/* Top bar: back button + title */}
-      <header className="edit-header">
-      <button
-          className="edit-back-button"
-          onClick={() => navigate("/profilepage")}
-        >
-          ←
-        </button>
-
-        <h1 className="edit-title">Edit Profile</h1>
-      </header>
 
       {/* Profile Picture block */}
       <div className="edit-photo-section">
@@ -127,5 +126,7 @@ export default function EditProfilePage() {
         </div>
       </form>
     </div>
+    <Footer />
+    </>
   );
 }
