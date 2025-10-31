@@ -4,8 +4,7 @@ import axios from 'axios';
 import './BoardDetail.css';
 import { useNavigate } from "react-router-dom";
 import BoardFeed from "./BoardFeed";
-
-const API_KEY = process.env.REACT_APP_MOCKAROO_KEY;
+import Header from "./Header";
 
 const BoardDetail = () => {
   const { id } = useParams();            
@@ -43,8 +42,8 @@ const BoardDetail = () => {
   const description =board.descriptionLong;
 
   return (
+    <><Header title={board.title} />
     <div className="BoardDetail">
-      <h1>{board.title}</h1>
       <section className="main-content">
         <article className="board" key={board.id}>
           <img alt={board.title} src={imageSrc} className="board-image" />
@@ -93,6 +92,7 @@ const BoardDetail = () => {
       </section>
       <BoardFeed boardId={board.id} isOwner={board.isOwner} />
     </div>
+    </>
   );
 };
 

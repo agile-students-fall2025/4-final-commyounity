@@ -47,20 +47,6 @@
 }
 .header .back-button:hover { transform: translateY(-1px); opacity: .9; }
 
-.header .logo {
-  width: 180px;
-  height: auto;
-  object-fit: contain;
-  justify-self: start;
-}
-
-.header h1 {
-  grid-column: 1 / -1;
-  margin: 8px 0 0;
-  font-size: 1.9rem;
-  font-weight: 800;
-  letter-spacing: .2px;
-}
 
 /* ===== Card that holds the form ===== */
 .form-card {

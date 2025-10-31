@@ -5,6 +5,7 @@ import Logo from "./logo.svg";
 import mockFriends from "./mockFriends";
 import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
+import Header from "./Header";
 
 const FriendRequestsPage = () => {
   const [requests, setRequests] = useState([]);
@@ -145,17 +146,11 @@ const FriendRequestsPage = () => {
   };
 
   return (
-    <div className="FriendRequestsPage">
-      <header className="friendrequests-header">
-        <div className="friendrequests-logo">
-          <img src={Logo} alt="App logo" />
-        </div>
-        <Link to="/friends" className="back-btn">
-          ← Back to Friends Home
+    <><Header title="Friend Requests" />
+    <Link to="/friends" className="back-btn">
+          ← Back
         </Link>
-      </header>
-
-      <h1>Friend Requests</h1>
+    <div className="FriendRequestsPage">
       <p>
         <i>Review and manage people who want to connect with you.</i>
       </p>
@@ -233,6 +228,7 @@ const FriendRequestsPage = () => {
         </>
       )}
     </div>
+    </>
   );
 };
 

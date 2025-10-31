@@ -4,8 +4,7 @@ import axios from "axios";
 import "./MemberList.css";
 import MemberThumb from "./MemberThumb";
 import { useLocation } from 'react-router-dom';
-
-const API_KEY = process.env.REACT_APP_MOCKAROO_KEY;
+import Header from "./Header";
 
 const MembersList = () => {
   const { id } = useParams();
@@ -48,17 +47,19 @@ const MembersList = () => {
   }, [id]);
 
   return (
-    <div className="MemberList">
-      <button className="back-button" onClick={() => window.history.back()}>
-        ← Back to Board
+    <>
+    <Header title="Members" />
+    <button className="back-button" onClick={() => window.history.back()}>
+        ← Back
       </button>
-      <h1>Board Members</h1>
+    <div className="MemberList">
       <section className="member-grid">
         {members.map((member) => (
           <MemberThumb key={member.id} details={member} canKick={canKick} />
         ))}
       </section>
     </div>
+    </>
   );
 };
 

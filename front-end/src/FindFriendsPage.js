@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import "./FindFriendsPage.css";
 import Logo from "./logo.svg";
 import mockFriends from "./mockFriends";
+import Header from "./Header";
+
 
 const FindFriendsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,17 +48,11 @@ const FindFriendsPage = () => {
   }, [matchingFriend, searchTerm, trimmedTerm]);
 
   return (
+    <><Header title="Find Friends" />
+    <Link to="/friends" className="back-btn">
+          ← Back
+    </Link>
     <div className="FindFriendsPage">
-      <header className="findfriends-header">
-        <div className="findfriends-logo">
-          <img src={Logo} alt="App logo" />
-        </div>
-        <Link to="/friends" className="back-btn">
-          ← Back to Friends Home
-        </Link>
-      </header>
-
-      <h1>Find Friends</h1>
       <p>
         <i>Search for new connections and send an invite once you find a match.</i>
       </p>
@@ -95,6 +91,7 @@ const FindFriendsPage = () => {
         <p>{messageDetails.text}</p>
       </section>
     </div>
+    </>
   );
 };
 

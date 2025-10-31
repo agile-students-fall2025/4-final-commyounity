@@ -12,7 +12,7 @@
 
 /* ===== Page container ===== */
 .home-container {
-  min-height: 100vh;
+  min-height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,27 +23,6 @@
   color: var(--text);
 }
 
-/* ===== Header ===== */
-.home-header {
-  text-align: center;
-  color: var(--text);
-  margin-bottom: 60px;
-}
-
-.home-header h1 {
-  font-size: 2.75rem;
-  margin: 0 0 12px 0;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: #111;
-}
-
-.home-header p {
-  font-size: 1.1rem;
-  color: var(--muted);
-  margin: 0;
-  line-height: 1.4;
-}
 
 /* ===== Menu buttons container ===== */
 .home-menu {

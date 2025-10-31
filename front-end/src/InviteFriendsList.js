@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./InviteFriendsList.css";
 import FriendThumb from "./FriendThumb";
-import mockFriends from "./mockFriends";
+import Header from "./Header";
+
 
 const InviteFriendsList = () => {
   const { id } = useParams();
@@ -57,19 +58,19 @@ const InviteFriendsList = () => {
   }, [id]);
 
   return (
-    <div className="InviteFriendsList">
-      <button className="back-button" onClick={() => navigate(-1)}>
-        ← Back to Board
+    <>
+    <Header title="Invite Friends" />
+    <button className="back-button" onClick={() => navigate(-1)}>
+        ← Back
       </button>
-
-      <h1>Your Friends</h1>
-
+    <div className="InviteFriendsList">
       <section className="friend-grid">
         {friends.map((friend) => (
           <FriendThumb key={friend.id} details={friend} />
         ))}
       </section>
     </div>
+    </>
   );
 };
 

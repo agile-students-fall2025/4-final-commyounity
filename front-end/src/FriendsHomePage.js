@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FriendsHomePage.css";
-import Logo from "./logo.svg"; // Import the logo
+import Header from "./Header";
 
 const FriendsHomePage = () => {
   const [activeTab, setActiveTab] = useState("friends");
@@ -21,18 +21,14 @@ const FriendsHomePage = () => {
   };
 
   return (
+    <>
+    <Header title="Friends" />
+    <div className="back-btn-row">
+    <button className="back-home-btn" onClick={() => navigate("/home")}>
+      ← Back
+    </button>
+    </div>
     <div className="FriendsHomePage">
-      <div className="FriendsHomePage-Logotext">
-        <div className="FriendsHomePage-textLogoText">
-          <img src={Logo} alt="App Logo" className="app-logo" />
-        </div>
-        <button
-          className="back-home-btn"
-          onClick={() => navigate("/home")}
-        >
-          ← Back to Home
-        </button>
-      </div>
 
       <div className="friends-homepage">
         <h1>Welcome to the Friends Page</h1>
@@ -70,6 +66,7 @@ const FriendsHomePage = () => {
         <div className="friends-content">{renderContent()}</div>
       </div>
     </div>
+    </>
   );
 };
 

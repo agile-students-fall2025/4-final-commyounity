@@ -116,6 +116,7 @@
   border-radius: 8px;
   text-decoration: none;
   transition: background-color 0.2s ease, transform 0.2s ease;
+  margin: 0 93px 0; 
 }
 
 .back-btn:hover,

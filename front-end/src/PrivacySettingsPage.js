@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PrivacySettingsPage.css";
+import Header from "./Header";
+
 
 export default function PrivacySettingsPage() {
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ export default function PrivacySettingsPage() {
   };
 
   return (
+    <><Header title="Privacy Settings" />
     <div className="PrivacyPage">
       {/* Back arrow at top */}
       <header className="privacy-header">
@@ -37,7 +40,7 @@ export default function PrivacySettingsPage() {
             className="privacy-back"
             onClick={() => navigate("/settings")}
           >
-            ←
+            ← Back
         </button>
       </header>
 
@@ -65,5 +68,6 @@ export default function PrivacySettingsPage() {
         </button>
       </div>
     </div>
+    </>
   );
 }
