@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './SignUpPage.css';
 import logo from './logo.svg';
+import Header from "./Header";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -18,16 +19,12 @@ const SignUpPage = () => {
 
   return (
     <div className="signup-page">
-      <header className="signup-header">
-        <img
-          src={logo}
-          alt="App Logo"
-          className="signup-logo"
-        />
+       <Header title="Create Your Account" />
+       <header className="signup-header">
+      
         <h1>CommYOUnity</h1>
-        <p>Create Your Account</p>
+        <p>Connect Culture & Community</p>
       </header>
-
       <form className="signup-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="username">Username</label>

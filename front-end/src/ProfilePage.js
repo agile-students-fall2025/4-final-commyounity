@@ -1,6 +1,7 @@
 import React from "react";
 import "./ProfilePage.css";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 
 export default function ProfilePage() {
@@ -15,6 +16,8 @@ export default function ProfilePage() {
 
 
   return (
+    <>
+    <Header title="Your Profile" />
     <div className="ProfilePage">
       {/* ===== Top bar: back button + logo + "Login" ===== */}
       <header className="profile-header-bar">
@@ -23,7 +26,7 @@ export default function ProfilePage() {
           className="back-button"
           onClick={() => navigate("/home")}
         >
-          ←
+          ← Back
         </button>
         
         
@@ -109,5 +112,6 @@ export default function ProfilePage() {
         </button>
         </section>
     </div>
+    </>
   );
 }

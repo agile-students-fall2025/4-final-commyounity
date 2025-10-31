@@ -5,6 +5,7 @@ import Logo from "./logo.svg";
 import FriendThumb from "./FriendThumb";
 import mockFriends from "./mockFriends";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
+import Header from "./Header";
 
 const FriendsList = () => {
   const [friends, setFriends] = useState(() => {
@@ -75,20 +76,11 @@ const FriendsList = () => {
   }, [friends, searchTerm, statusFilter]);
 
   return (
+    <><Header title="View Your Friends" />
+    <Link to="/friends" className="back-btn">
+          ← Back 
+    </Link>
     <div className="FriendsList">
-      <header className="friendslist-header">
-        {/* App logo */}
-        <div className="friendslist-logo">
-          <img src={Logo} alt="App logo" />
-        </div>
-
-        {/* Back button to main friends page */}
-        <Link to="/friends" className="back-btn">
-          ← Back to Friends Home
-        </Link>
-      </header>
-
-      <h1>Friends List</h1>
       <p>
         <i>Here are your friends.</i>
       </p>
@@ -141,6 +133,7 @@ const FriendsList = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

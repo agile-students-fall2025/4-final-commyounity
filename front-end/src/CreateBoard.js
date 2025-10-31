@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import "./CreateBoard.css";
-import Logo from "./logo.svg";
+import Header from "./Header";
 
 const CreateBoard = () => {
     const [boardName, setBoardName] = useState("");
@@ -25,14 +25,12 @@ const CreateBoard = () => {
         navigate("/viewboards");
       };
       return (
+        <>
+        <Header title="Create a CommYOUnity Board" />
         <div className="CreateBoard">
-          <div className="header">
             <button className="back-button" onClick={() => navigate(-1)}>
-              ←
-            </button>
-            <img src={Logo} alt="CommYOUnity Logo" className="logo" />
-            
-          </div>
+              ← Back
+            </button>   
     
           <div className="upload-section">
             <div className="photo-upload">
@@ -81,6 +79,7 @@ const CreateBoard = () => {
             </button>
           </div>
         </div>
+        </>
       );
     };
     

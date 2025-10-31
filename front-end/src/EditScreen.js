@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './EditScreen.css'
 import { useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 const EditScreen = () => {
   const [board, setBoard] = useState(null)
@@ -32,10 +33,12 @@ const EditScreen = () => {
   const imageSrc = `https://picsum.photos/800/400?seed=board-${board.id}`;
 
   return (
-    <div className="EditScreen">
-      <button className="back-button" onClick={() => navigate(`/boards/${board.id}`)}>
+    <><Header title="Edit Board" />
+    <button className="back-button" onClick={() => navigate(`/boards/${board.id}`)}>
         ← Back
       </button>
+    <div className="EditScreen">
+      
 
       <div className="edit-content">
         <div className="board-photo">
@@ -70,6 +73,7 @@ const EditScreen = () => {
         </form>
       </div>
     </div>
+    </>
   )
 }
 

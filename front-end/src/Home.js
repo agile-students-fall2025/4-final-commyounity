@@ -1,16 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
+import Header from "./Header";
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
+    <>
+    <Header title="Home Page" />
     <div className="home-container">
-      <div className="home-header">
-        <h1>CommYOUnity</h1>
-        <p>Connect Culture & Community</p>
-      </div>
       
       <div className="home-menu">
         <button 
@@ -50,6 +49,7 @@ const Home = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

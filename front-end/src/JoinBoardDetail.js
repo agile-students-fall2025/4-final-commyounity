@@ -3,9 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './JoinBoardDetail.css';
 import { useNavigate } from "react-router-dom";
-
-
-const API_KEY = process.env.REACT_APP_MOCKAROO_KEY;
+import Header from "./Header";
 
 
 const JoinBoardDetail = () => {
@@ -48,8 +46,8 @@ const JoinBoardDetail = () => {
 
 
  return (
+  <><Header title={board.title} />
    <div className="JoinBoardDetail">
-     <h1>{board.title}</h1>
      <section className="main-content">
        <article className="board" key={board.id}>
          <img alt={board.title} src={imageSrc} className="board-image" />
@@ -91,6 +89,7 @@ const JoinBoardDetail = () => {
        </article>
      </section>
    </div>
+   </>
  );
 };
 

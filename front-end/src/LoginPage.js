@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './LoginPage.css';
-import logo from './logo.svg';
+import Header from "./Header";
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -15,13 +15,11 @@ const LoginPage = () => {
   };
 
   return (
+    <>
     <div className="login-page">
+      <Header title="Welcome back!" />
       <header className="login-header">
-        <img
-          src={logo}
-          alt="App Logo"
-          className="login-logo"
-        />
+      
         <h1>CommYOUnity</h1>
         <p>Connect Culture & Community</p>
       </header>
@@ -60,6 +58,7 @@ const LoginPage = () => {
         <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
       </div>
     </div>
+    </>
   );
 };
 

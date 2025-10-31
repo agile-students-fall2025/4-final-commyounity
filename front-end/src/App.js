@@ -50,7 +50,6 @@ function App() {
             <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
             <Route path="/delete-profile" element={<DeleteProfilePage />} />
             <Route path="/viewboards" element={<ViewBoard />} />
-            <Route path="/browse" element={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/joinboards/:id" element={<JoinBoardDetail />} />
             <Route path="/boards/:id/members" element={<MembersList />} />

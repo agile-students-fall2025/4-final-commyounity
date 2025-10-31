@@ -29,62 +29,39 @@
 .profile-header-bar {
   display: flex;
   align-items: center;
-  justify-content: center;      /* center the logo horizontally */
-  position: relative;           /* allows the back button to stay on the left */
+  justify-content: center; /* center the logo/title */
+  position: relative;      /* keeps the back button anchored on the left */
   margin-bottom: 80px;
   padding-top: 16px;
 }
 
-/* Back button stays fixed at left */
+/* ===== Back button ===== */
 .profile-header-bar .back-button {
   position: absolute;
   left: 0;
   top: 16px;
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* space between arrow and text */
+  padding: 0 16px;
+  height: 48px;
+
   background: #111;
   color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  white-space: nowrap; /* prevents line break */
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
+
 .profile-header-bar .back-button:hover {
   transform: translateY(-2px);
   opacity: 0.9;
-}
-
-
-/* Back button */
-.profile-header-bar .back-button {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border: none;
-  background: #111;
-  color: #fff;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease;
-}
-.profile-header-bar .back-button:hover {
-  transform: translateY(-1px);
-  opacity: 0.9;
-}
-
-/* Logo — make it visually prominent */
-.app-logo {
-  display: block;
-  margin: 0 auto;
-  height: 70px;       /* increased from 40px */
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.1));
 }
 
 /* ===== Profile hero card ===== */

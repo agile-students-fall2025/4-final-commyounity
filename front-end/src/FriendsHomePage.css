@@ -14,55 +14,40 @@
   .FriendsHomePage {
     max-width: 960px;
     margin: 80px auto;
-    padding: 48px 24px;
+    padding: 12px 24px;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: var(--text);
     background: var(--bg);
     text-align: center;
     position: relative;
   }
-  
-  /* ===== Fixed Logo in Top-Left Corner ===== */
-  .FriendsHomePage-Logotext {
-    position: fixed;
-    top: 16px;
-    left: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    z-index: 100;
-  }
-  
-  .FriendsHomePage-textLogoText img {
-    width: 160px;
-    height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  }
-  
-  /* ===== Back to Home Button (BLACK) ===== */
-  .back-home-btn {
-    background: #000;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 18px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-    transition: all 0.25s ease;
-  }
-  
-  .back-home-btn:hover {
-    background: #222;
-    transform: translateY(-2px);
-  }
-  
-  .back-home-btn:active {
-    transform: scale(0.97);
-  }
+/* Row that sits directly under the header and aligns with the page */
+.back-btn-row {
+  max-width: 960px;   /* match .FriendsHomePage */
+  display: flex;
+   padding: 0 24px;
+  margin: 8px auto 10px; 
+  justify-content: left;
+}
+
+/* Button look (you can keep what you have; shown for completeness) */
+.back-home-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transition: all .25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.back-home-btn:hover { background:#222; transform: translateY(-2px); }
+.back-home-btn:active { transform: scale(0.97); }
   
   /* ===== Buttons container ===== */
   .button-container {

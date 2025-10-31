@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NotificationSettingsPage.css";
+import Header from "./Header";
 
 export default function NotificationSettingsPage() {
   const navigate = useNavigate();
@@ -10,11 +11,12 @@ export default function NotificationSettingsPage() {
   const [followersOn, setFollowersOn] = useState(true);
 
   return (
+    <><Header title="Notifications Settings" />
     <div className="NotifPage">
       {/* Back arrow at top */}
       <header className="notif-header">
         <button className="notif-back" onClick={() => navigate("/settings")}>
-          ←
+          ← Back
         </button>
       </header>
 
@@ -51,5 +53,6 @@ export default function NotificationSettingsPage() {
         </button>
       </div>
     </div>
+    </>
   );
 }
