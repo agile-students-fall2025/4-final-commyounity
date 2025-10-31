@@ -1,3 +1,4 @@
+/* ===== Theme Variables ===== */
 .EditProfilePage {
   --bg: #f7f7f8;
   --text: #1b1b1f;
@@ -14,15 +15,16 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--text);
   background: var(--bg);
+  box-sizing: border-box;
 }
 
-/* remove link underline */
+/* Remove link underline */
 .EditProfilePage a {
   color: inherit;
   text-decoration: none;
 }
 
-/* ===== Header section ===== */
+/* ===== Header Section ===== */
 .edit-header {
   display: flex;
   flex-direction: column;
@@ -46,7 +48,6 @@
   box-shadow: var(--shadow);
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
-
 .edit-back-button:hover {
   transform: translateY(-2px);
   opacity: 0.9;
@@ -58,29 +59,49 @@
   color: #111;
 }
 
-/* ===== Profile picture section ===== */
+/* ===== Profile Photo Section ===== */
 .edit-photo-section {
   display: flex;
   justify-content: center;
   margin-bottom: 36px;
 }
 
-.edit-photo-placeholder {
-  width: 220px;
-  height: 160px;
-  border-radius: 14px;
-  background: #e5e7eb;
-  color: #333;
-  font-size: 1rem;
-  font-weight: 500;
+/* Profile Photo Upload */
+.profile-photo-uploader {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  border: none;
-  box-shadow: var(--shadow);
+  gap: 14px;
 }
 
-/* ===== Form fields ===== */
+/* Avatar Photo */
+.profile-photo {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 3px solid #eee;
+}
+
+/* Upload Button */
+.upload-photo-btn {
+  background: #2f6df6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.25);
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+}
+.upload-photo-btn:hover {
+  background: #2057cc;
+  transform: translateY(-2px);
+}
+
+/* ===== Form Fields ===== */
 .edit-form {
   display: flex;
   flex-direction: column;
@@ -116,7 +137,6 @@
   box-sizing: border-box;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-
 .edit-input:focus,
 .edit-textarea:focus {
   outline: none;
@@ -135,7 +155,7 @@
   text-align: right;
 }
 
-/* ===== Save button ===== */
+/* ===== Save Button ===== */
 .save-wrapper {
   display: flex;
   justify-content: center;
@@ -155,7 +175,6 @@
   box-shadow: var(--shadow);
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
-
 .save-button:hover {
   transform: translateY(-2px);
   opacity: 0.95;
@@ -167,48 +186,48 @@
     padding: 24px 16px 60px;
   }
 
-  .edit-photo-placeholder {
-    width: 100%;
-    max-width: 300px;
+  .edit-header {
+    align-items: center;
+    text-align: center;
   }
 
   .edit-title {
-    text-align: center;
-    width: 100%;
+    font-size: 1.6rem;
+  }
+
+  .edit-photo-section {
+    margin-bottom: 24px;
+  }
+
+  .profile-photo {
+    width: 130px;
+    height: 130px;
+  }
+
+  .upload-photo-btn {
+    font-size: 0.9rem;
+    padding: 10px 16px;
   }
 }
 
-/* Center the image + button and give spacing */
-.profile-photo-uploader{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
+@media (max-width: 450px) {
+  .edit-field {
+    padding: 14px;
+    gap: 6px;
+  }
 
-/* Make it a clean circular avatar (or change to 16px radius if you prefer a rounded rectangle) */
-.profile-photo{
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;         /* circle */
-  object-fit: cover;
-  box-shadow: 0 8px 24px rgba(0,0,0,.08);
-  border: 3px solid #eee;
-}
+  .edit-label {
+    font-size: 0.9rem;
+  }
 
-/* Blue pill button like the rest of the app */
-.upload-photo-btn{
-  background: #2f6df6;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 18px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(47,109,246,.25);
-  transition: transform .15s ease, opacity .15s ease, background .15s ease;
-}
-.upload-photo-btn:hover{
-  background: #2057cc;
-  transform: translateY(-2px);
+  .edit-input,
+  .edit-textarea {
+    font-size: 0.9rem;
+  }
+
+  .save-button {
+    width: 100%;
+    min-width: unset;
+    height: 44px;
+  }
 }
