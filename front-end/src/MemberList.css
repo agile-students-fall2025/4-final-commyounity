@@ -8,30 +8,7 @@
     text-align: center;
   }
   
-  .back-button {
-    background: #000;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 18px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-    transition: all 0.25s ease;
-    display: inline-flex;
-    align-items: center;
-    margin: 20px 0 30px 40px; /* small top and left margin to align under header */
-  }
   
-  .back-button:hover {
-    background: #222;
-    transform: translateY(-2px);
-  }
-  
-  .back-button:active {
-    transform: scale(0.97);
-  }
   .MemberList .member-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

@@ -1,6 +1,7 @@
 import React from "react";
 import "./ProfilePage.css";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -18,20 +19,10 @@ export default function ProfilePage() {
   return (
     <>
     <Header title="Your Profile" />
-    <div className="ProfilePage">
-      {/* ===== Top bar: back button + logo + "Login" ===== */}
-      <header className="profile-header-bar">
-        {/* The back button. Right now it just links to /viewboards as a placeholder. */}
-        <button
-          className="back-button"
-          onClick={() => navigate("/home")}
-        >
+    <Link to="/home" className="back-btn">
           ← Back
-        </button>
-        
-        
-      </header>
-
+    </Link>
+    <div className="ProfilePage">
       {/* ===== User top card: name/handle + profile picture area ===== */}
       <section className="profile-top-card">
         {/* User info block on the left */}

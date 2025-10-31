@@ -88,10 +88,6 @@
   background-color: #f2f2f2;
   color: #111;
 }
-.BoardDetail .buttons .back-button {
-  background-color: #111;
-  color: #fff;
-}
 
 .BoardDetail .buttons button:hover {
   transform: translateY(-2px);

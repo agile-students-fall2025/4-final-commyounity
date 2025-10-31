@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom';
 import axios from 'axios'
 import './EditScreen.css'
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 
 const EditScreen = () => {
+  const { id } = useParams();  
   const [board, setBoard] = useState(null)
   const navigate = useNavigate();
 
@@ -35,9 +38,9 @@ const EditScreen = () => {
 
   return (
     <><Header title="Edit Board" />
-    <button className="back-button" onClick={() => navigate(`/boards/${board.id}`)}>
-        ← Back
-      </button>
+    <Link to={`/boards/${id}`} className="back-btn">
+          ← Back
+    </Link>
     <div className="EditScreen">
       
 
