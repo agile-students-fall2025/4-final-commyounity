@@ -51,16 +51,6 @@ export default function EditProfilePage() {
           />
         </div>
 
-        {/* New Password */}
-        <div className="edit-field">
-          <label className="edit-label">New Password</label>
-          <input
-            className="edit-input"
-            type="password"
-            placeholder="Enter new password"
-          />
-        </div>
-
         {/* About Me */}
         <div className="edit-field">
           <label className="edit-label">About Me:</label>

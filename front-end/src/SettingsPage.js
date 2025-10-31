@@ -21,6 +21,11 @@ export default function SettingsPage() {
         <Link to="/settings/privacy" className="settings-block">
           Profile Privacy
         </Link>
+
+        <Link to="/settings/change-password" className="settings-block">
+          Change Password
+        </Link>
+
       </div>
     </div>
   );
