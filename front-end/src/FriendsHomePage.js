@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FriendsHomePage.css";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const FriendsHomePage = () => {
   const [activeTab, setActiveTab] = useState("friends");
@@ -66,6 +67,7 @@ const FriendsHomePage = () => {
         <div className="friends-content">{renderContent()}</div>
       </div>
     </div>
+    <Footer/>
     </>
   );
 };

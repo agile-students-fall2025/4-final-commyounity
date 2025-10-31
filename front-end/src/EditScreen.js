@@ -3,6 +3,7 @@ import axios from 'axios'
 import './EditScreen.css'
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const EditScreen = () => {
   const [board, setBoard] = useState(null)
@@ -73,6 +74,7 @@ const EditScreen = () => {
         </form>
       </div>
     </div>
+    <Footer />
     </>
   )
 }

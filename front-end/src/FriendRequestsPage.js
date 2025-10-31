@@ -6,6 +6,7 @@ import mockFriends from "./mockFriends";
 import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const FriendRequestsPage = () => {
   const [requests, setRequests] = useState([]);
@@ -228,6 +229,7 @@ const FriendRequestsPage = () => {
         </>
       )}
     </div>
+    <Footer />
     </>
   );
 };

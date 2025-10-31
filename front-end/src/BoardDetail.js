@@ -5,6 +5,7 @@ import './BoardDetail.css';
 import { useNavigate } from "react-router-dom";
 import BoardFeed from "./BoardFeed";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const BoardDetail = () => {
   const { id } = useParams();            
@@ -92,6 +93,7 @@ const BoardDetail = () => {
       </section>
       <BoardFeed boardId={board.id} isOwner={board.isOwner} />
     </div>
+    <Footer />
     </>
   );
 };

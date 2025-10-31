@@ -2,6 +2,7 @@ import "./BrowseBoard.css"
 import BrowseBoardList from "./BrowseBoardList";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const BrowseBoard = () => {
     const navigate = useNavigate();
@@ -19,6 +20,7 @@ const BrowseBoard = () => {
     <div className="browse-board-content">
         <BrowseBoardList /> 
     </div>
+    <Footer />
     </>
 }
 

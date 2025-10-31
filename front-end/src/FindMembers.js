@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./FindMembers.css";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const FindMembers = () => {
   const [query, setQuery] = useState("");
@@ -26,6 +27,7 @@ const FindMembers = () => {
         <button type="submit">Search</button>
       </form>
     </div>
+    <Footer/>
     </>
   );
 };

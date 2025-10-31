@@ -4,7 +4,7 @@ import axios from 'axios';
 import './JoinBoardDetail.css';
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-
+import Footer from "./Footer";
 
 const JoinBoardDetail = () => {
  const { id } = useParams();
@@ -89,6 +89,7 @@ const JoinBoardDetail = () => {
        </article>
      </section>
    </div>
+   <Footer/>
    </>
  );
 };
