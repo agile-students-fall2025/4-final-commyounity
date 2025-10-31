@@ -40,7 +40,9 @@ const EditScreen = () => {
 
   if (!board) return <div>Loading...</div>
 
-  const imageSrc = `https://picsum.photos/800/400?seed=board-${board.id}`;
+  const imageSrc =
+  photoUrl ||
+  `https://picsum.photos/800/400?seed=board-${board.id}`;
 
   return (
     <><Header title="Edit Board" />
