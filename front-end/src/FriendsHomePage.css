@@ -1,36 +1,38 @@
 /* ===== Theme variables for consistency ===== */
 :root {
-    --brand: #2f6df6;
-    --brand-dark: #2057cc;
-    --text: #1b1b1f;
-    --muted: #6b7280;
-    --bg: #f7f7f8;
-    --card: #ffffff;
-    --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    --radius: 16px;
-  }
-  
-  /* ===== Main Container ===== */
-  .FriendsHomePage {
-    max-width: 960px;
-    margin: 80px auto;
-    padding: 12px 24px;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: var(--text);
-    background: var(--bg);
-    text-align: center;
-    position: relative;
-  }
-/* Row that sits directly under the header and aligns with the page */
-.back-btn-row {
-  max-width: 960px;   /* match .FriendsHomePage */
-  display: flex;
-   padding: 0 24px;
-  margin: 8px auto 10px; 
-  justify-content: left;
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #6b7280;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
 }
 
-/* Button look (you can keep what you have; shown for completeness) */
+/* ===== Main Container ===== */
+.FriendsHomePage {
+  max-width: 960px;
+  margin: 80px auto;
+  padding: 24px 24px 100px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  text-align: center;
+  position: relative;
+}
+
+/* ===== Back Button Row (under header) ===== */
+.back-btn-row {
+  max-width: 960px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 12px auto 20px;
+  padding: 0 24px;
+}
+
+/* ===== Back Button Styling ===== */
 .back-home-btn {
   background: #000;
   color: #fff;
@@ -40,74 +42,102 @@
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  transition: all .25s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
-.back-home-btn:hover { background:#222; transform: translateY(-2px); }
-.back-home-btn:active { transform: scale(0.97); }
-  
-  /* ===== Buttons container ===== */
+.back-home-btn:hover {
+  background: #222;
+  transform: translateY(-2px);
+}
+.back-home-btn:active {
+  transform: scale(0.97);
+}
+
+/* ===== Buttons Container ===== */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  margin-top: 50px;
+}
+
+/* ===== Friends Page Buttons ===== */
+.friends-btn {
+  width: 260px;
+  padding: 16px 22px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--brand);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 6px 20px rgba(47, 109, 246, 0.25);
+}
+
+.friends-btn:hover {
+  background: var(--brand-dark);
+  transform: translateY(-2px);
+}
+
+.friends-btn:active {
+  transform: scale(0.98);
+}
+
+.friends-btn.active {
+  background: #1e40af;
+}
+
+/* ===== Accessibility Focus ===== */
+.friends-btn:focus-visible {
+  outline: 3px solid black;
+}
+
+/* ===== Responsive Tweaks ===== */
+@media (max-width: 720px) {
+  .FriendsHomePage {
+    padding: 32px 16px 80px;
+    margin: 40px auto;
+  }
+
+  .back-btn-row {
+    justify-content: center;
+    padding: 0;
+    margin: 16px 0;
+  }
+
+  .back-home-btn {
+    font-size: 0.9rem;
+    padding: 9px 16px;
+    border-radius: 8px;
+  }
+
   .button-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 26px;
-    margin-top: 60px;
+    gap: 20px;
+    margin-top: 40px;
   }
-  
-  /* ===== Friends page buttons ===== */
+
   .friends-btn {
-    width: 260px;
-    padding: 16px 22px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #fff;
-    background: var(--brand);
-    border: none;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    box-shadow: 0 6px 20px rgba(47, 109, 246, 0.25);
+    width: 220px;
+    font-size: 1rem;
+    padding: 14px 18px;
   }
-  
-  .friends-btn:hover {
-    background: var(--brand-dark);
-    transform: translateY(-2px);
+}
+
+/* ===== Ultra-small devices (≤400px) ===== */
+@media (max-width: 400px) {
+  .FriendsHomePage {
+    padding: 24px 12px 70px;
   }
-  
-  .friends-btn:active {
-    transform: scale(0.98);
+
+  .friends-btn {
+    width: 100%;
+    max-width: 280px;
   }
-  
-  .friends-btn.active {
-    background: #1e40af;
-  }
-  
-  /* ===== Optional subtle hover pulse ===== */
-  .friends-btn:focus-visible {
-    outline: 3px solid black;
-  }
-  
-  /* ===== Responsive tweaks ===== */
-  @media (max-width: 720px) {
-    .FriendsHomePage {
-      padding: 32px 16px;
-    }
-  
-    .FriendsHomePage-textLogoText img {
-      width: 120px;
-    }
-  
-    .back-home-btn {
-      font-size: 0.85rem;
-      padding: 8px 14px;
-    }
-  
-    .friends-btn {
-      width: 220px;
-      font-size: 1rem;
-    }
-  }
+}

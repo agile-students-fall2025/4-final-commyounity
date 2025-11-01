@@ -32,6 +32,7 @@ import BrowseBoard from './BrowseBoard';
 import JoinBoardDetail from './JoinBoardDetail';
 
 function App() {
+  console.log("ke", process.env.REACT_APP_KEY)
   return (
     <div className="App">
       <Router>

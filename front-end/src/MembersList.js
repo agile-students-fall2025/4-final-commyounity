@@ -16,8 +16,8 @@ const MembersList = () => {
 
   useEffect(() => {
     axios
-      .get("https://my.api.mockaroo.com/members.json?key=dc8ece40", {
-        headers: { "X-API-Key": "dc8ece40" , Accept: "application/json" },
+      .get(`https://my.api.mockaroo.com/members.json?key=${process.env.REACT_APP_KEY}`, {
+        headers: { "X-API-Key": process.env.REACT_APP_KEY , Accept: "application/json" },
         params: { count: 10 },
       })
       .then((res) => {
