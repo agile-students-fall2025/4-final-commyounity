@@ -1,12 +1,78 @@
+/* ===== Board Thumbnail (Individual Card) ===== */
 .BoardThumb {
-    flex: 1 0 40%; /* shorthand for: flex-grow flex-shrink flex-basis settings */
-    text-align: center;
-    border: 1px solid black;
-    border-left-width: 1px;
-    padding: 40px 0;
+  flex: 1 1 280px; /* flexible but keeps a minimum width */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  text-align: center;
+  padding: 24px 16px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.BoardThumb:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+  border-color: #2f6df6; /* brand color accent */
+}
+
+/* ===== Thumbnail Image ===== */
+.BoardThumb img {
+  width: 100%;
+  max-width: 280px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  transition: transform 0.25s ease;
+}
+
+.BoardThumb:hover img {
+  transform: scale(1.02);
+}
+
+/* ===== Board Title ===== */
+.BoardThumb h2 {
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-weight: 700;
+  color: #111;
+  margin: 8px 0 0;
+}
+
+/* ===== Optional small caption text ===== */
+.BoardThumb p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 6px;
+}
+
+/* ===== Responsive tweaks ===== */
+@media (max-width: 900px) {
+  .BoardThumb {
+    flex: 1 1 45%;
+    padding: 20px 12px;
   }
-  
-  .BoardThumb img,
-  .BoardThumb h2 {
+
+  .BoardThumb img {
+    height: 140px;
   }
-  
+}
+
+@media (max-width: 600px) {
+  .BoardThumb {
+    flex: 1 1 100%;
+    padding: 16px;
+  }
+
+  .BoardThumb img {
+    max-width: 100%;
+    height: 180px;
+  }
+}
