@@ -170,6 +170,28 @@
   font-size: 1rem;
 }
 
+.friendslist-loading,
+.friendslist-error {
+  margin-top: 36px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.friendslist-loading {
+  background: rgba(47, 109, 246, 0.08);
+  color: var(--brand-dark);
+}
+
+.friendslist-error {
+  background: #fdf2f2;
+  color: #b91c1c;
+  border: 1px solid rgba(185, 28, 28, 0.25);
+}
+
 /* ===== Responsive Layout ===== */
 @media (max-width: 768px) {
   .FriendsList {
