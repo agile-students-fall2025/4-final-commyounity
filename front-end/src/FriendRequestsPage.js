@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
-import Logo from "./logo.svg";
-import mockFriends from "./mockFriends";
 import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
@@ -85,18 +83,13 @@ const FriendRequestsPage = () => {
 
     try {
       const stored = window.localStorage.getItem(FRIENDS_STORAGE_KEY);
-      let parsed = mockFriends;
+      let parsed = [];
 
       if (stored) {
         const existing = JSON.parse(stored);
         if (Array.isArray(existing)) {
           parsed = existing;
         }
-      } else {
-        window.localStorage.setItem(
-          FRIENDS_STORAGE_KEY,
-          JSON.stringify(mockFriends)
-        );
       }
 
       const next = updater(parsed);
