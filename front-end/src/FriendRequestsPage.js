@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
-import Logo from "./logo.svg";
-import mockFriends from "./mockFriends";
 import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
@@ -26,11 +24,16 @@ const FriendRequestsPage = () => {
       };
 
       try {
+        const key = process.env.REACT_APP_KEY;
+        if (!key) {
+          throw new Error("REACT_APP_KEY is missing. Please add it to your .env file.");
+        }
+
         const response = await fetch(
-          "https://my.api.mockaroo.com/friends.json?key=dc8ece40&count=6",
+          `https://my.api.mockaroo.com/friends.json?key=${key}&count=6`,
           {
             headers: {
-              "X-API-Key": "dc8ece40",
+              "X-API-Key": key,
               Accept: "application/json",
             },
           }
@@ -85,18 +88,13 @@ const FriendRequestsPage = () => {
 
     try {
       const stored = window.localStorage.getItem(FRIENDS_STORAGE_KEY);
-      let parsed = mockFriends;
+      let parsed = [];
 
       if (stored) {
         const existing = JSON.parse(stored);
         if (Array.isArray(existing)) {
           parsed = existing;
         }
-      } else {
-        window.localStorage.setItem(
-          FRIENDS_STORAGE_KEY,
-          JSON.stringify(mockFriends)
-        );
       }
 
       const next = updater(parsed);
@@ -123,7 +121,9 @@ const FriendRequestsPage = () => {
           first_name: request.first_name,
           last_name: request.last_name,
           username: request.username,
-          avatar: request.avatar,
+          avatar:
+            request.avatar ||
+            `https://picsum.photos/seed/${request.username}/200/200`,
           online: true,
         },
       ];
