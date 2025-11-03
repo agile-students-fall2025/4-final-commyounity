@@ -131,11 +131,114 @@ const FriendsList = () => {
     };
   }, []);
 
-  const handleUnfriend = (friendId) => {
-    setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendId)
-    );
-  };
+  useEffect(() => {
+    let isMounted = true;
+
+    const normalizeFriend = (friend, index) => {
+      const fallbackId = `friend-${Date.now()}-${index}`;
+      const id = friend.id ?? fallbackId;
+      const firstName = friend.first_name ?? friend.firstName ?? "Friend";
+      const lastName = friend.last_name ?? friend.lastName ?? "";
+      const username =
+        friend.username ??
+        friend.handle ??
+        `user-${typeof id === "string" ? id : fallbackId}`;
+
+      return {
+        id,
+        first_name: firstName,
+        last_name: lastName,
+        username,
+        avatar:
+          friend.avatar ??
+          friend.profilePhotoURL ??
+          `https://picsum.photos/seed/${username}/200/200`,
+        online:
+          typeof friend.online === "boolean"
+            ? friend.online
+            : Boolean(friend.isOnline ?? friend.active),
+      };
+    };
+
+    const hydrateFromStorage = () => {
+      if (typeof window === "undefined") {
+        return false;
+      }
+
+      try {
+        const stored = window.localStorage.getItem(FRIENDS_STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            if (isMounted) {
+              setFriends(parsed);
+              setHydrated(true);
+              setError(null);
+            }
+            return true;
+          }
+        }
+      } catch (storageError) {
+        console.warn("Unable to parse stored friends.", storageError);
+      }
+
+      return false;
+    };
+
+    const loadFriends = async () => {
+      try {
+        const response = await fetch(buildFriendsUrl(12), {
+          headers: {
+            Accept: "application/json",
+            "X-API-Key": process.env.REACT_APP_KEY,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Mockaroo responded with status ${response.status}`);
+        }
+
+        const payload = await response.json();
+        const normalized = (Array.isArray(payload) ? payload : [payload]).map(
+          normalizeFriend
+        );
+
+        if (!isMounted) {
+          return;
+        }
+
+        setFriends(normalized);
+        setHydrated(true);
+        setError(null);
+      } catch (fetchError) {
+        if (!isMounted) {
+          return;
+        }
+
+        console.warn("Unable to load friends from Mockaroo.", fetchError);
+        setFriends(FALLBACK_FRIENDS);
+        setHydrated(false);
+        setError(
+          "Showing a few sample friends while the live mock API is unavailable."
+        );
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    const alreadyHydrated = hydrateFromStorage();
+    if (alreadyHydrated) {
+      setLoading(false);
+    } else {
+      loadFriends();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!hydrated || typeof window === "undefined") {
@@ -147,8 +250,8 @@ const FriendsList = () => {
         FRIENDS_STORAGE_KEY,
         JSON.stringify(friends)
       );
-    } catch (error) {
-      console.warn("Unable to persist friends list.", error);
+    } catch (storageError) {
+      console.warn("Unable to persist friends list.", storageError);
     }
   }, [friends, hydrated]);
 

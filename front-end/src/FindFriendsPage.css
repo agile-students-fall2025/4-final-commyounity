@@ -23,60 +23,7 @@
   box-sizing: border-box;
 }
 
-/* ===== Header (Logo + Back) ===== */
-.findfriends-header {
-  display: flex;
-  flex-direction: column;         /* stack logo over back */
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.findfriends-logo img {
-  width: 200px;
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.1));
-}
-
-/* Back button under the logo, brand-styled */
-.findfriends-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
-  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.25);
-}
-.findfriends-back:hover { background: var(--brand-dark); transform: translateY(-2px); }
-.findfriends-back:active { transform: scale(0.98); }
-.findfriends-back:focus-visible {
-  outline: 3px solid rgba(47, 109, 246, 0.35);
-  outline-offset: 2px;
-}
-
-/* Optional page title / subtitle */
-.findfriends-title {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #111;
-  margin: 8px 0 4px;
-}
-.findfriends-subtitle {
-  color: var(--muted);
-  font-size: 0.98rem;
-  margin-bottom: 8px;
-}
+/* Back buttons across friends flows share .back-btn styles from FriendsListPage.css */
 
 /* ===== Search Card ===== */
 .findfriends-search {
@@ -141,6 +88,7 @@
 .findfriends-demo-card.success { color: #1e9c5e; }
 .findfriends-demo-card.info    { color: #2563eb; }
 .findfriends-demo-card.error   { color: #dc2626; }
+.findfriends-demo-card.neutral { color: var(--brand-dark); }
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
