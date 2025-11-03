@@ -5,7 +5,6 @@ import FriendThumb from "./FriendThumb";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
-import { fetchFriends } from "./api/friendsApi";
 
 const FALLBACK_FRIENDS = [
   {
@@ -34,6 +33,20 @@ const FALLBACK_FRIENDS = [
   },
 ];
 
+const buildFriendsUrl = (count = 12) => {
+  const key = process.env.REACT_APP_KEY;
+  if (!key) {
+    throw new Error("REACT_APP_KEY is missing. Please add it to your .env file.");
+  }
+
+  const params = new URLSearchParams({
+    key,
+    count: String(count),
+  });
+
+  return `https://my.api.mockaroo.com/friends.json?${params.toString()}`;
+};
+
 const FriendsList = () => {
   const [friends, setFriends] = useState([]);
   const navigate = useNavigate();
@@ -42,94 +55,6 @@ const FriendsList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    // Normalize API payload so the UI always has the fields it expects.
-    const normalizeFriend = (friend, index) => {
-      const fallbackId = `friend-${Date.now()}-${index}`;
-      const id = friend.id ?? fallbackId;
-      const firstName = friend.first_name ?? friend.firstName ?? "Friend";
-      const lastName = friend.last_name ?? friend.lastName ?? "";
-      const username =
-        friend.username ??
-        friend.handle ??
-        `user-${typeof id === "string" ? id : fallbackId}`;
-
-      return {
-        id,
-        first_name: firstName,
-        last_name: lastName,
-        username,
-        avatar:
-          friend.avatar ??
-          friend.profilePhotoURL ??
-          `https://picsum.photos/seed/${username}/200/200`,
-        online:
-          typeof friend.online === "boolean"
-            ? friend.online
-            : Boolean(friend.isOnline ?? friend.active),
-      };
-    };
-
-    // Attempt to read an existing list from localStorage before hitting Mockaroo.
-    const hydrateFromStorage = () => {
-      if (typeof window === "undefined") {
-        return false;
-      }
-
-      try {
-        const stored = window.localStorage.getItem(FRIENDS_STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed)) {
-            if (isMounted) {
-              setFriends(parsed);
-              setHydrated(true);
-              setLoading(false);
-            }
-            return true;
-          }
-        }
-      } catch (storageError) {
-        console.warn("Unable to parse stored friends.", storageError);
-      }
-
-      return false;
-    };
-
-    const loadFriends = async () => {
-      try {
-        const fetched = await fetchFriends();
-        if (!isMounted) {
-          return;
-        }
-        const normalized = fetched.map(normalizeFriend);
-        setFriends(normalized);
-        setHydrated(true);
-        setLoading(false);
-      } catch (fetchError) {
-        if (!isMounted) {
-          return;
-        }
-        console.warn("Unable to load friends from Mockaroo.", fetchError);
-        setFriends(FALLBACK_FRIENDS);
-        setHydrated(false);
-        setError(null);
-        setLoading(false);
-      }
-    };
-
-    const alreadyHydrated = hydrateFromStorage();
-    if (!alreadyHydrated) {
-      loadFriends();
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -255,6 +180,12 @@ const FriendsList = () => {
     }
   }, [friends, hydrated]);
 
+  const handleUnfriend = (friendId) => {
+    setFriends((prevFriends) =>
+      prevFriends.filter((friend) => friend.id !== friendId)
+    );
+  };
+
   const filteredFriends = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
@@ -305,9 +236,7 @@ const FriendsList = () => {
       )}
 
       {loading ? (
-        <div className="friendslist-loading">
-          Loading your friends…
-        </div>
+        <div className="friendslist-loading">Loading your friends…</div>
       ) : error ? (
         <div className="friendslist-error" role="alert">
           {error}
