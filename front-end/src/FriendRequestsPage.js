@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
-import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
+// import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
