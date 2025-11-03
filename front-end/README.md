@@ -64,7 +64,32 @@ cd front-end
 npm install
 ```
 
-### 3. Run the development server
+### 3. Configure environment variables
+
+The application requires a Mockaroo API key to fetch mock data. You need to create a `.env` file in the `front-end` directory.
+
+1. Create a `.env` file in the `front-end` directory:
+
+```bash
+# In the front-end directory
+touch .env
+```
+
+2. Add your Mockaroo API key to the `.env` file:
+
+```env
+REACT_APP_KEY=your_mockaroo_api_key_here
+```
+
+**How to get a Mockaroo API key:**
+- Visit [Mockaroo](https://www.mockaroo.com/)
+- Sign up for a free account (allows 200 requests per day)
+- Go to your account settings to find your API key
+- Copy the API key and paste it into your `.env` file
+
+**Note:** The `.env` file is already included in `.gitignore` and will not be committed to version control for security reasons.
+
+### 4. Run the development server
 
 ```bash
 npm start

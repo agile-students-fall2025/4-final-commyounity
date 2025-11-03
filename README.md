@@ -130,3 +130,57 @@ The MVP will focus on enabling users to sign up/log in, join or create CommYOUni
 This project was designed by interational students for internstional students. We have noticed that most international students have a hard time when they first move abroad for their studies. To ease this transition, we cam up wit CommYOUnity - an app that can bring "home" closer. 
 
 If you wish to contibute to this project, please visit the [CONTRIBUTING.md](./CONTRIBUTING.md) document.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher recommended)
+- npm (comes with Node.js)
+- A Mockaroo API key (free account available at [mockaroo.com](https://www.mockaroo.com/))
+
+### Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/agile-students-fall2025/4-final-commyounity.git
+   cd 4-final-commyounity
+   ```
+
+2. **Set up the front-end**
+   ```bash
+   cd front-end
+   npm install
+   ```
+
+3. **Configure environment variables**
+   - Copy `.env.example` to `.env` in the `front-end` directory
+   - Add your Mockaroo API key to the `.env` file:
+     ```env
+     REACT_APP_KEY=your_mockaroo_api_key_here
+     ```
+
+4. **Run the front-end development server**
+   ```bash
+   npm start
+   ```
+   The app will open at [http://localhost:3000](http://localhost:3000)
+
+For detailed setup instructions, please refer to the [front-end README](./front-end/README.md).
+
+---
+
+## Project Structure
+
+```
+4-final-commyounity/
+├── front-end/          # React.js front-end application
+│   ├── src/            # Source code
+│   ├── public/         # Public assets
+│   └── README.md       # Front-end setup instructions
+├── back-end/           # Express.js back-end (Sprint 2)
+├── ux-design/          # Wireframes and prototypes
+└── README.md           # This file
+```
