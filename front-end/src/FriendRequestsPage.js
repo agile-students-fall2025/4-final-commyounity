@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
+import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -93,9 +94,7 @@ const FriendRequestsPage = () => {
       try {
         const key = process.env.REACT_APP_KEY;
         if (!key) {
-          throw new Error(
-            "REACT_APP_KEY is missing. Please add it to your .env file."
-          );
+          throw new Error("REACT_APP_KEY is missing. Please add it to your .env file.");
         }
 
         const response = await fetch(
