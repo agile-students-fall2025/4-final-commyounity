@@ -57,6 +57,63 @@ const enrichBoard = (b) => {
 
   //GET
 
+  // Homepage route - get data from Mockaroo
+  app.get("/api/home", async (req, res) => {
+    try {
+      // Fetch boards data from Mockaroo to calculate homepage stats
+      const response = await axios.get(MOCKAROO_URL);
+      const boards = Array.isArray(response.data) ? response.data : [];
+      
+      // Calculate stats from Mockaroo data
+      const totalBoards = boards.length;
+      const activeCommunities = boards.filter(b => b.isJoined === true || b.isJoined === "true").length;
+      
+      // Get recent activity from boards data
+      const recentActivity = boards.slice(0, 3).map(board => ({
+        type: "board_joined",
+        message: `You joined '${board.title || "Community Board"}'`,
+        timestamp: new Date().toISOString()
+      }));
+      
+      const homeData = {
+        welcomeMessage: "Welcome to CommYOUnity",
+        userStats: {
+          totalBoards: totalBoards,
+          totalFriends: 12, 
+          activeCommunities: activeCommunities
+        },
+        recentActivity: recentActivity.length > 0 ? recentActivity : [
+          {
+            type: "board_joined",
+            message: "Welcome to CommYOUnity!",
+            timestamp: new Date().toISOString()
+          }
+        ]
+      };
+      
+      res.json({ data: homeData });
+    } catch (err) {
+      console.warn("Mockaroo failed for homepage, using fallback data.");
+      // Fallback data
+      const fallbackData = {
+        welcomeMessage: "Welcome to CommYOUnity",
+        userStats: {
+          totalBoards: fallbackBoards.length,
+          totalFriends: 12,
+          activeCommunities: fallbackBoards.filter(b => b.isJoined).length
+        },
+        recentActivity: [
+          {
+            type: "board_joined",
+            message: `You joined '${fallbackBoards[0]?.title || "Community Board"}'`,
+            timestamp: new Date().toISOString()
+          }
+        ]
+      };
+      res.json({ data: fallbackData });
+    }
+  });
+
   //get mock boards for viewBoards
   app.get("/api/boards", async (req, res) => {
     try {
