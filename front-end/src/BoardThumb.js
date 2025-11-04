@@ -4,8 +4,7 @@ import './BoardThumb.css'
 
 
 const BoardThumb = ({ details }) => {
-  const imgSrc = `https://picsum.photos/200?id=${details.id}` 
-
+ 
   const linkPath =
   details.isOwner || details.isJoined
     ? `/boards/${details.id}`    
@@ -16,7 +15,7 @@ const BoardThumb = ({ details }) => {
     
     <article className="BoardThumb">
       <Link to={linkPath}>
-        <img alt={details.title} src={imgSrc} />
+        <img alt={details.title} src={details.coverPhotoURL} />
         <h2>{details.title}</h2>
       </Link>
     </article>

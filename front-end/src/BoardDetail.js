@@ -12,34 +12,22 @@ const BoardDetail = () => {
   const { id } = useParams();            
   const [board, setBoard] = useState(null);
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get('https://my.api.mockaroo.com/mock_boards_data.json', {
-      headers: { 'X-API-Key': process.env.REACT_APP_KEY, Accept: 'application/json' },
-      params: { count: 50 }            
-    })
+    let mounted = true;
+    axios.get(`http://localhost:3000/api/boards/${id}`)
     .then(res => {
-      const list = Array.isArray(res.data) ? res.data : [res.data];
-      const found = list.find(item => String(item.id) === String(id));
-      setBoard(found || list[0]);       
+      if (!mounted) return;
+      setBoard(res.data?.data || null);
     })
     .catch(err => {
-      console.error('Mockaroo error:', err);
-      setBoard({
-        id: 1,
-        title: 'Your Cool Board',
-        memberCount: 10,
-        isOwner: true,
-        coverPhotoURL: 'https://picsum.photos/800/400?seed=fallback',
-        descriptionLong:
-          'Fallback description: sample long text about this board.',
-      });
+      console.error('Backend error:', err);
+      setError('Could not load this board.');
     });
   }, [id]);
 
   if (!board) return <div>Loading…</div>;
-
-  const imageSrc = `https://picsum.photos/800/400?seed=board-${board.id}`;
 
   const description =board.descriptionLong;
 
@@ -51,7 +39,7 @@ const BoardDetail = () => {
     <div className="BoardDetail">
       <section className="main-content">
         <article className="board" key={board.id}>
-          <img alt={board.title} src={imageSrc} className="board-image" />
+          <img alt={board.title} src={board.coverPhotoURL} className="board-image" />
           <div className="details">
             <p className="description">{description}</p>
             <p><strong>Members:</strong> {board.memberCount}</p>
