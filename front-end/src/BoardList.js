@@ -8,49 +8,19 @@ import BoardThumb from './BoardThumb'
 const BoardList = props => {
   // start a state varaible with a blank array
   const [data, setData] = useState([])
+  const [error, setError] = useState(null)
   // the following side-effect will be called once upon initial render
   useEffect(() => {
     // fetch some mock data about animals for sale
     console.log('fetching 10 random boards...')
-    axios(`https://my.api.mockaroo.com/mock_boards_data.json?key=${process.env.REACT_APP_KEY}`)
+    axios('http://localhost:3000/api/boards')
       .then(response => {
         // extract the data from the server response
-        setData(response.data)
+        setData(response.data.data)
       })
       .catch(err => {
-        // Mockaroo, which we're using for our Mock API, only allows 200 requests per day on the free plan
-        console.log(`Sorry, buster.  No more requests allowed today!`)
-        console.error(err) // the server returned an error... probably too many requests... until we pay!
-
-        // make some backup fake data
-        const backupData = [
-          {
-            id: 1,
-            title: 'Your Cool Boards',
-            isOwner: true,
-            isJoined:true, 
-            memberCount: 10,
-            coverPhotoURL: 'http://dummyimage.com/236x100.png/cc0000/ffffff',
-            descriptionShort:
-              'purus eu magna vulputate luctus cum sociis natoque penatibus et magnis',
-            descriptionLong:
-                'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
-          },
-          {
-            id: 2,
-            title: 'Not Your Cool Boards',
-            isOwner: false,
-            isJoined: true, 
-            memberCount: 10,
-            coverPhotoURL: 'http://dummyimage.com/236x100.png/cc0000/ffffff',
-            descriptionShort:
-              'purus eu magna vulputate luctus cum sociis natoque penatibus et magnis',
-            descriptionLong:
-                'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
-          },
-        ]
-
-        setData(backupData)
+        console.error('Backend request failed:', err)
+        setError('Could not load boards.')
       })
   }, []) // only run it once!
 
