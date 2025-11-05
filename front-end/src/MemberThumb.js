@@ -3,11 +3,10 @@ import './MemberThumb.css'
 
 
 const MemberThumb = props => {
-  const imgSrc = props.details.avatar || `https://i.pravatar.cc/100?u=${props.details.id}`
-
+  
   return (
     <article className="MemberThumb">
-        <img alt={`${props.details.first_name} ${props.details.last_name}`} src={imgSrc} />
+        <img alt={`${props.details.first_name} ${props.details.last_name}`} src={props.details.avatar} />
         <h2>{props.details.first_name} {props.details.last_name}</h2>
         <div className="username">@{props.details.username}</div>
         <div className="country">From: {props.details.country}</div>

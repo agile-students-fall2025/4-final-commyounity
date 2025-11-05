@@ -6,46 +6,26 @@ import MemberThumb from "./MemberThumb";
 import { useLocation } from 'react-router-dom';
 import Header from "./Header";
 import Footer from "./Footer";
-import { Link } from 'react-router-dom';
+
 
 const MembersList = () => {
   const { id } = useParams();
   const { state } = useLocation();
-  const [members, setMembers] = useState([]);
   const canKick = !!(state && state.isBoardOwner);
+  const [data, setData] = useState([])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    axios
-      .get(`https://my.api.mockaroo.com/members.json?key=${process.env.REACT_APP_KEY}`, {
-        headers: { "X-API-Key": process.env.REACT_APP_KEY , Accept: "application/json" },
-        params: { count: 10 },
+    
+    axios('http://localhost:3000/api/members')
+      .then(response => {
+        // extract the data from the server response
+        setData(response.data.data)
       })
-      .then((res) => {
-        setMembers(Array.isArray(res.data) ? res.data : [res.data]);
+      .catch(err => {
+        console.error('Backend request failed:', err)
+        setError('Could not load boards.')
       })
-      .catch((err) => {
-        console.error("Mockaroo limit reached, using backup data:", err);
-        setMembers([
-          {
-            id: 1,
-            first_name: "Sherwin",
-            last_name: "Peverell",
-            username: "speverell0",
-            country: "Indonesia",
-            description: "non velit nec nisi vulputate",
-            avatar: "https://i.pravatar.cc/100?img=1",
-          },
-          {
-            id: 2,
-            first_name: "Anna",
-            last_name: "Petrova",
-            username: "apetrova",
-            country: "Russia",
-            description: "non velit nec nisi vulputate",
-            avatar: "https://i.pravatar.cc/100?img=2",
-          },
-        ]);
-      });
   }, [id]);
   const handleBack = () => {
     window.history.back();
@@ -59,7 +39,7 @@ const MembersList = () => {
     </button>
     <div className="MemberList">
       <section className="member-grid">
-        {members.map((member) => (
+        {data.map((member) => (
           <MemberThumb key={member.id} details={member} canKick={canKick} />
         ))}
       </section>
