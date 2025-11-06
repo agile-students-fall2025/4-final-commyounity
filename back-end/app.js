@@ -37,8 +37,30 @@ const fallbackBoards = [
       }
   ];
 
+  const fallbackMembers = [
+    {
+      id: 1,
+      first_name: "Sherwin",
+      last_name: "Peverell",
+      username: "speverell0",
+      country: "Indonesia",
+      description: "non velit nec nisi vulputate",
+      avatar: "https://i.pravatar.cc/100?img=1",
+    },
+    {
+      id: 2,
+      first_name: "Anna",
+      last_name: "Petrova",
+      username: "apetrova",
+      country: "Russia",
+      description: "non velit nec nisi vulputate",
+      avatar: "https://i.pravatar.cc/100?img=2",
+    },
+  ];
+
   //mockaroo api - for now no env
   const MOCKAROO_URL = "https://my.api.mockaroo.com/mock_boards_data.json?key=dc8ece40";
+  const MOCKAROO_URL_MEMBERS = 'https://my.api.mockaroo.com/members.json?key=dc8ece40';
 
 //mock photos for boards
 const picsumUrl = (id, w = 800, h = 400) => `https://picsum.photos/${w}/${h}?seed=board-${id}`;
@@ -51,12 +73,36 @@ const enrichBoard = (b) => {
     coverPhotoURL: picsumUrl(id, 800, 400),
   };
 };
+//mock photos for members
+const avatarUrl = (id) => `https://i.pravatar.cc/100?img=${id}`;
 
-
+const enrichMember = (b) => {
+  if (!b || typeof b !== "object") return b;
+  const id = String(b.id ?? "").trim() || "unknown";
+  return {
+    ...b,
+    avatar: avatarUrl(id),
+  };
+};
   //ROUTES
 
   //GET
 
+  //get mock members
+  app.get("/api/members", async (req, res) => {
+    try {
+      const response = await axios.get(MOCKAROO_URL_MEMBERS);
+      console.log("Data loaded from Mockaroo");
+      const members = Array.isArray(response.data) ? response.data : [];
+      const enriched = members.map(enrichMember);
+      res.json({ data: enriched });
+    } catch (err) {
+      console.warn("Mockaroo failed, using fallback data instead.");
+      res.json({ data: fallbackMembers });
+    }
+  });
+
+  //get mock boards
   // Homepage route - get data from Mockaroo
   app.get("/api/home", async (req, res) => {
     try {
