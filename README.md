@@ -149,24 +149,46 @@ If you wish to contibute to this project, please visit the [CONTRIBUTING.md](./C
    cd 4-final-commyounity
    ```
 
-2. **Set up the front-end**
+2. **Set up the back-end**
+   ```bash
+   cd back-end
+   npm install
+   ```
+
+3. **Configure back-end environment variables (optional)**
+   - Create a `.env` file in the `back-end` directory (optional, API key is currently hardcoded):
+     ```env
+     MOCKAROO_API_KEY=your key
+     PORT=3000
+     ```
+   - Get your free Mockaroo API key from [mockaroo.com](https://www.mockaroo.com/)
+
+4. **Start the back-end server**
+   ```bash
+   npm start
+   ```
+   The server will run on [http://localhost:3000](http://localhost:3000)
+   
+   Or use `npm run dev` for development with auto-reload (if nodemon is installed).
+
+5. **Set up the front-end** (in a new terminal window)
    ```bash
    cd front-end
    npm install
    ```
 
-3. **Configure environment variables**
-   - Copy `.env.example` to `.env` in the `front-end` directory
+6. **Configure front-end environment variables**
+   - Create a `.env` file in the `front-end` directory
    - Add your Mockaroo API key to the `.env` file:
      ```env
      REACT_APP_KEY=your_mockaroo_api_key_here
      ```
 
-4. **Run the front-end development server**
+7. **Run the front-end development server**
    ```bash
    npm start
    ```
-   The app will open at [http://localhost:3000](http://localhost:3000)
+   The app will open at [http://localhost:3001](http://localhost:3001) (or another available port)
 
 For detailed setup instructions, please refer to the [front-end README](./front-end/README.md).
 
@@ -181,6 +203,35 @@ For detailed setup instructions, please refer to the [front-end README](./front-
 │   ├── public/         # Public assets
 │   └── README.md       # Front-end setup instructions
 ├── back-end/           # Express.js back-end (Sprint 2)
+│   ├── app.js          # Express application and routes
+│   ├── server.js       # Server entry point
+│   └── package.json    # Back-end dependencies
 ├── ux-design/          # Wireframes and prototypes
 └── README.md           # This file
 ```
+
+## Back-End API Endpoints
+
+The back-end provides the following API endpoints:
+
+### Boards
+- `GET /api/boards` - Get all boards
+- `GET /api/boards/:id` - Get a single board by ID
+
+### Authentication
+- `POST /api/auth/signup` - Sign up a new user
+  - Body: `{ username, email, password, confirmPassword }`
+- `POST /api/auth/login` - Login user
+  - Body: `{ username, password }` (username can be email or username)
+- `GET /api/user/me` - Get current user information
+
+All API routes return JSON responses in the format:
+- Success: `{ data: {...} }` or `{ message: "...", data: {...} }`
+- Error: `{ error: "error message" }`
+
+## Development Notes
+
+- The back-end uses Mockaroo for mock data when available, with fallback hardcoded data
+- User authentication is currently mocked (in-memory storage) and does not persist between server restarts
+- All routes are configured with CORS to allow front-end requests
+- API keys and credentials should be stored in `.env` files and never committed to version control
