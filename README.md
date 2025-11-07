@@ -229,6 +229,36 @@ All API routes return JSON responses in the format:
 - Success: `{ data: {...} }` or `{ message: "...", data: {...} }`
 - Error: `{ error: "error message" }`
 
+# API Documentation
+
+## Endpoints
+
+### 1. Get Members
+- **URL**: `/api/members`
+- **Method**: GET
+- **Description**: Fetches a list of members.
+
+### 2. Get Boards
+- **URL**: `/api/boards`
+- **Method**: GET
+- **Description**: Fetches a list of boards.
+
+### 3. Login
+- **URL**: `/api/auth/login`
+- **Method**: POST
+- **Description**: Authenticates a user.
+
+### 4. Signup
+- **URL**: `/api/auth/signup`
+- **Method**: POST
+- **Description**: Registers a new user.
+
+---
+
+## Notes
+- Replace `mock-jwt-token` with a real JWT token in production.
+- Ensure `.env` files are used to store sensitive information like API keys.
+
 ## Development Notes
 
 - The back-end uses Mockaroo for mock data when available, with fallback hardcoded data
