@@ -308,7 +308,30 @@ app.post('/api/boards/:id/leave', (req, res) => {
   });
 });
 
+// invite friend to board
 
+app.post('/api/boards/:id/invite', (req, res) => {
+  const { id } = req.params;
+  const { friendId } = req.body;
+
+  if (!friendId) {
+    return res.status(400).json({ status: 'error', message: 'friendId is required' });
+  }
+
+  console.log('[INVITE]', {
+    boardId: id,
+    friendId,
+    at: new Date().toISOString(),
+  });
+
+  return res.status(202).json({
+    status: 'received',
+    boardId: id,
+    friendId,
+    message: 'Invite recorded (mock).',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 
 

@@ -1,7 +1,8 @@
 import React from "react";
 import "./FriendThumb.css";
+import axios from "axios";
 
-const FriendThumb = ({ details, variant = "card", onUnfriend }) => {
+const FriendThumb = ({ details, boardId, variant = "card", onUnfriend, onInvite }) => {
   const imgSrc =
     details.avatar || `https://i.pravatar.cc/100?u=${details.id}`;
   const isOnline = Boolean(details.online);
@@ -16,6 +17,25 @@ const FriendThumb = ({ details, variant = "card", onUnfriend }) => {
       }
     }
   };
+
+  const handleInviteClick = async () => {
+    try {
+      console.log(`[FRONTEND] Inviting ${details.first_name}...`);
+      const response = await axios.post(
+        `http://localhost:3000/api/boards/${boardId}/invite`, 
+        { friendId: details.id }
+      );
+
+      console.log("Backend response:", response.data);
+      alert(`Invite sent to ${details.first_name}! (Backend received it)`);
+      
+      if (typeof onInvite === "function") onInvite(details.id);
+    } catch (err) {
+      console.error("Invite failed:", err);
+      alert("Invite failed — check backend console/logs.");
+    }
+  };
+
 
   return (
     <article
@@ -57,12 +77,7 @@ const FriendThumb = ({ details, variant = "card", onUnfriend }) => {
             </button>
           </>
         ) : (
-          <button
-            className="invite-button"
-            onClick={() =>
-              alert(`You just invited ${details.first_name} (pretend)!`)
-            }
-          >
+          <button className="invite-button" onClick={handleInviteClick}>
             Invite Member
           </button>
         )}
