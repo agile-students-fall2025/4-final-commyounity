@@ -17,6 +17,7 @@ const BoardDetail = () => {
 
   useEffect(() => {
     let mounted = true;
+    console.log('fetching...')
     axios.get(`http://localhost:3000/api/boards/${id}`)
     .then(res => {
       if (!mounted) return;
