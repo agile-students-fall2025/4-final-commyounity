@@ -192,7 +192,9 @@ const enrichMember = (b) => {
     }
   });
 
-// POST for board edit
+// POST 
+
+//edit form
 
 //multer
 
@@ -234,6 +236,27 @@ app.post('/api/boards/:id/edit', upload.single('photo'), (req, res) => {
       photo: fileMeta,
     },
     updatedAt: new Date().toISOString(),
+  });
+});
+
+//leave board button
+
+app.post('/api/boards/:id/leave', (req, res) => {
+  const { id } = req.params;
+
+  console.log('[LEAVE BOARD]', {
+    boardId: id,
+  });
+
+  return res.status(202).json({
+    status: 'received',
+    boardId: id,
+    message: 'User left the board (mock).',
+    updated: {
+      isJoined: false,
+      memberCountDelta: -1, 
+    },
+    timestamp: new Date().toISOString(),
   });
 });
 

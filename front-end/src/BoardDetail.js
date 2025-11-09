@@ -13,6 +13,7 @@ const BoardDetail = () => {
   const [board, setBoard] = useState(null);
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -26,6 +27,24 @@ const BoardDetail = () => {
       setError('Could not load this board.');
     });
   }, [id]);
+
+  const handleLeaveBoard = async () => {
+    if (leaving) return; 
+    setLeaving(true);
+    try {
+      const response = await axios.post(`http://localhost:3000/api/boards/${id}/leave`);
+      console.log("Leave request acknowledged by backend:", response.data);
+
+      alert("You have left this board! (mock confirmation from backend)");
+
+      navigate("/viewboards");
+    } catch (error) {
+      console.error(" Leave board failed:", error);
+      alert("Could not communicate with backend. Check console for details.");
+    } finally {
+      setLeaving(false);
+    }
+  };
 
   if (!board) return <div>Loading…</div>;
 
@@ -68,14 +87,12 @@ const BoardDetail = () => {
               </button>
             )}
             <button
-              className="leave-button"
-              onClick={() => {
-                alert("You are leaving this board! (pretend)");
-                navigate("/viewboards");
-              }}
-            >
-              Leave Board
-            </button>
+                  className="leave-button"
+                  onClick={handleLeaveBoard}   
+                  disabled={leaving}          
+                >
+                  {leaving ? "Leaving…" : "Leave Board"}
+                </button>
           </div>
           </div>
         </article>
