@@ -13,50 +13,18 @@ const InviteFriendsList = () => {
   const [friends, setFriends] = useState([]);
 
   useEffect(() => {
+    console.log('fetching friends...')
     axios
-      .get(`https://my.api.mockaroo.com/friends.json?key= ${process.env.REACT_APP_KEY}`, {
-        headers: { "X-API-Key": process.env.REACT_APP_KEY, Accept: "application/json" },
-        params: { count: 10 },
-      })
+      .get("http://localhost:3000/api/friends")
       .then((res) => {
-        setFriends(Array.isArray(res.data) ? res.data : [res.data]);
+        setFriends(Array.isArray(res.data.data) ? res.data.data : []);
       })
       .catch((err) => {
-        console.error("Mockaroo limit reached, using backup data:", err);
-        // setFriends(mockFriends);
-        const fallbackFriends = [
-          {
-            id: 1,
-            first_name: "Emma",
-            last_name: "Chen",
-            username: "emma_chen",
-            mutualCount: 12,
-            profilePhotoURL: "https://picsum.photos/seed/emma/200/200",
-            bio: "Loves art museums, matcha lattes, and weekend hikes 🌿",
-            online: true,
-          },
-          {
-            id: 2,
-            first_name: "Liam",
-            last_name: "Patel",
-            username: "liam.codes",
-            mutualCount: 8,
-            profilePhotoURL: "https://picsum.photos/seed/liam/200/200",
-            online: false,
-          },
-          {
-            id: 3,
-            first_name: "Sofia",
-            last_name: "Reyes",
-            username: "sofiareyes",
-            mutualCount: 5,
-            profilePhotoURL: "https://picsum.photos/seed/sofia/200/200",
-            online: true,
-          },
-        ];
-        setFriends(fallbackFriends);
+        console.error("Backend request failed:", err);
+        setFriends([]); // fallback handled by backend now
       });
   }, [id]);
+
   const handleBack = () => {
     window.history.back();
   };

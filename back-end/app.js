@@ -192,6 +192,54 @@ const enrichMember = (b) => {
     }
   });
 
+  //get mock data for invite firends
+  app.get("/api/friends", async (req, res) => {
+    try {
+      const MOCKAROO_URL_FRIENDS = "https://my.api.mockaroo.com/friends.json?key=dc8ece40";
+      const response = await axios.get(MOCKAROO_URL_FRIENDS, {
+        params: { count: 10 },
+      });
+  
+      console.log("Data loaded from Mockaroo (friends)");
+      const friends = Array.isArray(response.data) ? response.data : [];
+      const enriched = friends.map(enrichMember);
+      res.json({ data: enriched });
+    } catch (err) {
+      console.warn("Mockaroo failed for friends, using fallback data.");
+      const fallbackFriends = [
+        {
+          id: 1,
+          first_name: "Emma",
+          last_name: "Chen",
+          username: "emma_chen",
+          mutualCount: 12,
+          profilePhotoURL: "https://picsum.photos/seed/emma/200/200",
+          bio: "Loves art museums, matcha lattes, and weekend hikes 🌿",
+          online: true,
+        },
+        {
+          id: 2,
+          first_name: "Liam",
+          last_name: "Patel",
+          username: "liam.codes",
+          mutualCount: 8,
+          profilePhotoURL: "https://picsum.photos/seed/liam/200/200",
+          online: false,
+        },
+        {
+          id: 3,
+          first_name: "Sofia",
+          last_name: "Reyes",
+          username: "sofiareyes",
+          mutualCount: 5,
+          profilePhotoURL: "https://picsum.photos/seed/sofia/200/200",
+          online: true,
+        },
+      ];
+      res.json({ data: fallbackFriends });
+    }
+  });
+
 // POST 
 
 //edit form
@@ -259,6 +307,14 @@ app.post('/api/boards/:id/leave', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+
+
+
+
+
+//code might below be bad (shouldn't have been merged)... 
+//double-check this pls - Carina
 
 // Authentication Routes
 
