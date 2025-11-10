@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams} from "react-router-dom";
 import axios from "axios";
 import "./MemberList.css";
 import MemberThumb from "./MemberThumb";
@@ -14,7 +14,8 @@ const MembersList = () => {
   const canKick = !!(state && state.isBoardOwner);
   const [data, setData] = useState([])
   const [error, setError] = useState(null)
-
+  const initialBoardId = state?.boardId ?? id;           
+  const [memberCount, setMemberCount] = useState(state?.memberCount); 
   useEffect(() => {
     
     axios('http://localhost:3000/api/members')
@@ -40,7 +41,13 @@ const MembersList = () => {
     <div className="MemberList">
       <section className="member-grid">
         {data.map((member) => (
-          <MemberThumb key={member.id} details={member} canKick={canKick} />
+         <MemberThumb
+         key={member.id}
+         details={member}
+         canKick={canKick}
+         boardId={initialBoardId}
+         memberCount={memberCount}
+       />
         ))}
       </section>
     </div>
