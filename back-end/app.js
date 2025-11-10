@@ -2,6 +2,7 @@
 const express = require("express") // CommonJS import style!
 const axios = require("axios"); 
 const cors = require("cors");
+const multer = require('multer');
 
 const app = express() // instantiate an Express object
 app.use(cors());
@@ -190,6 +191,51 @@ const enrichMember = (b) => {
       res.json({ data: board });
     }
   });
+
+// POST for board edit
+
+//multer
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (file && !file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only image uploads are allowed'));
+    }
+    cb(null, true);
+  },
+});
+
+app.post('/api/boards/:id/edit', upload.single('photo'), (req, res) => {
+  const { id } = req.params;
+  const { title, descriptionLong } = req.body;
+
+  const fileMeta = req.file
+    ? {
+        filename: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      }
+    : null;
+
+  console.log('[BOARD EDIT RECEIVED]', {
+    boardId: id,
+    title,
+    descriptionLong,
+    file: fileMeta || '(no file)',
+  });
+
+  return res.status(202).json({
+    status: 'received',
+    boardId: id,
+    received: {
+      title: title ?? null,
+      descriptionLong: descriptionLong ?? null,
+      photo: fileMeta,
+    },
+    updatedAt: new Date().toISOString(),
+  });
+});
 
 // Authentication Routes
 

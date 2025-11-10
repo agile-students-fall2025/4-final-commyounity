@@ -10,43 +10,79 @@ import Footer from "./Footer";
 const EditScreen = () => {
   const { id } = useParams();  
   const [board, setBoard] = useState(null)
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [photoUrl, setPhotoUrl] = useState("");
+  
+  const [pendingTitle, setPendingTitle] = useState('');              
+  const [pendingDescription, setPendingDescription] = useState('');  
+  const [photoUrl, setPhotoUrl] = useState("");                      
+  const [pendingPhotoFile, setPendingPhotoFile] = useState(null);    
+
 
   useEffect(() => {
+    console.log("Fetching boards from backend...");
     axios
-      .get(`https://my.api.mockaroo.com/mock_boards_data.json?key=${process.env.REACT_APP_KEY}`)
-      .then(response => {
-        const data = Array.isArray(response.data) ? response.data[0] : response.data
-        setBoard(data)
+      .get("http://localhost:3000/api/boards")
+      .then((response) => {
+        const boards = response.data.data; 
+        const selected = boards.find((b) => String(b.id) === String(id));
+        if (selected) {
+          setBoard(selected);
+          setPendingTitle(selected.title || '');
+          setPendingDescription(selected.descriptionLong || '');
+        } else {
+          setError("Board not found.");
+        }
       })
-      .catch(err => {
-        console.error('Error fetching board data:', err)
-        setBoard({
-          id: 1,
-          title: 'Your Cool Board',
-          descriptionLong: 'Fallback example description for edit screen.',
-          coverPhotoURL: 'https://picsum.photos/400/200?seed=fallback',
-        })
-      })
-  }, [])
-
+      .catch((err) => {
+        console.error("Backend request failed:", err);
+        setError("Could not load board data.");
+      });
+  }, [id]); 
+  
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (photoUrl) URL.revokeObjectURL(photoUrl);
+
     const url = URL.createObjectURL(file);
     setPhotoUrl(url);
+    setPendingPhotoFile(file); 
   };
 
+  const handleSave = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('title', pendingTitle);
+      formData.append('descriptionLong', pendingDescription);
+      if (pendingPhotoFile) {
+        formData.append('photo', pendingPhotoFile); 
+      }
+      const res = await axios.post(
+        `http://localhost:3000/api/boards/${id}/edit`, 
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      console.log("Edit posted:", res.data);
+      alert("Edits sent to backend (no database yet).");
+      navigate("/viewboards");
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("Save failed — check backend connection/logs.");
+    }
+  };
+
+  if (error) return <div className="EditScreen error">{error}</div>;
   if (!board) return <div>Loading...</div>
 
-  const imageSrc =
-  photoUrl ||
-  `https://picsum.photos/800/400?seed=board-${board.id}`;
+  const displayImage = photoUrl || board.coverPhotoURL;
 
   return (
     <><Header title="Edit Board" />
-    <Link to={`/boards/${id}`} className="back-btn">
+    <Link to={`/boards/${board.id}`} className="back-btn">
           ← Back
     </Link>
     <div className="EditScreen">
@@ -54,7 +90,7 @@ const EditScreen = () => {
 
       <div className="edit-content">
       <div className="board-photo">
-            <img src={imageSrc} alt={board.title} className="board-image" />
+      <img src={displayImage} alt={board.title} className="board-image" />
             <h2>{board.title}</h2>
             <div className="upload-wrap">
               <label htmlFor="board-photo-input" className="upload-button">
@@ -64,29 +100,26 @@ const EditScreen = () => {
                 id="board-photo-input"
                 type="file"
                 accept="image/*"
-                onChange={handlePhotoUpload}
+                onChange={handlePhotoUpload}   
                 style={{ display: "none" }}
               />
-              {photoUrl && (
-                <button
-                  type="button"
-                  className="clear-upload"
-                  onClick={() => setPhotoUrl("")}
-                >
-                  Remove
-                </button>
-              )}
             </div>
           </div>
 
-        <form className="edit-form">
-          <label>Board Name</label>
-          <input type="text" defaultValue={board.title} />
+        <form className="edit-form" onSubmit={handleSave}>
+        <label>Board Name</label>
+            <input
+              type="text"
+              value={pendingTitle}
+              onChange={(e) => setPendingTitle(e.target.value)}
+            />
 
-          <label>Description</label>
-          <textarea defaultValue={board.descriptionLong}></textarea>
-          <p className="char-limit">• max 500 characters</p>
-
+            <label>Description</label>
+            <textarea
+              value={pendingDescription}
+              onChange={(e) => setPendingDescription(e.target.value)}
+            />
+            <p className="char-limit">• max 500 characters</p>
           <div className="member-actions">
             <button type="button" className="invite" onClick={() => navigate(`/boards/${board.id}/invite`)}>
               Invite Friends
@@ -96,7 +129,7 @@ const EditScreen = () => {
             </button>
           </div>
 
-          <button type="submit" className="save-button" onClick={() => {alert("Can't save changes, app doesn't have a back-end! Pretend the changes are saved for now!"); navigate("/viewboards");}}>
+          <button type="submit" className="save-button">
             Save Changes
           </button>
         </form>
