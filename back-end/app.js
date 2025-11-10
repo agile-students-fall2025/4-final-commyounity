@@ -22,7 +22,7 @@ const fallbackBoards = [
         descriptionShort:
           'purus eu magna vulputate luctus cum sociis natoque penatibus et magnis',
         descriptionLong:
-            'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
+          'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
       },
       {
         id: 2,
@@ -360,138 +360,6 @@ app.post("/api/searches", (req, res) => {
   });
 });
 
-
-
-//code might below be bad (shouldn't have been merged)... 
-//double-check this pls - Carina
-
-// Authentication Routes
-
-// Login Route
-app.post("/api/auth/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Attempt to fetch users from Mockaroo API
-    const response = await axios.get(MOCKAROO_URL_MEMBERS);
-    const users = Array.isArray(response.data) ? response.data : [];
-
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      const { password: _, ...userWithoutPassword } = user;
-      return res.json({
-        data: {
-          user: userWithoutPassword,
-          token: "mock-jwt-token" // Replace with real JWT in production
-        }
-      });
-    }
-  } catch (err) {
-    console.warn("Mockaroo API failed, falling back to local data.");
-  }
-
-  // Fallback to local data
-  const user = fallbackUsers.find(u => u.email === email && u.password === password);
-  if (user) {
-    const { password: _, ...userWithoutPassword } = user;
-    return res.json({
-      data: {
-        user: userWithoutPassword,
-        token: "mock-jwt-token"
-      }
-    });
-  }
-
-  return res.status(401).json({ error: "Invalid email or password" });
-});
-
-// Signup Route
-app.post("/api/auth/signup", async (req, res) => {
-  const { email, password, username, first_name, last_name } = req.body;
-
-  try {
-    // Check if email already exists in Mockaroo API
-    const response = await axios.get(MOCKAROO_URL_MEMBERS);
-    const users = Array.isArray(response.data) ? response.data : [];
-
-    if (users.some(u => u.email === email)) {
-      return res.status(400).json({ error: "Email already registered" });
-    }
-  } catch (err) {
-    console.warn("Mockaroo API failed, falling back to local data.");
-  }
-
-  // Check if email already exists in fallback data
-  if (fallbackUsers.some(u => u.email === email)) {
-    return res.status(400).json({ error: "Email already registered" });
-  }
-
-  // Create new user
-  const newUser = {
-    id: fallbackUsers.length + 1,
-    email,
-    password, // In real app, hash the password
-    username,
-    first_name,
-    last_name,
-    avatar: avatarUrl(fallbackUsers.length + 1),
-    friends: [],
-    boards: [],
-    settings: {
-      notifications: true,
-      privacy: "public"
-    }
-  };
-
-  fallbackUsers.push(newUser);
-
-  const { password: _, ...userWithoutPassword } = newUser;
-  return res.status(201).json({
-    data: {
-      user: userWithoutPassword,
-      token: "mock-jwt-token"
-    }
-  });
-});
-
-// Add fallback users
-defineFallbackUsers();
-
-// Define fallback users
-function defineFallbackUsers() {
-  const fallbackUsers = [
-    {
-      id: 1,
-      email: "user1@example.com",
-      password: "password123", // In real app, hash the password
-      username: "user1",
-      first_name: "John",
-      last_name: "Doe",
-      avatar: "https://i.pravatar.cc/100?img=11",
-      friends: [2, 3],
-      boards: [1, 2],
-      settings: {
-        notifications: true,
-        privacy: "public"
-      }
-    },
-    {
-      id: 2,
-      email: "user2@example.com",
-      password: "password456",
-      username: "user2",
-      first_name: "Jane",
-      last_name: "Smith",
-      avatar: "https://i.pravatar.cc/100?img=12",
-      friends: [1],
-      boards: [2],
-      settings: {
-        notifications: true,
-        privacy: "private"
-      }
-    }
-  ];
-}
 
 // export the express app we created to make it available to other modules
 module.exports = app
