@@ -68,7 +68,11 @@ const BoardDetail = () => {
               className="members-button"
               onClick={() =>
                 navigate(`/boards/${board.id}/members`, {
-                  state: { isBoardOwner: board.isOwner },
+                  state: {
+                    isBoardOwner: board.isOwner,
+                    boardId: board.id,               
+                    memberCount: board.memberCount,   
+                  },
                 })
               }
             >
