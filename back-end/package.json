@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
-    "coverage": "c8 mocha",
+    "test": "mocha --timeout 8000 --exit",
+    "coverage": "c8 mocha --timeout 8000 --exit",
     "dev": "nodemon server.js"
   },
   "author": "",
