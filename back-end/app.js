@@ -333,6 +333,32 @@ app.post('/api/boards/:id/invite', (req, res) => {
   });
 });
 
+// search bar
+
+app.post("/api/searches", (req, res) => {
+  const { query } = req.body || {};
+  const username = String(query || "").trim();
+  if (!username) {
+    return res.status(400).json({
+      ok: false,
+      error: "Username is required.",
+    });
+  }
+  if (!/^[A-Za-z0-9_]+$/.test(username)) {
+    return res.status(400).json({
+      ok: false,
+      error:
+        "Illegal username. Only letters, digits (0–9), and underscores (_) are allowed.",
+    });
+  }
+  console.log(`[SEARCH RECEIVED] username=${username}`);
+
+  return res.status(200).json({
+    ok: true,
+    message: `Backend received search for username "${username}".`,
+    timestamp: new Date().toISOString(),
+  });
+});
 
 
 
