@@ -1,6 +1,6 @@
 const server = require("./app") // load up the web server
 
-const port = 3000 // the port to listen to for incoming requests
+const port = process.env.PORT || 4000 // default to 4000 so CRA can stay on 3000
 
 // call express's listen function to start listening to the port
 const listener = server.listen(port, function () {
