@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 import "./FindFriendsPage.css";
 import Header from "./Header";
 import Footer from "./Footer";
-import { FRIENDS_STORAGE_KEY } from "./storageKeys";
+
+const BACKEND_BASE =
+  (process.env.REACT_APP_BACKEND_URL &&
+    process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
+  "http://localhost:4000";
+const FRIENDS_ENDPOINT = `${BACKEND_BASE}/api/friends`;
 
 const FALLBACK_FRIENDS = [
   {
@@ -58,96 +63,73 @@ const normalizeFriend = (friend, index) => {
   };
 };
 
-const buildFriendsUrl = (count = 12) => {
-  const key = process.env.REACT_APP_KEY;
-
-  if (!key) {
-    throw new Error("REACT_APP_KEY is missing. Please add it to your .env file.");
-  }
-
-  const params = new URLSearchParams({
-    key,
-    count: String(count),
-  });
-
-  return `https://my.api.mockaroo.com/friends.json?${params.toString()}`;
-};
-
 const FindFriendsPage = () => {
-  const [friends, setFriends] = useState([]);
+  const [matchingFriend, setMatchingFriend] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [requestedUsernames, setRequestedUsernames] = useState(() => new Set());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [requestedUsernames, setRequestedUsernames] = useState(() => new Set());
+
+  const trimmedTerm = searchTerm.trim().toLowerCase();
 
   useEffect(() => {
     let isMounted = true;
 
-    const hydrateFromStorage = () => {
-      if (typeof window === "undefined") {
-        return false;
-      }
+    if (!trimmedTerm) {
+      setMatchingFriend(null);
+      setError(null);
+      setLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
 
+    const controller = new AbortController();
+
+    const fetchMatch = async () => {
+      setLoading(true);
       try {
-        const stored = window.localStorage.getItem(FRIENDS_STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed)) {
-            if (isMounted) {
-              setFriends(parsed);
-              setError(null);
-              setLoading(false);
-            }
-            return true;
-          }
-        }
-      } catch (storageError) {
-        console.warn("Unable to parse stored friends.", storageError);
-      }
-
-      return false;
-    };
-
-    const loadFriends = async () => {
-      try {
-        const response = await fetch(buildFriendsUrl(12), {
-          headers: {
-            Accept: "application/json",
-            "X-API-Key": process.env.REACT_APP_KEY,
-          },
+        const url = new URL(FRIENDS_ENDPOINT);
+        url.searchParams.set("username", trimmedTerm);
+        url.searchParams.set("limit", "1");
+        const response = await fetch(url.toString(), {
+          signal: controller.signal,
         });
 
         if (!response.ok) {
-          throw new Error(`Mockaroo responded with status ${response.status}`);
+          throw new Error(`Server responded with status ${response.status}`);
         }
 
         const payload = await response.json();
-        const normalized = (Array.isArray(payload) ? payload : [payload]).map(
-          normalizeFriend
-        );
+        const first =
+          Array.isArray(payload?.data) && payload.data.length > 0
+            ? normalizeFriend(payload.data[0], 0)
+            : null;
 
         if (!isMounted) {
           return;
         }
 
-        setFriends(normalized);
+        setMatchingFriend(first);
         setError(null);
-
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(
-            FRIENDS_STORAGE_KEY,
-            JSON.stringify(normalized)
-          );
-        }
       } catch (fetchError) {
-        if (!isMounted) {
+        if (!isMounted || fetchError.name === "AbortError") {
           return;
         }
 
-        console.warn("Unable to load friends from Mockaroo.", fetchError);
-        setFriends(FALLBACK_FRIENDS);
+        console.warn("Unable to search friends via API.", fetchError);
+        const fallback = FALLBACK_FRIENDS.find(
+          (friend) =>
+            friend.username.toLowerCase() === trimmedTerm ||
+            `${friend.first_name} ${friend.last_name}`
+              .toLowerCase()
+              .includes(trimmedTerm)
+        );
+        setMatchingFriend(fallback ?? null);
         setError(
-          "Showing a few sample profiles while the live mock API is unavailable."
+          fallback
+            ? "Showing a cached profile because the friends service is unavailable."
+            : "We couldn’t reach the friends service. Please try again."
         );
       } finally {
         if (isMounted) {
@@ -156,28 +138,13 @@ const FindFriendsPage = () => {
       }
     };
 
-    const alreadyHydrated = hydrateFromStorage();
-    if (!alreadyHydrated) {
-      loadFriends();
-    }
+    fetchMatch();
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
-  }, []);
-
-  const lookup = useMemo(() => {
-    return friends.reduce((acc, friend) => {
-      if (friend.username) {
-        acc[friend.username.toLowerCase()] = friend;
-      }
-      return acc;
-    }, {});
-  }, [friends]);
-
-  const trimmedTerm = searchTerm.trim().toLowerCase();
-  const matchingFriend =
-    trimmedTerm && !loading ? lookup[trimmedTerm] ?? null : null;
+  }, [trimmedTerm]);
 
   const isAlreadySent = matchingFriend
     ? requestedUsernames.has(matchingFriend.username.toLowerCase())
@@ -187,11 +154,11 @@ const FindFriendsPage = () => {
     if (loading) {
       return {
         type: "neutral",
-        text: "Fetching fresh profiles...",
+        text: "Searching our community…",
       };
     }
 
-    if (error) {
+    if (error && !matchingFriend) {
       return {
         type: "error",
         text: error,
@@ -206,6 +173,13 @@ const FindFriendsPage = () => {
     }
 
     if (matchingFriend) {
+      if (error) {
+        return {
+          type: "info",
+          text: error,
+        };
+      }
+
       return {
         type: isAlreadySent ? "info" : "success",
         text: isAlreadySent
@@ -233,38 +207,38 @@ const FindFriendsPage = () => {
           </i>
         </p>
 
-        <div className="findfriends-search">
-          <input
-            type="search"
-            placeholder="Search by username"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            disabled={loading}
-          />
-          <button
-            type="button"
-            disabled={loading || !matchingFriend}
-            onClick={() => {
-              if (!matchingFriend) {
-                return;
-              }
+      <div className="findfriends-search">
+        <input
+          type="search"
+          placeholder="Search by username"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          disabled={loading}
+        />
+        <button
+          type="button"
+          disabled={loading || !matchingFriend}
+          onClick={() => {
+            if (!matchingFriend) {
+              return;
+            }
 
-              setRequestedUsernames((prev) => {
-                const next = new Set(prev);
-                next.add(matchingFriend.username.toLowerCase());
-                return next;
-              });
-            }}
-          >
-            {loading
-              ? "Loading…"
-              : matchingFriend
-              ? isAlreadySent
-                ? "Requested"
-                : "Send Invite"
-              : "Search"}
-          </button>
-        </div>
+            setRequestedUsernames((prev) => {
+              const next = new Set(prev);
+              next.add(matchingFriend.username.toLowerCase());
+              return next;
+            });
+          }}
+        >
+          {loading
+            ? "Searching…"
+            : matchingFriend
+            ? isAlreadySent
+              ? "Requested"
+              : "Send Invite"
+            : "Search"}
+        </button>
+      </div>
 
         <section
           className={`findfriends-demo-card ${messageDetails.type}`}
