@@ -14,7 +14,37 @@ export default function ProfilePage() {
   // - Settings + Delete Profile buttons
   const navigate = useNavigate();
   const randomImage = `https://picsum.photos/160/120?random=${Math.floor(Math.random() * 1000)}`;
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:4000/logout", {
+        method: "GET",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      navigate("/"); 
+    }
+  };
 
+  const handleDeleteProfile = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your profile?\n\nThis action cannot be undone."
+    );
+
+    if (!confirmed) {
+      alert("Profile deletion canceled.");
+      return;
+    }
+
+    try {
+      alert("Profile deleted successfully. You will now be logged out.");
+      await handleLogout();
+    } catch (err) {
+      console.error("Error deleting profile:", err);
+      alert("Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <>
@@ -91,16 +121,11 @@ export default function ProfilePage() {
         </button>
 
         <button
-          className="wide-button delete-btn"
-          onClick={() => {
-            if (window.confirm("Are you sure you want to delete your profile? (pretend)")) {
-              alert("Profile deleted (pretend).");
-              navigate("/");
-            }
-          }}
-        >
-          Delete Profile
-        </button>
+            className="wide-button delete-btn"
+            onClick={handleDeleteProfile}
+          >
+            Delete Profile
+          </button>
         </section>
     </div>
     <Footer />
