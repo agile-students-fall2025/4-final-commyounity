@@ -1,10 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
-// import mockFriendRequestsFallback from "./mockFriendRequestsFallback";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
+
+const BACKEND_BASE =
+  (process.env.REACT_APP_BACKEND_URL &&
+    process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
+  "http://localhost:4000";
+const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
 
 const REQUESTS_CACHE_KEY = "friend-requests";
 
@@ -92,29 +97,16 @@ const FriendRequestsPage = () => {
       }
 
       try {
-        const key = process.env.REACT_APP_KEY;
-        if (!key) {
-          throw new Error("REACT_APP_KEY is missing. Please add it to your .env file.");
-        }
-
-        const response = await fetch(
-          `https://my.api.mockaroo.com/friends.json?key=${key}&count=6`,
-          {
-            headers: {
-              "X-API-Key": key,
-              Accept: "application/json",
-            },
-          }
-        );
+        const response = await fetch(FRIEND_REQUESTS_ENDPOINT);
 
         if (!response.ok) {
-          throw new Error(`Mockaroo responded with status ${response.status}`);
+          throw new Error(`Server responded with status ${response.status}`);
         }
 
         const payload = await response.json();
-        const normalized = (Array.isArray(payload) ? payload : [payload]).map(
-          normalizeRequest
-        );
+        const normalized = Array.isArray(payload?.data)
+          ? payload.data.map(normalizeRequest)
+          : [];
 
         if (!isMounted) {
           return;
@@ -128,10 +120,7 @@ const FriendRequestsPage = () => {
           return;
         }
 
-        console.warn(
-          "Unable to load friend requests from Mockaroo.",
-          fetchError
-        );
+        console.warn("Unable to load friend requests from the API.", fetchError);
         setError(
           "We couldn't load your friend requests right now. Showing your most recent saved list."
         );
@@ -181,50 +170,77 @@ const FriendRequestsPage = () => {
     }
   };
 
-  const handleAccept = (request) => {
+  const handleAccept = async (request) => {
     const fullName = `${request.first_name} ${request.last_name}`;
 
-    setRequestsAndPersist((prev) =>
-      prev.filter((item) => item.id !== request.id)
-    );
+    try {
+      const response = await fetch(
+        `${FRIEND_REQUESTS_ENDPOINT}/${encodeURIComponent(request.id)}/accept`,
+        { method: "POST" }
+      );
 
-    updateStoredFriends((current) => {
-      if (current.some((friend) => friend.id === request.id)) {
-        return current;
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
       }
 
-      return [
-        ...current,
-        {
-          id: request.id,
-          first_name: request.first_name,
-          last_name: request.last_name,
-          username: request.username,
-          avatar:
-            request.avatar ||
-            `https://picsum.photos/seed/${request.username}/200/200`,
-          online: true,
-        },
-      ];
-    });
+      const payload = await response.json();
 
-    setFeedback({
-      type: "success",
-      message: `${fullName} was added to your friends list.`,
-    });
+      setRequestsAndPersist((prev) =>
+        prev.filter((item) => item.id !== request.id)
+      );
+
+      if (payload?.friend) {
+        updateStoredFriends((current) => {
+          if (current.some((friend) => friend.id === payload.friend.id)) {
+            return current;
+          }
+          return [...current, payload.friend];
+        });
+      }
+
+      setFeedback({
+        type: "success",
+        message: `${fullName} was added to your friends list.`,
+      });
+    } catch (actionError) {
+      console.warn("Unable to accept friend request.", actionError);
+      setFeedback({
+        type: "error",
+        message: "We couldn’t accept the request. Please try again shortly.",
+      });
+    }
   };
 
-  const handleDecline = (request) => {
+  const handleDecline = async (request) => {
     const fullName = `${request.first_name} ${request.last_name}`;
 
-    setRequestsAndPersist((prev) =>
-      prev.filter((item) => item.id !== request.id)
-    );
+    try {
+      const response = await fetch(
+        `${FRIEND_REQUESTS_ENDPOINT}/${encodeURIComponent(request.id)}/decline`,
+        { method: "POST" }
+      );
 
-    setFeedback({
-      type: "info",
-      message: `Declined ${fullName}'s friend request.`,
-    });
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+
+      await response.json();
+
+      setRequestsAndPersist((prev) =>
+        prev.filter((item) => item.id !== request.id)
+      );
+
+      setFeedback({
+        type: "info",
+        message: `Declined ${fullName}'s friend request.`,
+      });
+    } catch (actionError) {
+      console.warn("Unable to decline friend request.", actionError);
+      setFeedback({
+        type: "error",
+        message: "We couldn’t decline the request. Please try again shortly.",
+      });
+    }
   };
 
   return (
