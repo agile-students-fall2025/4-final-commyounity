@@ -214,6 +214,15 @@ const ensureFriendsCache = async () => {
 const filterFriendsByQuery = (list, query) => {
   if (!query) return list;
   const term = query.toLowerCase();
+
+  const usernameMatches = list.filter((friend) => {
+    const username = String(friend.username ?? "").toLowerCase();
+    return username === term;
+  });
+  if (usernameMatches.length > 0) {
+    return usernameMatches;
+  }
+
   return list.filter((friend) => {
     const username = String(friend.username ?? "").toLowerCase();
     const fullName = `${friend.first_name ?? ""} ${
