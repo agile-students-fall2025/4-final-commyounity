@@ -18,7 +18,7 @@ const BoardDetail = () => {
   useEffect(() => {
     let mounted = true;
     console.log('fetching...')
-    axios.get(`http://localhost:3000/api/boards/${id}`)
+    axios.get(`http://localhost:4000/api/boards/${id}`)
     .then(res => {
       if (!mounted) return;
       setBoard(res.data?.data || null);
@@ -33,7 +33,7 @@ const BoardDetail = () => {
     if (leaving) return; 
     setLeaving(true);
     try {
-      const response = await axios.post(`http://localhost:3000/api/boards/${id}/leave`);
+      const response = await axios.post(`http://localhost:4000/api/boards/${id}/leave`);
       console.log("Leave request acknowledged by backend:", response.data);
 
       alert("You have left this board! (mock confirmation from backend)");

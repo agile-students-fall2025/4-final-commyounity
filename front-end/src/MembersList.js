@@ -18,7 +18,7 @@ const MembersList = () => {
   const [memberCount, setMemberCount] = useState(state?.memberCount); 
   useEffect(() => {
     
-    axios('http://localhost:3000/api/members')
+    axios('http://localhost:4000/api/members')
       .then(response => {
         // extract the data from the server response
         setData(response.data.data)

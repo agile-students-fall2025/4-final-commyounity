@@ -22,7 +22,7 @@ const EditScreen = () => {
   useEffect(() => {
     console.log("Fetching boards from backend...");
     axios
-      .get("http://localhost:3000/api/boards")
+      .get("http://localhost:4000/api/boards")
       .then((response) => {
         const boards = response.data.data; 
         const selected = boards.find((b) => String(b.id) === String(id));
@@ -61,7 +61,7 @@ const EditScreen = () => {
         formData.append('photo', pendingPhotoFile); 
       }
       const res = await axios.post(
-        `http://localhost:3000/api/boards/${id}/edit`, 
+        `http://localhost:4000/api/boards/${id}/edit`, 
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
