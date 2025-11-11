@@ -68,7 +68,6 @@ const FindFriendsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [requestedUsernames, setRequestedUsernames] = useState(() => new Set());
 
   const trimmedTerm = searchTerm.trim().toLowerCase();
 
@@ -146,10 +145,6 @@ const FindFriendsPage = () => {
     };
   }, [trimmedTerm]);
 
-  const isAlreadySent = matchingFriend
-    ? requestedUsernames.has(matchingFriend.username.toLowerCase())
-    : false;
-
   const messageDetails = useMemo(() => {
     if (loading) {
       return {
@@ -181,10 +176,8 @@ const FindFriendsPage = () => {
       }
 
       return {
-        type: isAlreadySent ? "info" : "success",
-        text: isAlreadySent
-          ? `Invite already sent to ${matchingFriend.first_name}.`
-          : `We found ${matchingFriend.first_name}! Send them an invite below.`,
+        type: "success",
+        text: `We found ${matchingFriend.first_name}! Send them an invite below.`,
       };
     }
 
@@ -192,7 +185,7 @@ const FindFriendsPage = () => {
       type: "error",
       text: `No profile found for “${searchTerm}”. Try another username.`,
     };
-  }, [loading, error, trimmedTerm, matchingFriend, searchTerm, isAlreadySent]);
+  }, [loading, error, trimmedTerm, matchingFriend, searchTerm]);
 
   return (
     <>
@@ -215,27 +208,11 @@ const FindFriendsPage = () => {
           onChange={(event) => setSearchTerm(event.target.value)}
           disabled={loading}
         />
-        <button
-          type="button"
-          disabled={loading || !matchingFriend}
-          onClick={() => {
-            if (!matchingFriend) {
-              return;
-            }
-
-            setRequestedUsernames((prev) => {
-              const next = new Set(prev);
-              next.add(matchingFriend.username.toLowerCase());
-              return next;
-            });
-          }}
-        >
+        <button type="button" disabled={loading || !matchingFriend}>
           {loading
             ? "Searching…"
             : matchingFriend
-            ? isAlreadySent
-              ? "Requested"
-              : "Send Invite"
+            ? "Invite via back end"
             : "Search"}
         </button>
       </div>
