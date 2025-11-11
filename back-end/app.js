@@ -4,9 +4,15 @@ const express = require("express") // CommonJS import style!
 const axios = require("axios"); 
 const cors = require("cors");
 const multer = require('multer');
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express() // instantiate an Express object
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(express.json());
 
 // we will put some server logic here later...
@@ -480,6 +486,59 @@ const filterFriendsByQuery = (list, query) => {
     });
   });
 
+//log-in with Google
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:4000/auth/google/callback",
+    },
+    (accessToken, refreshToken, profile, done) => {
+      console.log("Google profile:", profile);
+      return done(null, profile);
+    }
+  )
+);
+
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login-failed",
+    successRedirect: "http://localhost:3000/home", 
+  })
+);
+
+app.get("/login-failed", (req, res) => {
+  res.status(401).json({ error: "Login failed" });
+});
+
+app.get("/logout", (req, res) => {
+  req.logout(() => {
+    res.redirect("http://localhost:3000/");
+  });
+});
+
 // POST 
 
 //edit form
@@ -654,6 +713,47 @@ app.post('/api/boards/:id/kick-member', (req, res) => {
     },
     timestamp: new Date().toISOString(),
   });
+});
+
+// Local login (manual username/password) 
+
+const users = [
+  { id: 1, username: 'testuser', password: '12345', name: 'Test User' },
+  { id: 2, username: 'carina', password: 'carina123', name: 'Carina Ilie' },
+];
+
+app.post('/auth/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ ok: false, error: 'Username and password are required.' });
+  }
+
+  const user = users.find(
+    (u) => u.username === username && u.password === password
+  );
+
+  if (!user) {
+    return res.status(401).json({ ok: false, error: 'Invalid credentials.' });
+  }
+  req.session.user = user;
+  console.log('[LOGIN SUCCESS]', user);
+
+  res.json({
+    ok: true,
+    message: `Welcome, ${user.name}!`,
+    user: { id: user.id, username: user.username, name: user.name },
+  });
+});
+
+app.get('/api/auth/me', (req, res) => {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return res.json({ ok: true, method: 'google', user: req.user });
+  }
+  if (req.session && req.session.user) {
+    return res.json({ ok: true, method: 'local', user: req.session.user });
+  }
+  return res.status(401).json({ ok: false, error: 'Not authenticated' });
 });
 
 // export the express app we created to make it available to other modules
