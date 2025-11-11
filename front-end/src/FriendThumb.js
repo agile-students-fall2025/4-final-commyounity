@@ -22,7 +22,7 @@ const FriendThumb = ({ details, boardId, variant = "card", onUnfriend, onInvite 
     try {
       console.log(`[FRONTEND] Inviting ${details.first_name}...`);
       const response = await axios.post(
-        `http://localhost:3000/api/boards/${boardId}/invite`, 
+        `http://localhost:4000/api/boards/${boardId}/invite`, 
         { friendId: details.id }
       );
 

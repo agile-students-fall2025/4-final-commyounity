@@ -13,7 +13,7 @@ const BoardList = props => {
   useEffect(() => {
     // fetch some mock data about animals for sale
     console.log('fetching 10 random boards...')
-    axios('http://localhost:3000/api/boards')
+    axios('http://localhost:4000/api/boards')
       .then(response => {
         // extract the data from the server response
         setData(response.data.data)

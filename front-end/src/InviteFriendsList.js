@@ -15,7 +15,7 @@ const InviteFriendsList = () => {
   useEffect(() => {
     console.log('fetching friends...')
     axios
-      .get("http://localhost:3000/api/friends")
+      .get("http://localhost:4000/api/friends")
       .then((res) => {
         setFriends(Array.isArray(res.data.data) ? res.data.data : []);
       })
