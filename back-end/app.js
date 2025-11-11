@@ -1,3 +1,4 @@
+require("dotenv").config({ silent: true });
 // import and instantiate express
 const express = require("express") // CommonJS import style!
 const axios = require("axios"); 
@@ -62,6 +63,12 @@ const fallbackBoards = [
   //mockaroo api - for now no env
   const MOCKAROO_URL = "https://my.api.mockaroo.com/mock_boards_data.json?key=dc8ece40";
   const MOCKAROO_URL_MEMBERS = 'https://my.api.mockaroo.com/members.json?key=dc8ece40';
+  const MOCKAROO_API_KEY = process.env.MOCKAROO_API_KEY || "dc8ece40";
+  const MOCKAROO_FRIENDS_URL =
+    process.env.MOCKAROO_FRIENDS_URL || "https://my.api.mockaroo.com/friends.json";
+  const FRIENDS_FETCH_COUNT = Number(process.env.FRIENDS_FETCH_COUNT) || 20;
+  const FRIENDS_CACHE_TTL_MS =
+    Number(process.env.FRIENDS_CACHE_TTL_MS) || 5 * 60 * 1000; // default 5 minutes
 
 //mock photos for boards
 const picsumUrl = (id, w = 800, h = 400) => `https://picsum.photos/${w}/${h}?seed=board-${id}`;
@@ -85,6 +92,137 @@ const enrichMember = (b) => {
     avatar: avatarUrl(id),
   };
 };
+const fallbackFriends = [
+  {
+    id: 1,
+    first_name: "Emma",
+    last_name: "Chen",
+    username: "emma_chen",
+    mutualCount: 12,
+    profilePhotoURL: "https://picsum.photos/seed/emma/200/200",
+    bio: "Loves art museums, matcha lattes, and weekend hikes 🌿",
+    online: true,
+  },
+  {
+    id: 2,
+    first_name: "Liam",
+    last_name: "Patel",
+    username: "liam.codes",
+    mutualCount: 8,
+    profilePhotoURL: "https://picsum.photos/seed/liam/200/200",
+    online: false,
+  },
+  {
+    id: 3,
+    first_name: "Sofia",
+    last_name: "Reyes",
+    username: "sofiareyes",
+    mutualCount: 5,
+    profilePhotoURL: "https://picsum.photos/seed/sofia/200/200",
+    online: true,
+  },
+];
+
+const normalizeFriend = (friend, index = 0) => {
+  const fallbackId = `friend-${Date.now()}-${index}`;
+  const id = friend.id ?? fallbackId;
+  const usernameBase = friend.username ?? friend.handle ?? `user-${index}`;
+  const username = String(usernameBase).trim() || `user-${index}`;
+  const firstName = friend.first_name ?? friend.firstName ?? "Friend";
+  const lastName = friend.last_name ?? friend.lastName ?? "";
+  const avatar =
+    friend.avatar ??
+    friend.profilePhotoURL ??
+    `https://picsum.photos/seed/${encodeURIComponent(username)}/200/200`;
+  const online =
+    typeof friend.online === "boolean"
+      ? friend.online
+      : Boolean(friend.isOnline ?? friend.active ?? friend.status === "online");
+
+  return {
+    id,
+    first_name: firstName,
+    last_name: lastName,
+    username,
+    avatar,
+    online,
+  };
+};
+
+const normalizedFallbackFriends = fallbackFriends.map((friend, index) =>
+  normalizeFriend(friend, index)
+);
+
+let friendsCache = {
+  data: normalizedFallbackFriends,
+  timestamp: 0,
+  source: "fallback",
+};
+
+const shouldRefreshFriendsCache = () => {
+  return (
+    !friendsCache.data.length ||
+    Date.now() - friendsCache.timestamp > FRIENDS_CACHE_TTL_MS
+  );
+};
+
+const fetchFriendsFromMockaroo = async () => {
+  const response = await axios.get(MOCKAROO_FRIENDS_URL, {
+    params: {
+      key: MOCKAROO_API_KEY,
+      count: FRIENDS_FETCH_COUNT,
+    },
+    headers: {
+      "X-API-Key": MOCKAROO_API_KEY,
+    },
+  });
+  const payload = Array.isArray(response.data) ? response.data : [];
+  const normalized = payload.map((friend, index) =>
+    normalizeFriend(friend, index)
+  );
+  friendsCache = {
+    data: normalized,
+    timestamp: Date.now(),
+    source: "mockaroo",
+  };
+  return normalized;
+};
+
+const ensureFriendsCache = async () => {
+  if (!shouldRefreshFriendsCache()) {
+    return friendsCache.data;
+  }
+
+  try {
+    return await fetchFriendsFromMockaroo();
+  } catch (error) {
+    console.warn(
+      "Unable to refresh friends from Mockaroo. Serving cached/fallback data.",
+      error.message || error
+    );
+    if (!friendsCache.data.length) {
+      friendsCache = {
+        data: normalizedFallbackFriends,
+        timestamp: Date.now(),
+        source: "fallback",
+      };
+    }
+    return friendsCache.data;
+  }
+};
+
+const filterFriendsByQuery = (list, query) => {
+  if (!query) return list;
+  const term = query.toLowerCase();
+  return list.filter((friend) => {
+    const username = String(friend.username ?? "").toLowerCase();
+    const fullName = `${friend.first_name ?? ""} ${
+      friend.last_name ?? ""
+    }`.trim().toLowerCase();
+    return username.includes(term) || fullName.includes(term);
+  });
+};
+
   //ROUTES
 
   //GET
@@ -194,50 +332,27 @@ const enrichMember = (b) => {
 
   //get mock data for invite firends
   app.get("/api/friends", async (req, res) => {
-    try {
-      const MOCKAROO_URL_FRIENDS = "https://my.api.mockaroo.com/friends.json?key=dc8ece40";
-      const response = await axios.get(MOCKAROO_URL_FRIENDS, {
-        params: { count: 10 },
-      });
-  
-      console.log("Data loaded from Mockaroo (friends)");
-      const friends = Array.isArray(response.data) ? response.data : [];
-      const enriched = friends.map(enrichMember);
-      res.json({ data: enriched });
-    } catch (err) {
-      console.warn("Mockaroo failed for friends, using fallback data.");
-      const fallbackFriends = [
-        {
-          id: 1,
-          first_name: "Emma",
-          last_name: "Chen",
-          username: "emma_chen",
-          mutualCount: 12,
-          profilePhotoURL: "https://picsum.photos/seed/emma/200/200",
-          bio: "Loves art museums, matcha lattes, and weekend hikes 🌿",
-          online: true,
-        },
-        {
-          id: 2,
-          first_name: "Liam",
-          last_name: "Patel",
-          username: "liam.codes",
-          mutualCount: 8,
-          profilePhotoURL: "https://picsum.photos/seed/liam/200/200",
-          online: false,
-        },
-        {
-          id: 3,
-          first_name: "Sofia",
-          last_name: "Reyes",
-          username: "sofiareyes",
-          mutualCount: 5,
-          profilePhotoURL: "https://picsum.photos/seed/sofia/200/200",
-          online: true,
-        },
-      ];
-      res.json({ data: fallbackFriends });
-    }
+    const query =
+      (req.query.search || req.query.username || "").toString().trim();
+    const limitParam = Number(req.query.limit);
+    const limit =
+      Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
+
+    const friends = await ensureFriendsCache();
+    const filtered = filterFriendsByQuery(friends, query);
+    const data = limit ? filtered.slice(0, limit) : filtered;
+
+    res.json({
+      data,
+      meta: {
+        total: friends.length,
+        count: data.length,
+        filtered: Boolean(query),
+        cacheSource: friendsCache.source,
+        cachedAt: friendsCache.timestamp,
+        ttlMs: FRIENDS_CACHE_TTL_MS,
+      },
+    });
   });
 
 // POST 
