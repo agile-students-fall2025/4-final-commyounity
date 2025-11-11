@@ -95,6 +95,18 @@ const FindFriendsPage = () => {
           signal: controller.signal,
         });
 
+        if (response.status === 400) {
+          const payload = await response.json();
+          if (isMounted) {
+            setMatchingFriend(null);
+            setError(
+              payload?.error ||
+                "Usernames may only include letters, numbers, dots, underscores, or hyphens."
+            );
+          }
+          return;
+        }
+
         if (!response.ok) {
           throw new Error(`Server responded with status ${response.status}`);
         }
