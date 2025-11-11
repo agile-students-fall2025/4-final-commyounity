@@ -67,11 +67,10 @@ const fallbackBoards = [
   ];
 
   //mockaroo api - for now no env
-  const MOCKAROO_URL = "https://my.api.mockaroo.com/mock_boards_data.json?key=dc8ece40";
-  const MOCKAROO_URL_MEMBERS = 'https://my.api.mockaroo.com/members.json?key=dc8ece40';
-  const MOCKAROO_API_KEY = process.env.MOCKAROO_API_KEY || "dc8ece40";
-  const MOCKAROO_FRIENDS_URL =
-    process.env.MOCKAROO_FRIENDS_URL || "https://my.api.mockaroo.com/friends.json";
+  const MOCKAROO_API_KEY = process.env.MOCKAROO_API_KEY;
+  const MOCKAROO_URL = `https://my.api.mockaroo.com/mock_boards_data.json?key=${MOCKAROO_API_KEY}`;
+  const MOCKAROO_URL_MEMBERS = `https://my.api.mockaroo.com/members.json?key=${MOCKAROO_API_KEY}`;
+  const MOCKAROO_FRIENDS_URL = `https://my.api.mockaroo.com/friends.json?key=${MOCKAROO_API_KEY}`;
   const FRIENDS_FETCH_COUNT = Number(process.env.FRIENDS_FETCH_COUNT) || 20;
   const FRIENDS_CACHE_TTL_MS =
     Number(process.env.FRIENDS_CACHE_TTL_MS) || 5 * 60 * 1000; // default 5 minutes
