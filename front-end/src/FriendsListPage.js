@@ -6,6 +6,12 @@ import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
 
+const BACKEND_BASE =
+  (process.env.REACT_APP_BACKEND_URL &&
+    process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
+  "http://localhost:3000";
+const FRIENDS_ENDPOINT = `${BACKEND_BASE}/api/friends`;
+
 const FALLBACK_FRIENDS = [
   {
     id: "fallback-1",
@@ -32,20 +38,6 @@ const FALLBACK_FRIENDS = [
     online: true,
   },
 ];
-
-const buildFriendsUrl = (count = 12) => {
-  const key = process.env.REACT_APP_KEY;
-  if (!key) {
-    throw new Error("REACT_APP_KEY is missing. Please add it to your .env file.");
-  }
-
-  const params = new URLSearchParams({
-    key,
-    count: String(count),
-  });
-
-  return `https://my.api.mockaroo.com/friends.json?${params.toString()}`;
-};
 
 const FriendsList = () => {
   const [friends, setFriends] = useState([]);
@@ -112,21 +104,19 @@ const FriendsList = () => {
 
     const loadFriends = async () => {
       try {
-        const response = await fetch(buildFriendsUrl(12), {
-          headers: {
-            Accept: "application/json",
-            "X-API-Key": process.env.REACT_APP_KEY,
-          },
-        });
+        const response = await fetch(FRIENDS_ENDPOINT);
 
         if (!response.ok) {
-          throw new Error(`Mockaroo responded with status ${response.status}`);
+          throw new Error(`Server responded with status ${response.status}`);
         }
 
         const payload = await response.json();
-        const normalized = (Array.isArray(payload) ? payload : [payload]).map(
-          normalizeFriend
-        );
+        const normalized = (Array.isArray(payload?.data)
+          ? payload.data
+          : [payload?.data]
+        )
+          .filter(Boolean)
+          .map((friend, index) => normalizeFriend(friend, index));
 
         if (!isMounted) {
           return;
@@ -140,11 +130,11 @@ const FriendsList = () => {
           return;
         }
 
-        console.warn("Unable to load friends from Mockaroo.", fetchError);
+        console.warn("Unable to load friends from the Express API.", fetchError);
         setFriends(FALLBACK_FRIENDS);
         setHydrated(false);
         setError(
-          "Showing a few sample friends while the live mock API is unavailable."
+          "Showing a few sample friends while the friends service is unavailable."
         );
       } finally {
         if (isMounted) {
