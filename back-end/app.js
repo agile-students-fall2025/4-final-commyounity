@@ -337,6 +337,15 @@ const filterFriendsByQuery = (list, query) => {
     const limitParam = Number(req.query.limit);
     const limit =
       Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
+    const simulateError =
+      String(req.query.simulateError || "").toLowerCase() === "true";
+
+    if (simulateError) {
+      return res.status(503).json({
+        error: "Simulated friends service failure.",
+        meta: { simulated: true },
+      });
+    }
 
     const friends = await ensureFriendsCache();
     const filtered = filterFriendsByQuery(friends, query);
