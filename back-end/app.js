@@ -153,11 +153,55 @@ const normalizedFallbackFriends = fallbackFriends.map((friend, index) =>
   normalizeFriend(friend, index)
 );
 
+const fallbackFriendRequests = [
+  {
+    id: "request-1",
+    first_name: "Wilhem",
+    last_name: "Hoffmann",
+    username: "wil.hoff",
+    avatar: "https://picsum.photos/seed/wilhelm/200/200",
+    message: "Hey! We met at the design sprint last week—would love to connect.",
+    mutualFriends: 3,
+  },
+  {
+    id: "request-2",
+    first_name: "Kara",
+    last_name: "Singh",
+    username: "kara.codes",
+    avatar: "https://picsum.photos/seed/kara/200/200",
+    message:
+      "Loved your post about remote collaboration. Want to swap tips sometime?",
+    mutualFriends: 1,
+  },
+];
+
 let friendsCache = {
   data: normalizedFallbackFriends,
   timestamp: 0,
   source: "fallback",
 };
+
+let friendRequestsCache = [...fallbackFriendRequests];
+
+const getFriendRequests = () => friendRequestsCache;
+const findFriendRequest = (id) =>
+  friendRequestsCache.find((req) => String(req.id) === String(id));
+const removeFriendRequest = (id) => {
+  friendRequestsCache = friendRequestsCache.filter(
+    (req) => String(req.id) !== String(id)
+  );
+};
+
+const addFriendFromRequest = (request) => ({
+  id: request.id,
+  first_name: request.first_name,
+  last_name: request.last_name,
+  username: request.username,
+  avatar:
+    request.avatar ||
+    `https://picsum.photos/seed/${encodeURIComponent(request.username)}/200/200`,
+  online: true,
+});
 
 const shouldRefreshFriendsCache = () => {
   return (
@@ -396,6 +440,43 @@ const filterFriendsByQuery = (list, query) => {
         cachedAt: friendsCache.timestamp,
         ttlMs: FRIENDS_CACHE_TTL_MS,
       },
+    });
+  });
+
+  app.get("/api/friend-requests", (req, res) => {
+    res.json({
+      data: getFriendRequests(),
+      meta: { count: friendRequestsCache.length },
+    });
+  });
+
+  app.post("/api/friend-requests/:id/accept", (req, res) => {
+    const { id } = req.params;
+    const match = findFriendRequest(id);
+    if (!match) {
+      return res.status(404).json({ error: "Friend request not found." });
+    }
+
+    removeFriendRequest(id);
+    res.json({
+      status: "accepted",
+      friend: addFriendFromRequest(match),
+      remainingRequests: friendRequestsCache.length,
+    });
+  });
+
+  app.post("/api/friend-requests/:id/decline", (req, res) => {
+    const { id } = req.params;
+    const match = findFriendRequest(id);
+    if (!match) {
+      return res.status(404).json({ error: "Friend request not found." });
+    }
+
+    removeFriendRequest(id);
+    res.json({
+      status: "declined",
+      declinedRequest: { id: match.id, username: match.username },
+      remainingRequests: friendRequestsCache.length,
     });
   });
 
