@@ -214,15 +214,6 @@ const ensureFriendsCache = async () => {
 const filterFriendsByQuery = (list, query) => {
   if (!query) return list;
   const term = query.toLowerCase();
-
-  const usernameMatches = list.filter((friend) => {
-    const username = String(friend.username ?? "").toLowerCase();
-    return username === term;
-  });
-  if (usernameMatches.length > 0) {
-    return usernameMatches;
-  }
-
   return list.filter((friend) => {
     const username = String(friend.username ?? "").toLowerCase();
     const fullName = `${friend.first_name ?? ""} ${
@@ -341,13 +332,21 @@ const filterFriendsByQuery = (list, query) => {
 
   //get mock data for invite firends
   app.get("/api/friends", async (req, res) => {
-    const query =
-      (req.query.search || req.query.username || "").toString().trim();
+    const rawUsername =
+      typeof req.query.username === "string" ? req.query.username.trim() : "";
+    const rawSearch =
+      typeof req.query.search === "string"
+        ? req.query.search.trim()
+        : rawUsername
+        ? ""
+        : "";
     const limitParam = Number(req.query.limit);
     const limit =
       Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
     const simulateError =
       String(req.query.simulateError || "").toLowerCase() === "true";
+    const hasExactUsername = rawUsername.length > 0;
+    const hasSearch = !hasExactUsername && rawSearch.length > 0;
 
     if (simulateError) {
       return res.status(503).json({
@@ -356,16 +355,43 @@ const filterFriendsByQuery = (list, query) => {
       });
     }
 
+    if (
+      hasExactUsername &&
+      !/^[A-Za-z0-9._-]+$/.test(rawUsername)
+    ) {
+      return res.status(400).json({
+        error:
+          "Username may only include letters, digits, dots (.), underscores (_), or hyphens (-).",
+      });
+    }
+
     const friends = await ensureFriendsCache();
-    const filtered = filterFriendsByQuery(friends, query);
-    const data = limit ? filtered.slice(0, limit) : filtered;
+    let filteredList = friends;
+    let filtered = false;
+    let filterType = null;
+
+    if (hasExactUsername) {
+      filtered = true;
+      filterType = "username";
+      const term = rawUsername.toLowerCase();
+      filteredList = friends.filter(
+        (friend) => String(friend.username ?? "").toLowerCase() === term
+      );
+    } else if (hasSearch) {
+      filtered = true;
+      filterType = "search";
+      filteredList = filterFriendsByQuery(friends, rawSearch);
+    }
+
+    const data = limit ? filteredList.slice(0, limit) : filteredList;
 
     res.json({
       data,
       meta: {
         total: friends.length,
         count: data.length,
-        filtered: Boolean(query),
+        filtered,
+        filterType,
         cacheSource: friendsCache.source,
         cachedAt: friendsCache.timestamp,
         ttlMs: FRIENDS_CACHE_TTL_MS,

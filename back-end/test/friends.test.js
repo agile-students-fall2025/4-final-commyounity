@@ -56,6 +56,62 @@ it("/api/friends items each include an id", (done) => {
     });
 });
 
+it("/api/friends filters by username when requested", (done) => {
+  request
+    .execute(app)
+    .get("/api/friends")
+    .end((err, res) => {
+      expect(err).to.be.null;
+      expect(res).to.have.status(200);
+      const first = res.body?.data?.[0];
+      expect(first, "Expected at least one friend to test filtering").to.be.an(
+        "object"
+      );
+      const username = encodeURIComponent(String(first.username || "").trim());
+      expect(username.length).to.be.greaterThan(0);
+
+      request
+        .execute(app)
+        .get(`/api/friends?username=${username}`)
+        .end((err2, res2) => {
+          expect(err2).to.be.null;
+          expect(res2).to.have.status(200);
+          expect(res2.body).to.have.property("data").that.is.an("array");
+          expect(res2.body.meta).to.have.property("filtered", true);
+          expect(res2.body.meta).to.have.property("filterType", "username");
+          expect(res2.body.data[0]?.username?.toLowerCase()).to.equal(
+            first.username.toLowerCase()
+          );
+          done();
+        });
+    });
+});
+
+it("/api/friends returns empty data when username is not found", (done) => {
+  const fake = `does-not-exist-${Date.now()}`;
+  request
+    .execute(app)
+    .get(`/api/friends?username=${fake}`)
+    .end((err, res) => {
+      expect(err).to.be.null;
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.be.an("array").that.has.length(0);
+      expect(res.body.meta).to.have.property("filtered", true);
+      done();
+    });
+});
+
+it("/api/friends rejects invalid username characters", (done) => {
+  request
+    .execute(app)
+    .get("/api/friends?username=bad name")
+    .end((err, res) => {
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property("error");
+      done();
+    });
+});
+
 it("/api/friends returns 503 when simulateError flag is set", (done) => {
   request
     .execute(app)

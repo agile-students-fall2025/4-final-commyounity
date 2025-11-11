@@ -27,8 +27,11 @@ Set these in `back-end/.env` (never commit secrets):
 
 | Method | Route | Description |
 | --- | --- | --- |
-| `GET` | `/api/friends` | Returns the canonical friends roster that the front-end uses for hydration, filtering, and local storage seeding. Accepts `search`, `username`, and `limit` query params. |
-| `GET` | `/api/friends?simulateError=true` | Dev/test helper that forces a `503` response, used by the mocha/chai suite to cover error handling without touching production code. |
+| `GET` | `/api/friends` | Returns the canonical friends roster that the front-end uses for hydration, filtering, and local storage seeding. |
+| `GET` | `/api/friends?username=<exact>` | Exact, case-insensitive username match. Rejects invalid characters with `400`. |
+| `GET` | `/api/friends?search=<term>` | Partial match across username and full name. |
+| `GET` | `/api/friends?limit=5` | Optional cap on returned entries (applies after filtering). |
+| `GET` | `/api/friends?simulateError=true` | Dev/test helper that forces a `503` response, used by the mocha/chai suite. |
 
 The `/api/friends` response shape matches the React components’ expectations:
 
@@ -54,6 +57,8 @@ The `/api/friends` response shape matches the React components’ expectations:
   }
 }
 ```
+
+> `username` queries accept only letters, digits, dots (`.`), underscores (`_`), and hyphens (`-`). Any other character results in a `400` response so the front end can surface “bad input” errors cleanly.
 
 ## Testing
 
