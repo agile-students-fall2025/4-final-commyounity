@@ -928,7 +928,7 @@ app.post('/auth/signup', (req, res) => {
 });
 
 //join board button
-// Join board
+
 app.post('/api/boards/:id/join', (req, res) => {
   const { id } = req.params;
   const { userId } = req.body || {}; 
@@ -948,6 +948,61 @@ app.post('/api/boards/:id/join', (req, res) => {
       memberCountDelta: +1,
     },
     timestamp: new Date().toISOString(),
+  });
+});
+
+//create form
+
+const createdBoards =
+  global.__CREATED_BOARDS__ || (global.__CREATED_BOARDS__ = []);
+
+app.post('/api/boards/create', upload.single('photo'), (req, res) => {
+  const title =
+    (req.body.title || req.body.boardName || '').toString().trim();
+  const descriptionLong =
+    (req.body.descriptionLong || req.body.description || '').toString();
+
+  if (!title) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Title (board name) is required',
+    });
+  }
+
+  const fileMeta = req.file
+    ? {
+        filename: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      }
+    : null;
+
+
+  const id = Date.now();
+  const newBoard = {
+    id,
+    title,
+    descriptionLong,
+    isOwner: true,
+    isJoined: true,
+    memberCount: 1,
+    coverPhotoURL: `https://picsum.photos/800/400?seed=board-${id}`,
+    _createdAt: new Date().toISOString(),
+    _file: fileMeta,
+  };
+
+  createdBoards.unshift(newBoard);
+
+  console.log('[BOARD CREATE RECEIVED]', {
+    boardId: id,
+    title,
+    descriptionLong,
+    file: fileMeta || '(no file)',
+  });
+
+  return res.status(201).json({
+    status: 'created',
+    data: newBoard,
   });
 });
 
