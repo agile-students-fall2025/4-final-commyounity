@@ -23,11 +23,6 @@ import PrivacySettingsPage from "./PrivacySettingsPage";
 import DeleteProfilePage from "./DeleteProfilePage";
 import CreateBoard from "./CreateBoard";
 import ChangePasswordPage from "./ChangePasswordPage";
-
-
-
-
-
 import BrowseBoard from './BrowseBoard';
 import JoinBoardDetail from './JoinBoardDetail';
 
@@ -47,11 +42,11 @@ function App() {
             <Route path="/friends/find" element={<FindFriendsPage />} />
             <Route path="/profilepage" element={<ProfilePage />} />
             <Route path="/edit-profile" element={<EditProfilePage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/change-password" element={<ChangePasswordPage />} />
             <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
             <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/delete-profile" element={<DeleteProfilePage />} />
-            <Route path="/settings/change-password" element={<ChangePasswordPage />} />
             <Route path="/viewboards" element={<ViewBoard />} />
             <Route path="/boards/:id" element={<BoardDetail />} />
             <Route path="/joinboards/:id" element={<JoinBoardDetail />} />
@@ -61,10 +56,6 @@ function App() {
             <Route path="/boards/:id/findmembers" element={<FindMembers />} />
             <Route path="/browseboards" element ={<BrowseBoard />} />
             <Route path="/createboard" element={<CreateBoard />} />
-
-
-    
-            
           </Routes>
       </Router>
     </div>
