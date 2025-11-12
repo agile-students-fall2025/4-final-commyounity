@@ -1,0 +1,158 @@
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import './JoinBoardDetail.css';
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
+
+const JoinBoardDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [board, setBoard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState('');
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [joinError, setJoinError] = useState('');
+  const [joined, setJoined] = useState(false);
+
+
+ useEffect(() => {
+  const controller = new AbortController();
+
+  (async () => {
+    try {
+      const res = await axios.get(`http://localhost:4000/api/boards/${id}`, {
+        signal: controller.signal,
+        withCredentials: true, 
+      });
+      setBoard(res.data?.data || null);
+    } catch (e) {
+      if (axios.isCancel(e)) return;
+      console.error('GET /api/boards/:id failed:', e);
+      setError('Could not load board details.');
+    } finally {
+      setLoading(false);
+    }
+  })();
+
+  return () => controller.abort();
+}, [id]);
+
+const handleViewMembers = async () => {
+  setMembersError('');
+  setMembersLoading(true);
+  try {
+    const res = await axios.get('http://localhost:4000/api/members', {
+      withCredentials: true,
+    });
+
+    const members = Array.isArray(res.data?.data) ? res.data.data : [];
+    navigate(`/boards/${id}/members`, {
+      state: {
+        boardId: id,
+        boardTitle: board?.title,
+        members,
+        fetchedAt: Date.now(),
+      },
+    });
+  } catch (e) {
+    console.error('GET /api/members failed:', e);
+    setMembersError('Could not load members. Please try again.');
+  } finally {
+    setMembersLoading(false);
+  }
+};
+
+const handleJoin = async () => {
+  if (joinLoading || joined) return;
+  setJoinError('');
+  setJoinLoading(true);
+  try {
+    const res = await axios.post(
+      `http://localhost:4000/api/boards/${id}/join`,
+      { userId: 1 }, // optional, remove if unused
+      { withCredentials: true }
+    );
+
+    // Optimistically update local UI
+    setBoard((prev) =>
+      prev
+        ? {
+            ...prev,
+            isJoined: true,
+            memberCount: Math.max(0, Number(prev.memberCount || 0) + 1),
+          }
+        : prev
+    );
+    setJoined(true);
+    alert(res.data?.message || "You've joined this board!");
+    navigate('/browseboards');
+  } catch (e) {
+    console.error('POST /api/boards/:id/join failed:', e);
+    setJoinError('Failed to join the board. Please try again.');
+    alert('Failed to join the board. Please try again.');
+  } finally {
+    setJoinLoading(false);
+  }
+};
+
+
+ if (!board) return <div>Loading…</div>;
+
+
+ 
+ const description = board.descriptionLong;
+
+
+ return (
+  <><Header title={board.title} />
+  <Link to="/browseboards" className="back-btn">
+          ← Back
+  </Link>
+   <div className="JoinBoardDetail">
+     <section className="main-content">
+       <article className="board" key={board.id}>
+         <img alt={board.title} src={board.coverPhotoURL} className="board-image" />
+         <div className="details">
+           <p className="description">{description}</p>
+           <p><strong>Members:</strong> {board.memberCount}</p>
+           <div className="buttons">
+           <button
+                  className="members-button"
+                  onClick={handleViewMembers}
+                  disabled={membersLoading}
+                  aria-busy={membersLoading ? 'true' : 'false'}
+                >
+                  {membersLoading ? 'Loading members…' : 'View Members'}
+            </button>
+
+
+            <button
+                  className="join-button"
+                  onClick={handleJoin}
+                  disabled={joinLoading || joined || board.isJoined}
+                  aria-busy={joinLoading ? 'true' : 'false'}
+                >
+                  {joined || board.isJoined
+                    ? 'Joined'
+                    : (joinLoading ? 'Joining…' : 'Join Board')}
+            </button>
+           </div>
+         </div>
+       </article>
+     </section>
+   </div>
+   <Footer/>
+   </>
+ );
+};
+
+
+
+
+export default JoinBoardDetail;
+ 

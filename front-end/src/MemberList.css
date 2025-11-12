@@ -1,0 +1,109 @@
+/* ===== Theme Variables for Consistency ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #6b7280;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+/* ===== Page Container ===== */
+.MemberList {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 24px;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  text-align: center;
+}
+
+/* ===== Member Grid ===== */
+.MemberList .member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  justify-items: center;
+  margin-top: 32px;
+}
+
+/* ===== Member Card ===== */
+.MemberList .member-card {
+  width: 100%;
+  max-width: 280px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.MemberList .member-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Member Avatar ===== */
+.MemberList .member-card img {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 14px;
+  border: 2px solid #eee;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Text ===== */
+.MemberList .member-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.MemberList .member-card p {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* ===== Hover State Accent ===== */
+.MemberList .member-card:hover h3 {
+  color: var(--brand);
+}
+
+/* ===== Responsive Tweaks ===== */
+@media (max-width: 768px) {
+  .MemberList {
+    padding: 16px;
+    margin: 40px auto;
+  }
+
+  .MemberList .member-grid {
+    gap: 16px;
+  }
+
+  .MemberList .member-card {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .MemberList .member-card img {
+    width: 72px;
+    height: 72px;
+  }
+
+  .MemberList .member-card h3 {
+    font-size: 1rem;
+  }
+}

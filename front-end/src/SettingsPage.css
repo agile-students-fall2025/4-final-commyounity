@@ -1,0 +1,120 @@
+/* ===== Theme variables for consistency ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+}
+
+/* ===== Page layout ===== */
+.SettingsPage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 60vh;
+  padding: 40px 24px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ===== Back button container (aligned with page grid) ===== */
+.settings-back-container {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+}
+
+/* ===== Back button ===== */
+.settings-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #000;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s ease;
+}
+
+.settings-back:hover {
+  background: #222;
+  transform: translateY(-2px);
+}
+.settings-back:active {
+  transform: scale(0.97);
+}
+
+/* ===== Button group ===== */
+.settings-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  margin-top: 40px;
+}
+
+/* ===== Individual setting blocks ===== */
+.settings-block {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  height: 56px;
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+  background: var(--brand);
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(47, 109, 246, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.settings-block:hover {
+  background: var(--brand-dark);
+  transform: translateY(-2px);
+  opacity: 0.95;
+  box-shadow: 0 10px 26px rgba(47, 109, 246, 0.35);
+}
+
+.settings-block:focus-visible,
+.settings-back:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.3);
+}
+
+/* ===== Responsive adjustments ===== */
+@media (max-width: 600px) {
+  .settings-buttons {
+    gap: 18px;
+  }
+
+  .settings-back-container {
+    justify-content: center;
+    padding: 0 16px;
+  }
+
+  .settings-block {
+    width: 100%;
+    max-width: 320px;
+  }
+}

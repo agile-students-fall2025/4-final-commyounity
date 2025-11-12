@@ -1,0 +1,244 @@
+/* ===== Theme Variables (shared) ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #6b7280;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+/* ===== Main Container ===== */
+.FriendRequestsPage {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 40px 28px 100px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  text-align: center;
+}
+
+/* ===== Header Section ===== */
+.friendrequests-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.friendrequests-logo img {
+  width: 280px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+/* ===== Feedback Messages ===== */
+.request-feedback {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.request-feedback.success {
+  background: #e8faf1;
+  color: #1e9c5e;
+}
+
+.request-feedback.info {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.request-loading {
+  margin-top: 40px;
+  color: #555;
+}
+
+.request-error {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  background: #fdf2f2;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* ===== Requests Grid ===== */
+.request-list {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.request-card {
+  background: var(--card);
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.request-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== User Info Row ===== */
+.request-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.request-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
+/* ===== Text Content ===== */
+.request-card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.request-card .request-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.request-message {
+  margin: 0;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* ===== Action Buttons ===== */
+.request-card .request-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.request-card button {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.request-card button.accept {
+  background: #000;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.request-card button.accept:hover {
+  background: #222;
+  transform: translateY(-2px);
+}
+
+.request-card button.decline {
+  background: #f3f4f6;
+  color: #111;
+}
+.request-card button.decline:hover {
+  background: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+/* ===== Empty State ===== */
+.request-empty {
+  margin-top: 48px;
+  padding: 40px 32px;
+  color: #444;
+  background: var(--card);
+  border: 1px dashed #ccc;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  box-shadow: var(--shadow);
+}
+
+.request-empty h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.request-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: var(--brand);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+.request-empty-cta:hover {
+  background: var(--brand-dark);
+  transform: translateY(-2px);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .FriendRequestsPage {
+    margin: 40px 12px;
+    padding: 32px 18px 80px;
+  }
+
+  .friendrequests-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .friendrequests-logo img {
+    width: 180px;
+    height: auto;
+  }
+
+  .request-list {
+    grid-template-columns: 1fr;
+  }
+
+  .request-card button {
+    padding: 14px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .request-card {
+    padding: 16px;
+  }
+  .request-avatar {
+    width: 48px;
+    height: 48px;
+  }
+  .request-card h2 {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,140 @@
+/* ---------- Theme + fluid type ---------- */
+:root{
+  --bg: #fafafa;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #444;
+  --brand: #007bff;
+  --warn: #ffc107;
+  --shadow: 0 8px 25px rgba(0,0,0,.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+
+  --fs-base: clamp(14px, 1.6vw, 16px);
+  --fs-lg: clamp(16px, 2vw, 18px);
+}
+
+/* ---------- Page wrapper ---------- */
+.BoardDetail {
+  max-width: 980px;
+  margin: 64px auto;
+  padding: 0 24px 48px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ---------- Card ---------- */
+.BoardDetail .board {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+/* image scales nicely; keeps rounded corners */
+.BoardDetail .board img {
+  width: min(320px, 38vw);
+  aspect-ratio: 4 / 3;        /* prevents jumping on load */
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+/* ---------- Details ---------- */
+.BoardDetail .details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  line-height: 1.6;
+}
+
+.BoardDetail .description {
+  font-size: var(--fs-base);
+  color: #333;
+  text-align: justify;
+}
+
+.BoardDetail .member-count {
+  font-weight: 600;
+  color: var(--muted);
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+/* ---------- Buttons row ---------- */
+.BoardDetail .buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 28px;
+  text-align: center;
+}
+
+/* base button */
+.BoardDetail .buttons button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  min-width: 160px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  line-height: 1;
+}
+
+/* variants */
+.BoardDetail .buttons .members-button { background: var(--brand); color: #fff; }
+.BoardDetail .buttons .edit-button    { background: var(--warn);  color: #333; }
+.BoardDetail .buttons .leave-button   { background: #f2f2f2;     color: #111; }
+
+/* hover/focus */
+.BoardDetail .buttons button:hover { transform: translateY(-2px); opacity: .95; }
+.BoardDetail .buttons button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,123,255,.25);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 820px) {
+  .BoardDetail { padding: 0 16px 40px; }
+  .BoardDetail .board img { width: 42vw; }
+}
+
+@media (max-width: 700px) {
+  .BoardDetail .board {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 18px;
+  }
+  .BoardDetail .board img {
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 16 / 9;     /* widescreen feel on phones */
+  }
+  .BoardDetail .details {
+    align-items: center;
+  }
+  .BoardDetail .buttons {
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .BoardDetail .buttons button {
+    width: min(100%, 320px);  /* comfy full-width buttons on mobile */
+  }
+}

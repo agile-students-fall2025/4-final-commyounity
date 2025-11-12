@@ -9,7 +9,6 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require("path");
 const profileRouter = require("./routes/profile");
-const boardFeedRouter = require("./routes/boardfeed");
 const app = express() // instantiate an Express object
 
 app.use(cors({
@@ -45,6 +44,30 @@ const fallbackBoards = [
           'purus eu magna vulputate luctus cum sociis natoque penatibus et magnis',
         descriptionLong:
             'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
+      },
+      {
+        id: 3,
+        title: 'Art & Culture Exchange',
+        isOwner: false,
+        isJoined: false,
+        memberCount: 24,
+        coverPhotoURL: 'https://picsum.photos/800/400?seed=board-3',
+        descriptionShort:
+          'connect with artists and creators sharing cross-cultural experiences',
+        descriptionLong:
+          'explore the intersection of art, music, and culture in this vibrant community. members host weekly digital exhibits, share creative inspiration, and collaborate across disciplines. perfect for painters, photographers, and anyone with a creative spark.'
+      },
+      {
+        id: 4,
+        title: 'Language Learners Hub',
+        isOwner: false,
+        isJoined: false,
+        memberCount: 18,
+        coverPhotoURL: 'https://picsum.photos/800/400?seed=board-4',
+        descriptionShort:
+          'practice languages with friendly native speakers from around the world',
+        descriptionLong:
+          'a global space for language enthusiasts to connect, exchange tips, and build fluency through conversation. join themed events like “spanish tuesdays” and “french friday” to improve your skills and make friends from every corner of the world.'
       }
   ];
 
@@ -904,24 +927,89 @@ app.post('/auth/signup', (req, res) => {
   });
 });
 
+//join board button
+
+app.post('/api/boards/:id/join', (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body || {}; 
+
+  console.log('[JOIN BOARD]', {
+    boardId: id,
+    userId: userId ?? '(anonymous)',
+    at: new Date().toISOString(),
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    boardId: id,
+    message: `User${userId ? ` ${userId}` : ''} joined the board.`,
+    updated: {
+      isJoined: true,
+      memberCountDelta: +1,
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
+//create form
+
+const createdBoards =
+  global.__CREATED_BOARDS__ || (global.__CREATED_BOARDS__ = []);
+
+app.post('/api/boards/create', upload.single('photo'), (req, res) => {
+  const title =
+    (req.body.title || req.body.boardName || '').toString().trim();
+  const descriptionLong =
+    (req.body.descriptionLong || req.body.description || '').toString();
+
+  if (!title) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Title (board name) is required',
+    });
+  }
+
+  const fileMeta = req.file
+    ? {
+        filename: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      }
+    : null;
+
+
+  const id = Date.now();
+  const newBoard = {
+    id,
+    title,
+    descriptionLong,
+    isOwner: true,
+    isJoined: true,
+    memberCount: 1,
+    coverPhotoURL: `https://picsum.photos/800/400?seed=board-${id}`,
+    _createdAt: new Date().toISOString(),
+    _file: fileMeta,
+  };
+
+  createdBoards.unshift(newBoard);
+
+  console.log('[BOARD CREATE RECEIVED]', {
+    boardId: id,
+    title,
+    descriptionLong,
+    file: fileMeta || '(no file)',
+  });
+
+  return res.status(201).json({
+    status: 'created',
+    data: newBoard,
+  });
+});
+
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 //profile routes
 app.use("/api/profile", profileRouter);
 // export the express app we created to make it available to other modules
-
-//board feed routes
-app.use("/api/boards", boardFeedRouter);
-
-
-
-//in memory storage for posts
-const boardPosts = global.__BOARD_POSTS__ || (global.__BOARD_POSTS__ = []);
-
-
-
-
-
-
 module.exports = app

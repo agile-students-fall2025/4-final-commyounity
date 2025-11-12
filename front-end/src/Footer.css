@@ -1,0 +1,87 @@
+/* ===== Shared Theme Variables ===== */
+:root {
+  --brand: #2f6df6;
+  --brand-dark: #2057cc;
+  --text: #1b1b1f;
+  --muted: #9ca3af;
+  --footer-bg: #111;
+  --footer-shadow: 0 -4px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== App Footer ===== */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--footer-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+  padding: 14px 0;
+  box-shadow: var(--footer-shadow);
+  z-index: 999;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ===== Footer Buttons ===== */
+.footer-btn {
+  background: transparent;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: color 0.25s ease, transform 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+/* ===== Hover & Active States ===== */
+.footer-btn:hover {
+  color: var(--brand);
+  transform: translateY(-2px);
+}
+
+.footer-btn:active {
+  transform: scale(0.97);
+}
+
+/* ===== Active Page Highlight ===== */
+.footer-btn.active {
+  color: var(--brand);
+  font-weight: 700;
+  text-shadow: 0 0 6px rgba(47, 109, 246, 0.6);
+}
+
+/* ===== Mobile Layout ===== */
+@media (max-width: 600px) {
+  .app-footer {
+    gap: 28px;
+    padding: 12px 0;
+  }
+
+  .footer-btn {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    gap: 6px;
+  }
+}
+
+/* ===== Ultra Small Devices (e.g. 360px) ===== */
+@media (max-width: 400px) {
+  .app-footer {
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 10px 0 12px;
+  }
+
+  .footer-btn {
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,104 @@
+/* ---------- Theme + fluid sizing ---------- */
+:root{
+  --bg: #282c34;
+  --text: #ffffff;
+  --accent: #61dafb;
+  --radius: 14px;
+
+  /* fluid type scales nicely from mobile → desktop */
+  --fs-base: clamp(14px, 1.6vw, 18px);
+  --fs-lg: clamp(16px, 2.2vw, 22px);
+  --fs-xl: clamp(20px, 3.2vw, 32px);
+}
+
+/* ---------- App shell ---------- */
+.App {
+  text-align: center;
+  font-size: var(--fs-base);
+  -webkit-tap-highlight-color: transparent;  /* nicer taps on mobile */
+}
+
+/* ---------- Header: safe-area + mobile viewport fix ---------- */
+.App-header {
+  background-color: var(--bg);
+  color: var(--text);
+
+  /* 100dvh works better on mobile than 100vh (respects browser UI) */
+  min-height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* comfortable padding, including iOS safe areas */
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+
+  gap: 20px;
+}
+
+/* ---------- Logo: fluid + responsive ---------- */
+.App-logo {
+  width: clamp(120px, 40vw, 280px);
+  aspect-ratio: 1 / 1;           /* keeps it square without hard-coding height */
+  height: auto;                  /* let width control size */
+  pointer-events: none;
+  will-change: transform;        /* smoother animation on low-end devices */
+  user-select: none;
+}
+
+/* Respect users who prefer reduced motion (keeps state/graphics, stops spin) */
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+/* ---------- Links / CTAs ---------- */
+.App-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: var(--fs-lg);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  transition: transform .15s ease, opacity .15s ease, filter .15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.App-link:active { transform: scale(0.98); }
+.App-link:hover  { opacity: 0.9; filter: brightness(1.05); }
+
+/* ---------- Keyframes (unchanged) ---------- */
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ---------- Mobile-first refinements ---------- */
+@media (max-width: 640px) {
+  .App-header {
+    gap: 16px;
+    padding: 24px 16px;
+  }
+  .App-link {
+    width: min(90%, 340px);   /* big, easy tap target */
+    justify-content: center;
+  }
+}
+
+/* ---------- Landscape phones: keep content centered and readable ---------- */
+@media (max-height: 460px) and (orientation: landscape) {
+  .App-header {
+    min-height: auto;
+    padding-block: 24px;
+  }
+  .App-logo {
+    width: clamp(90px, 22vw, 160px);
+  }
+}
