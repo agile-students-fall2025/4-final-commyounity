@@ -9,8 +9,8 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require("path");
 const profileRouter = require("./routes/profile");
-
 const app = express() // instantiate an Express object
+
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
@@ -907,6 +907,6 @@ app.post('/auth/signup', (req, res) => {
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 //profile routes
-app.use("/api", require("./routes/profile"))
+app.use("/api/profile", profileRouter);
 // export the express app we created to make it available to other modules
 module.exports = app
