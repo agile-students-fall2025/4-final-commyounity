@@ -2,46 +2,110 @@ import React, { useEffect, useState } from "react";
 import "./BoardFeed.css";
 
 const BoardFeed = ({ boardId, isOwner }) => {
-  const storageKey = `board:${boardId}:feed`;
   const [posts, setPosts] = useState([]);
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  const storageKey = `board:${boardId}:feed`;
+
+  // Load cached feed immediately
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
-      setPosts(Array.isArray(saved) ? saved : []);
+      if (Array.isArray(saved)) setPosts(saved);
     } catch {
-      setPosts([]);
+      console.warn("Local feed cache corrupted, ignoring.");
     }
-  }, [storageKey]);
+    fetchFeed(); // Then fetch fresh feed
+  }, [boardId]);
 
+  // Persist feed to localStorage on update
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(posts));
   }, [storageKey, posts]);
 
-  const handleSubmit = (e) => {
+  const fetchFeed = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setPosts(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error loading board feed:", err);
+      setError("Failed to load board feed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmed = text.trim();
     if (!trimmed) return;
-    const newPost = {
-      id: Date.now(),
-      author: "You",
-      avatar: `https://i.pravatar.cc/64?u=${Date.now()}`,
-      message: trimmed,
-      ts: new Date().toISOString(),
-      likes: 0,
-    };
-    setPosts([newPost, ...posts]);
-    setText("");
+
+    try {
+      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ message: trimmed }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const newPost = await res.json();
+
+      // Optimistic update
+      setPosts((prev) => [newPost, ...prev]);
+      setText("");
+    } catch (err) {
+      console.error("Error posting message:", err);
+      alert("Failed to post message. Please try again.");
+    }
   };
 
-  const like = (id) =>
-    setPosts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, likes: p.likes + 1 } : p))
-    );
+  const like = async (id) => {
+    try {
+      await fetch(`http://localhost:4000/api/boards/${boardId}/feed/${id}/like`, {
+        method: "POST",
+        credentials: "include",
+      });
+      setPosts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, likes: p.likes + 1 } : p))
+      );
+    } catch (err) {
+      console.error("Failed to like post:", err);
+    }
+  };
 
-  const remove = (id) =>
-    setPosts((prev) => prev.filter((p) => p.id !== id));
+  const remove = async (id) => {
+    if (!window.confirm("Delete this post?")) return;
+    try {
+      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setPosts((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        alert("Failed to delete post.");
+      }
+    } catch (err) {
+      console.error("Error deleting post:", err);
+    }
+  };
+
+  // === UI states ===
+  if (loading) return <div className="BoardFeed">Loading feed...</div>;
+  if (error)
+    return (
+      <div className="BoardFeed" style={{ color: "red" }}>
+        {error}
+      </div>
+    );
 
   return (
     <div className="BoardFeed">
