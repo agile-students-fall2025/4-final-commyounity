@@ -9,6 +9,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require("path");
 const profileRouter = require("./routes/profile");
+const boardFeedRouter = require("./routes/boardfeed");
 const app = express() // instantiate an Express object
 
 app.use(cors({
@@ -956,6 +957,9 @@ app.post('/api/boards/:id/join', (req, res) => {
 const createdBoards =
   global.__CREATED_BOARDS__ || (global.__CREATED_BOARDS__ = []);
 
+//in memory storage for posts
+const boardPosts = global.__BOARD_POSTS__ || (global.__BOARD_POSTS__ = []);
+
 app.post('/api/boards/create', upload.single('photo'), (req, res) => {
   const title =
     (req.body.title || req.body.boardName || '').toString().trim();
@@ -1011,5 +1015,10 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 //profile routes
 app.use("/api/profile", profileRouter);
+
+
+//board routes 
+app.use("/api/boards", boardFeedRouter);
+
 // export the express app we created to make it available to other modules
 module.exports = app
