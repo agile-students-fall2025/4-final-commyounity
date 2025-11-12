@@ -39,7 +39,7 @@ const BoardList = props => {
       <h3 style = {{ 'paddingLeft' : '20px'}}>Boards Your Are a Member Of:</h3>
       <section className="NotYourBoards">
         {data
-             .filter(item => !item.isOwner)        
+             .filter(item => !item.isOwner && item.isJoined)        
              .map(item => (                      
               <BoardThumb key={item.id} details={item} />
             ))
