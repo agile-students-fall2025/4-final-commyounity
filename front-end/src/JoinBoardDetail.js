@@ -8,41 +8,103 @@ import Header from "./Header";
 import Footer from "./Footer";
 
 const JoinBoardDetail = () => {
- const { id } = useParams();
- const [board, setBoard] = useState(null);
- const navigate = useNavigate();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [board, setBoard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState('');
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [joinError, setJoinError] = useState('');
+  const [joined, setJoined] = useState(false);
 
 
  useEffect(() => {
-   axios
-     .get('https://my.api.mockaroo.com/mock_boards_data.json', {
-       headers: { 'X-API-Key': process.env.REACT_APP_KEY, Accept: 'application/json' },
-       params: { count: 50 },
-     })
-     .then(res => {
-       const list = Array.isArray(res.data) ? res.data : [res.data];
-       const found = list.find(item => String(item.id) === String(id));
-       setBoard(found || list[0]);
-     })
-     .catch(err => {
-       console.error('Mockaroo error:', err);
-       setBoard({
-         id: 3,
-         title: 'Sample Board',
-         memberCount: 15,
-         isOwner: false,
-         coverPhotoURL: 'https://picsum.photos/800/400?seed=fallback',
-         descriptionLong:
-           'Fallback description: This is a placeholder board for users who haven’t joined yet.',
-       });
-     });
- }, [id]);
+  const controller = new AbortController();
+
+  (async () => {
+    try {
+      const res = await axios.get(`http://localhost:4000/api/boards/${id}`, {
+        signal: controller.signal,
+        withCredentials: true, 
+      });
+      setBoard(res.data?.data || null);
+    } catch (e) {
+      if (axios.isCancel(e)) return;
+      console.error('GET /api/boards/:id failed:', e);
+      setError('Could not load board details.');
+    } finally {
+      setLoading(false);
+    }
+  })();
+
+  return () => controller.abort();
+}, [id]);
+
+const handleViewMembers = async () => {
+  setMembersError('');
+  setMembersLoading(true);
+  try {
+    const res = await axios.get('http://localhost:4000/api/members', {
+      withCredentials: true,
+    });
+
+    const members = Array.isArray(res.data?.data) ? res.data.data : [];
+    navigate(`/boards/${id}/members`, {
+      state: {
+        boardId: id,
+        boardTitle: board?.title,
+        members,
+        fetchedAt: Date.now(),
+      },
+    });
+  } catch (e) {
+    console.error('GET /api/members failed:', e);
+    setMembersError('Could not load members. Please try again.');
+  } finally {
+    setMembersLoading(false);
+  }
+};
+
+const handleJoin = async () => {
+  if (joinLoading || joined) return;
+  setJoinError('');
+  setJoinLoading(true);
+  try {
+    const res = await axios.post(
+      `http://localhost:4000/api/boards/${id}/join`,
+      { userId: 1 }, // optional, remove if unused
+      { withCredentials: true }
+    );
+
+    // Optimistically update local UI
+    setBoard((prev) =>
+      prev
+        ? {
+            ...prev,
+            isJoined: true,
+            memberCount: Math.max(0, Number(prev.memberCount || 0) + 1),
+          }
+        : prev
+    );
+    setJoined(true);
+    alert(res.data?.message || "You've joined this board!");
+    navigate('/browseboards');
+  } catch (e) {
+    console.error('POST /api/boards/:id/join failed:', e);
+    setJoinError('Failed to join the board. Please try again.');
+    alert('Failed to join the board. Please try again.');
+  } finally {
+    setJoinLoading(false);
+  }
+};
 
 
  if (!board) return <div>Loading…</div>;
 
 
- const imageSrc = `https://picsum.photos/800/400?seed=board-${board.id}`;
+ 
  const description = board.descriptionLong;
 
 
@@ -54,32 +116,31 @@ const JoinBoardDetail = () => {
    <div className="JoinBoardDetail">
      <section className="main-content">
        <article className="board" key={board.id}>
-         <img alt={board.title} src={imageSrc} className="board-image" />
+         <img alt={board.title} src={board.coverPhotoURL} className="board-image" />
          <div className="details">
            <p className="description">{description}</p>
            <p><strong>Members:</strong> {board.memberCount}</p>
            <div className="buttons">
-             <button
-               className="members-button"
-               onClick={() =>
-                 navigate(`/boards/${board.id}/members`, {
-                   state: { isBoardOwner: false },
-                 })
-               }
-             >
-               View Members
-             </button>
+           <button
+                  className="members-button"
+                  onClick={handleViewMembers}
+                  disabled={membersLoading}
+                  aria-busy={membersLoading ? 'true' : 'false'}
+                >
+                  {membersLoading ? 'Loading members…' : 'View Members'}
+            </button>
 
 
-             <button
-               className="join-button"
-               onClick={() => {
-                 alert("You've joined this board! (pretend)");
-                 navigate('/browseboards');
-               }}
-             >
-               Join Board
-             </button>
+            <button
+                  className="join-button"
+                  onClick={handleJoin}
+                  disabled={joinLoading || joined || board.isJoined}
+                  aria-busy={joinLoading ? 'true' : 'false'}
+                >
+                  {joined || board.isJoined
+                    ? 'Joined'
+                    : (joinLoading ? 'Joining…' : 'Join Board')}
+            </button>
            </div>
          </div>
        </article>

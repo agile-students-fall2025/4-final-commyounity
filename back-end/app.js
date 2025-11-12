@@ -44,6 +44,30 @@ const fallbackBoards = [
           'purus eu magna vulputate luctus cum sociis natoque penatibus et magnis',
         descriptionLong:
             'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
+      },
+      {
+        id: 3,
+        title: 'Art & Culture Exchange',
+        isOwner: false,
+        isJoined: false,
+        memberCount: 24,
+        coverPhotoURL: 'https://picsum.photos/800/400?seed=board-3',
+        descriptionShort:
+          'connect with artists and creators sharing cross-cultural experiences',
+        descriptionLong:
+          'explore the intersection of art, music, and culture in this vibrant community. members host weekly digital exhibits, share creative inspiration, and collaborate across disciplines. perfect for painters, photographers, and anyone with a creative spark.'
+      },
+      {
+        id: 4,
+        title: 'Language Learners Hub',
+        isOwner: false,
+        isJoined: false,
+        memberCount: 18,
+        coverPhotoURL: 'https://picsum.photos/800/400?seed=board-4',
+        descriptionShort:
+          'practice languages with friendly native speakers from around the world',
+        descriptionLong:
+          'a global space for language enthusiasts to connect, exchange tips, and build fluency through conversation. join themed events like “spanish tuesdays” and “french friday” to improve your skills and make friends from every corner of the world.'
       }
   ];
 
@@ -900,6 +924,30 @@ app.post('/auth/signup', (req, res) => {
     ok: true,
     message: 'Account created successfully.',
     user: { id: newUser.id, username: newUser.username, email: newUser.email, name: newUser.name },
+  });
+});
+
+//join board button
+// Join board
+app.post('/api/boards/:id/join', (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body || {}; 
+
+  console.log('[JOIN BOARD]', {
+    boardId: id,
+    userId: userId ?? '(anonymous)',
+    at: new Date().toISOString(),
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    boardId: id,
+    message: `User${userId ? ` ${userId}` : ''} joined the board.`,
+    updated: {
+      isJoined: true,
+      memberCountDelta: +1,
+    },
+    timestamp: new Date().toISOString(),
   });
 });
 
