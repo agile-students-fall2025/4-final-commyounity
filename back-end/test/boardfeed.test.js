@@ -46,7 +46,7 @@ describe("BoardFeed API", () => {
       .end((err, res) => {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
-        expect(res.body).to.have.property("message", "Test post");
+        expect(res.body).to.have.property("message", "Test post from Chai");
         expect(res.body).to.have.property("id");
         testPostId = res.body.id; // save for later tests
         done();
