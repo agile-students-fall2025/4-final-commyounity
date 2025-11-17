@@ -1,14 +1,13 @@
-import chai from "chai";
-import chaiHttp from "chai-http";
+import { use, expect } from "chai";
+import { default as chaiHttp, request } from "chai-http";
 import app from "../app.js";
 
-chai.use(chaiHttp);
-const { expect } = chai;
+use(chaiHttp);
 
 describe("Friend Requests API", () => {
   it("GET /api/friend-requests returns cached requests", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .get("/api/friend-requests")
       .end((err, res) => {
         expect(err).to.be.null;
@@ -20,16 +19,16 @@ describe("Friend Requests API", () => {
   });
 
   it("POST /api/friend-requests/:id/accept removes the request and returns friend payload", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .get("/api/friend-requests")
       .end((err, res) => {
         expect(err).to.be.null;
         const target = res.body.data[0];
         expect(target).to.exist;
 
-        chai
-          .request(app)
+        request
+          .execute(app)
           .post(`/api/friend-requests/${encodeURIComponent(target.id)}/accept`)
           .end((err2, res2) => {
             expect(err2).to.be.null;
@@ -47,19 +46,17 @@ describe("Friend Requests API", () => {
   });
 
   it("POST /api/friend-requests/:id/decline removes the request and echoes declined data", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .get("/api/friend-requests")
       .end((err, res) => {
         expect(err).to.be.null;
         const target = res.body.data[0];
         expect(target).to.exist;
 
-        chai
-          .request(app)
-          .post(
-            `/api/friend-requests/${encodeURIComponent(target.id)}/decline`
-          )
+        request
+          .execute(app)
+          .post(`/api/friend-requests/${encodeURIComponent(target.id)}/decline`)
           .end((err2, res2) => {
             expect(err2).to.be.null;
             expect(res2).to.have.status(200);
