@@ -22,6 +22,7 @@ Set these in `back-end/.env` (never commit secrets):
 | `MOCKAROO_FRIENDS_URL` | Base URL for the friends dataset (defaults to Mockaroo friends endpoint). |
 | `FRIENDS_FETCH_COUNT` | How many friends to request per fetch (defaults to 20). |
 | `FRIENDS_CACHE_TTL_MS` | Cache lifetime for the friends roster in milliseconds (defaults to 5 minutes). |
+| — | Friend requests currently use a simple in-memory cache seeded from fallback data; no env vars required yet. |
 
 ## Key Routes
 
@@ -32,6 +33,9 @@ Set these in `back-end/.env` (never commit secrets):
 | `GET` | `/api/friends?search=<term>` | Partial match across username and full name. |
 | `GET` | `/api/friends?limit=5` | Optional cap on returned entries (applies after filtering). |
 | `GET` | `/api/friends?simulateError=true` | Dev/test helper that forces a `503` response, used by the mocha/chai suite. |
+| `GET` | `/api/friend-requests` | Returns the in-memory list of pending friend requests (cached from fallback data until a real backend exists). |
+| `POST` | `/api/friend-requests/:id/accept` | Simulates accepting a request. Removes it from the cache and returns the normalized friend object that the front end persists locally. |
+| `POST` | `/api/friend-requests/:id/decline` | Simulates declining a request. Removes it from the cache and echoes the declined id/username. |
 
 The `/api/friends` response shape matches the React components’ expectations:
 
@@ -70,3 +74,5 @@ npm run coverage       # c8 + mocha (target ≥10% coverage)
 ```
 
 `friends.test.js` hits `/api/friends` normally and again with `simulateError=true` to exercise the fallback/error handling logic. This keeps the friends API’s behavior in sync with the front-end integration. 
+
+`friendRequests.test.js` covers the GET + POST routes for the friend requests module so the mocked accept/decline flow stays in sync with the React page.
