@@ -424,7 +424,7 @@ app.get("/api/boards/search", async (req, res) => {
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'default-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
   })
@@ -433,35 +433,46 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:4000/auth/google/callback",
-    },
-    (accessToken, refreshToken, profile, done) => {
-      console.log("Google profile:", profile);
-      return done(null, profile);
-    }
-  )
-);
+// Only configure Google OAuth if credentials are provided
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "http://localhost:4000/auth/google/callback",
+      },
+      (accessToken, refreshToken, profile, done) => {
+        console.log("Google profile:", profile);
+        return done(null, profile);
+      }
+    )
+  );
+} else {
+  console.warn("Google OAuth credentials not found. Google login will be disabled.");
+}
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  app.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+  );
 
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/login-failed",
-    successRedirect: "http://localhost:3000/home", 
-  })
-);
+  app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", {
+      failureRedirect: "/login-failed",
+      successRedirect: "http://localhost:3000/home", 
+    })
+  );
+} else {
+  app.get("/auth/google", (req, res) => {
+    res.status(503).json({ error: "Google OAuth is not configured" });
+  });
+}
 
 app.get("/login-failed", (req, res) => {
   res.status(401).json({ error: "Login failed" });
@@ -478,67 +489,73 @@ app.get("/logout", (req, res) => {
 const googleSignupUsers =
   global.__GOOGLE_SIGNUP_USERS__ || (global.__GOOGLE_SIGNUP_USERS__ = []);
 
-passport.use(
-  'google-signup',
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'http://localhost:4000/auth/google/signup/callback',
-    },
-    (accessToken, refreshToken, profile, done) => {
-      try {
-        const email = profile.emails?.[0]?.value || null;
-        const name = profile.displayName || 'Google User';
-        const googleId = profile.id;
-        let user =
-          googleSignupUsers.find((u) => u.googleId === googleId) ||
-          (email
-            ? googleSignupUsers.find(
-                (u) => (u.email || '').toLowerCase() === email.toLowerCase()
-              )
-            : null);
-        if (!user) {
-          const nextId =
-            googleSignupUsers.length > 0
-              ? Math.max(...googleSignupUsers.map((u) => u.id || 0)) + 1
-              : 1;
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    'google-signup',
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: 'http://localhost:4000/auth/google/signup/callback',
+      },
+      (accessToken, refreshToken, profile, done) => {
+        try {
+          const email = profile.emails?.[0]?.value || null;
+          const name = profile.displayName || 'Google User';
+          const googleId = profile.id;
+          let user =
+            googleSignupUsers.find((u) => u.googleId === googleId) ||
+            (email
+              ? googleSignupUsers.find(
+                  (u) => (u.email || '').toLowerCase() === email.toLowerCase()
+                )
+              : null);
+          if (!user) {
+            const nextId =
+              googleSignupUsers.length > 0
+                ? Math.max(...googleSignupUsers.map((u) => u.id || 0)) + 1
+                : 1;
 
-          user = {
-            id: nextId,
-            googleId,
-            email,
-            name,
-            username: email ? email.split('@')[0] : `google_${googleId}`,
-            authProvider: 'google',
-          };
+            user = {
+              id: nextId,
+              googleId,
+              email,
+              name,
+              username: email ? email.split('@')[0] : `google_${googleId}`,
+              authProvider: 'google',
+            };
 
-          googleSignupUsers.push(user);
-          console.log('[GOOGLE SIGNUP SUCCESS]', user);
-        } else {
-          console.log('[GOOGLE SIGNUP - EXISTING USER]', user);
+            googleSignupUsers.push(user);
+            console.log('[GOOGLE SIGNUP SUCCESS]', user);
+          } else {
+            console.log('[GOOGLE SIGNUP - EXISTING USER]', user);
+          }
+
+          return done(null, user);
+        } catch (err) {
+          return done(err);
         }
-
-        return done(null, user);
-      } catch (err) {
-        return done(err);
       }
-    }
-  )
-);
+    )
+  );
 
-app.get(
-  '/auth/google/signup',
-  passport.authenticate('google-signup', { scope: ['profile', 'email'] })
-);
+  app.get(
+    '/auth/google/signup',
+    passport.authenticate('google-signup', { scope: ['profile', 'email'] })
+  );
 
-app.get(
-  '/auth/google/signup/callback',
-  passport.authenticate('google-signup', {
-    failureRedirect: 'http://localhost:3000/signup?error=google_signup_failed',
-    successRedirect: 'http://localhost:3000/home',
-  })
-);
+  app.get(
+    '/auth/google/signup/callback',
+    passport.authenticate('google-signup', {
+      failureRedirect: 'http://localhost:3000/signup?error=google_signup_failed',
+      successRedirect: 'http://localhost:3000/home',
+    })
+  );
+} else {
+  app.get('/auth/google/signup', (req, res) => {
+    res.status(503).json({ error: "Google OAuth is not configured" });
+  });
+}
 
 // POST 
 
