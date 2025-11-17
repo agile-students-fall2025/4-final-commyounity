@@ -26,11 +26,10 @@ it('POST /auth/signup returns 201 and new user information', done => {
       expect(res.body)
         .to.have.property('message')
         .that.includes('Account created successfully');
-      expect(res.body).to.have.property('user').that.includes({
-        username: payload.username,
-        email: payload.email,
-        name: payload.username,
-      });
+      expect(res.body).to.have.property('user');
+      expect(res.body.user).to.have.property('username', payload.username);
+      expect(res.body.user).to.have.property('email', payload.email);
+      expect(res.body.user).to.have.property('name', payload.username);
       done();
     });
 });
