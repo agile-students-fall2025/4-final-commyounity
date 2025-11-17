@@ -97,6 +97,7 @@ let friendsCache = {
 };
 
 let friendRequestsCache = [...fallbackFriendRequests];
+let mockFriendsFetcher = null; // used during tests
 
 const shouldRefreshFriendsCache = () => {
   return (
@@ -106,7 +107,8 @@ const shouldRefreshFriendsCache = () => {
 };
 
 const fetchFriendsFromMockaroo = async () => {
-  const response = await axios.get(MOCKAROO_FRIENDS_URL, {
+  const fetcher = mockFriendsFetcher || axios.get;
+  const response = await fetcher(MOCKAROO_FRIENDS_URL, {
     params: {
       key: MOCKAROO_API_KEY,
       count: FRIENDS_FETCH_COUNT,
@@ -172,6 +174,22 @@ const getFriendsCacheMeta = () => ({
   ttlMs: FRIENDS_CACHE_TTL_MS,
 });
 
+const resetFriendsCacheForTests = () => {
+  friendsCache = {
+    data: normalizedFallbackFriends,
+    timestamp: 0,
+    source: "fallback",
+  };
+};
+
+const resetFriendRequestsCacheForTests = () => {
+  friendRequestsCache = [...fallbackFriendRequests];
+};
+
+const setMockFriendsFetcherForTests = (fn) => {
+  mockFriendsFetcher = fn;
+};
+
 const findFriendRequest = (id) =>
   friendRequestsCache.find((req) => String(req.id) === String(id));
 
@@ -201,4 +219,7 @@ module.exports = {
   removeFriendRequest,
   addFriendFromRequest,
   getFriendsCacheMeta,
+  resetFriendsCacheForTests,
+  resetFriendRequestsCacheForTests,
+  setMockFriendsFetcherForTests,
 };
