@@ -131,9 +131,6 @@ export default function ProfilePage() {
   return (
     <>
       <Header title="Your Profile" />
-      <Link to="/home" className="back-btn">
-        ← Back
-      </Link>
       <div className="ProfilePage">
         {/* User top card: name/handle + profile picture area */}
         <section className="profile-top-card">
