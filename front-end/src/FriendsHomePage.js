@@ -1,21 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FriendsHomePage.css";
 import Header from "./Header";
 import Footer from "./Footer";
 
+const BACKEND_BASE =
+  (process.env.REACT_APP_BACKEND_URL &&
+    process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
+  "http://localhost:4000";
+const FRIENDS_ENDPOINT = `${BACKEND_BASE}/api/friends`;
+const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
+
 const FriendsHomePage = () => {
   const [activeTab, setActiveTab] = useState("friends");
+  const [friendsCount, setFriendsCount] = useState(0);
+  const [requestsCount, setRequestsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadStats = async () => {
+      try {
+        const [friendsRes, requestsRes] = await Promise.all([
+          fetch(FRIENDS_ENDPOINT),
+          fetch(FRIEND_REQUESTS_ENDPOINT),
+        ]);
+
+        if (isMounted) {
+          if (friendsRes.ok) {
+            const friendsData = await friendsRes.json();
+            setFriendsCount(friendsData?.meta?.total || friendsData?.data?.length || 0);
+          }
+
+          if (requestsRes.ok) {
+            const requestsData = await requestsRes.json();
+            setRequestsCount(requestsData?.meta?.count || requestsData?.data?.length || 0);
+          }
+        }
+      } catch (error) {
+        console.warn("Unable to load friends stats:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadStats();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const renderContent = () => {
+    if (loading) {
+      return <p>Loading your friends information...</p>;
+    }
+
     switch (activeTab) {
       case "friends":
-        return <p> Here’s your friends list (mocked data will come later)</p>;
+        return (
+          <p>
+            You have <strong>{friendsCount}</strong> friend{friendsCount !== 1 ? "s" : ""} in your network.
+          </p>
+        );
       case "requests":
-        return <p>Here are your pending friend requests</p>;
+        return (
+          <p>
+            You have <strong>{requestsCount}</strong> pending friend request{requestsCount !== 1 ? "s" : ""}.
+          </p>
+        );
       case "find":
-        return <p> Suggested friends you may know</p>;
+        return <p>Discover new friends and expand your commYOUnity.</p>;
       default:
         return null;
     }

@@ -16,11 +16,10 @@ it('POST /auth/login returns 200 and user info for valid credentials', done => {
       expect(res).to.be.json;
       expect(res.body).to.have.property('ok', true);
       expect(res.body).to.have.property('message').that.includes('Welcome');
-      expect(res.body).to.have.property('user').that.includes({
-        id: 1,
-        username: 'testuser',
-        name: 'Test User',
-      });
+      expect(res.body).to.have.property('user');
+      expect(res.body.user).to.have.property('id', 1);
+      expect(res.body.user).to.have.property('username', 'testuser');
+      expect(res.body.user).to.have.property('name', 'Test User');
       done();
     });
 });
