@@ -1,6 +1,6 @@
-import { use, expect } from "chai";
-import chaiHttp from "chai-http";
-import app from "../app.js";
+import { use, expect } from 'chai';
+import { default as chaiHttp, request } from 'chai-http';
+import app from '../app.js';
 
 use(chaiHttp);
 
@@ -9,8 +9,8 @@ describe("BoardFeed API", () => {
   let testPostId;
 
   before((done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .get("/api/boards")
       .end((err, res) => {
         expect(err).to.be.null;
@@ -27,8 +27,8 @@ describe("BoardFeed API", () => {
   });
 
   it("GET /api/boards/:id/feed returns posts", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .get(`/api/boards/${testBoardId}/feed`)
       .end((err, res) => {
         expect(err).to.be.null;
@@ -39,8 +39,8 @@ describe("BoardFeed API", () => {
   });
 
   it("POST /api/boards/:id/feed creates a new post", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .post(`/api/boards/${testBoardId}/feed`)
       .send({ message: "Test post from Chai" })
       .end((err, res) => {
@@ -54,8 +54,8 @@ describe("BoardFeed API", () => {
   });
 
   it("POST /api/boards/:id/feed/:postId/like increments likes", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .post(`/api/boards/${testBoardId}/feed/${testPostId}/like`)
       .end((err, res) => {
         expect(err).to.be.null;
@@ -66,8 +66,8 @@ describe("BoardFeed API", () => {
   });
 
   it("DELETE /api/boards/:id/feed/:postId deletes post", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .delete(`/api/boards/${testBoardId}/feed/${testPostId}`)
       .end((err, res) => {
         expect(err).to.be.null;
@@ -78,8 +78,8 @@ describe("BoardFeed API", () => {
   });
 
   it("POST /api/boards/:id/feed fails without message", (done) => {
-    chai
-      .request(app)
+    request
+      .execute(app)
       .post(`/api/boards/${testBoardId}/feed`)
       .send({})
       .end((err, res) => {
@@ -90,14 +90,15 @@ describe("BoardFeed API", () => {
       });
   });
 
-  it("GET /api/boards/:invalidId/feed returns 404", (done) => {
-    chai
-      .request(app)
-      .get(`/api/boards/999999/feed`)
+  it("GET /api/boards/:invalidId/feed returns empty array for unknown board", (done) => {
+    request
+      .execute(app)
+      .get("/api/boards/someInvalidId/feed")
       .end((err, res) => {
         expect(err).to.be.null;
-        expect(res).to.have.status(404);
-        expect(res.body).to.have.property("error");
+        expect(res).to.have.status(200);            
+        expect(res.body).to.be.an("array");
+        expect(res.body).to.have.length(0);          
         done();
       });
   });

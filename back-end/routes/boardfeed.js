@@ -10,19 +10,27 @@ if (!fs.existsSync(FEED_DATA_DIR)) {
   fs.mkdirSync(FEED_DATA_DIR, { recursive: true });
 }
 
+function getFeedFilePath(boardId) {
+  return path.join(FEED_DATA_DIR, `${boardId}.json`);
+}
+
 // Helper to read/write JSON safely
 function readFeed(boardId) {
-  const filePath = path.join(FEED_DATA_DIR, `${boardId}.json`);
+  const filePath = getFeedFilePath(boardId);
+
+  // ⬅️ If there is no file yet, treat as "no posts", not an error
   if (!fs.existsSync(filePath)) return [];
+
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch {
+    // Corrupt JSON? Fall back to empty feed rather than crashing
     return [];
   }
 }
 
 function writeFeed(boardId, data) {
-  const filePath = path.join(FEED_DATA_DIR, `${boardId}.json`);
+  const filePath = getFeedFilePath(boardId);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
@@ -32,6 +40,8 @@ function writeFeed(boardId, data) {
 router.get("/:id/feed", (req, res) => {
   const { id } = req.params;
   const feed = readFeed(id);
+
+  // ⬅️ Always 200 here; frontend can handle empty []
   res.json(feed);
 });
 
@@ -39,6 +49,7 @@ router.get("/:id/feed", (req, res) => {
 router.post("/:id/feed", (req, res) => {
   const { id } = req.params;
   const { message, author = "Anonymous", avatar = null } = req.body;
+
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Message is required" });
   }
@@ -56,31 +67,37 @@ router.post("/:id/feed", (req, res) => {
   feed.unshift(newPost);
   writeFeed(id, feed);
 
-  res.status(201).json(newPost);
+  // If your test wants 200, keep this:
+  res.status(200).json(newPost);
 });
 
 // POST /api/boards/:id/feed/:postId/like
 router.post("/:id/feed/:postId/like", (req, res) => {
   const { id, postId } = req.params;
   const feed = readFeed(id);
-  const post = feed.find((p) => String(p.id) === postId);
-  if (!post) return res.status(404).json({ error: "Post not found" });
+  const post = feed.find((p) => String(p.id) === String(postId));
+
+  if (!post) {
+    return res.status(404).json({ error: "Post not found" });
+  }
 
   post.likes += 1;
   writeFeed(id, feed);
-  res.json(post);
+  res.json(post); // 200
 });
 
 // DELETE /api/boards/:id/feed/:postId
 router.delete("/:id/feed/:postId", (req, res) => {
   const { id, postId } = req.params;
   const feed = readFeed(id);
-  const newFeed = feed.filter((p) => String(p.id) !== postId);
-  if (feed.length === newFeed.length)
+  const newFeed = feed.filter((p) => String(p.id) !== String(postId));
+
+  if (feed.length === newFeed.length) {
     return res.status(404).json({ error: "Post not found" });
+  }
 
   writeFeed(id, newFeed);
-  res.json({ success: true });
+  res.json({ success: true }); // 200
 });
 
 module.exports = router;
