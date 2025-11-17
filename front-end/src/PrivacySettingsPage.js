@@ -137,7 +137,10 @@ export default function PrivacySettingsPage() {
         {/* Row: Profile Visibility */}
         <div className="privacy-row">
           <div className="privacy-label">Profile Visibility</div>
-          <button className="privacy-toggle" onClick={toggleVisibility}>
+          <button 
+            className={`privacy-toggle ${visibility === "Private" ? "private" : "public"}`}
+            onClick={toggleVisibility}
+          >
             {visibility}
           </button>
         </div>
@@ -145,7 +148,10 @@ export default function PrivacySettingsPage() {
         {/* Row: Who Can Message Me */}
         <div className="privacy-row">
           <div className="privacy-label">Who Can Message Me</div>
-          <button className="privacy-toggle" onClick={toggleCanMessage}>
+          <button 
+            className={`privacy-toggle ${canMessage === "Everyone" ? "everyone" : "friends-only"}`}
+            onClick={toggleCanMessage}
+          >
             {canMessage}
           </button>
         </div>
@@ -153,7 +159,10 @@ export default function PrivacySettingsPage() {
         {/* Row: Online Status */}
         <div className="privacy-row">
           <div className="privacy-label">Online Status</div>
-          <button className="privacy-toggle" onClick={toggleOnlineStatus}>
+          <button 
+            className={`privacy-toggle ${onlineStatusOn ? "on" : "off"}`}
+            onClick={toggleOnlineStatus}
+          >
             {onlineStatusOn ? "On" : "Off"}
           </button>
         </div>

@@ -1,4 +1,4 @@
-/* ===== Theme tokens (aligned with the app) ===== */
+/* ===== Theme Tokens ===== */
 :root {
   --brand: #2f6df6;
   --brand-dark: #2057cc;
@@ -6,103 +6,276 @@
   --muted: #6b7280;
   --bg: #f7f7f8;
   --card: #ffffff;
-  --danger: #ef4444;
-  --shadow: 0 8px 24px rgba(0,0,0,.08);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   --radius: 16px;
   --radius-sm: 10px;
+  
+  /* Privacy-specific colors */
+  --orange: #f97316;
+  --orange-dark: #ea580c;
+  --green: #10b981;
+  --green-dark: #059669;
+  --purple: #8b5cf6;
+  --purple-dark: #7c3aed;
+  --gray: #9ca3af;
+  --gray-light: #e5e7eb;
+  --gray-dark: #6b7280;
 }
 
-/* ===== Page Frame ===== */
+/* ===== Page Container ===== */
 .PrivacyPage {
-  max-width: 900px;
+  max-width: 700px;
   margin: 64px auto;
-  padding: 24px;
+  padding: 0 24px 60px;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--text);
   background: var(--bg);
 }
 
-/* ===== Header + Back ===== */
-.privacy-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 28px;
-}
-
-.privacy-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 18px;           /* better than fixed width */
-  height: 40px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: #111;
-  color: #fff;
-  font-size: .95rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .18s ease, background .18s ease, opacity .18s ease;
-}
-.privacy-back:hover { background:#333; transform: translateY(-2px); }
-
-/* ===== Setting Row Card ===== */
+/* ===== Privacy Row ===== */
 .privacy-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 20px 22px;
+  padding: 18px 22px;
   margin-bottom: 20px;
-  transition: transform .18s ease, box-shadow .18s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .privacy-row:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0,0,0,.10);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
 }
 
 .privacy-label {
   font-size: 1rem;
-  font-weight: 700;
-  color: #111;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
 }
 
-/* ===== Right-side Toggle ===== */
+/* ===== Toggle Buttons - Base Styles ===== */
 .privacy-toggle {
-  min-width: 110px;
+  min-width: 140px;
   height: 40px;
   border: none;
   border-radius: var(--radius-sm);
-  background: var(--brand);
-  color: #fff;
-  font-weight: 700;
-  font-size: .95rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(47,109,246,.25);
-  transition: background .18s ease, transform .18s ease, opacity .18s ease;
-}
-.privacy-toggle:hover { background: var(--brand-dark); transform: translateY(-2px); }
-
-.privacy-toggle.danger {
-  background: var(--danger);
-  box-shadow: 0 6px 18px rgba(239,68,68,.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 720px) {
-  .PrivacyPage { padding: 20px 16px; }
+/* Ripple effect on click */
+.privacy-toggle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out;
+  opacity: 0;
+}
+
+.privacy-toggle:active::after {
+  width: 120px;
+  height: 120px;
+  opacity: 1;
+}
+
+/* Status indicator dot */
+.privacy-toggle::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  vertical-align: middle;
+}
+
+/* ===== PRIVATE State (Orange) ===== */
+.privacy-toggle.private {
+  background: var(--orange);
+  box-shadow: 0 6px 18px rgba(249, 115, 22, 0.35);
+}
+
+.privacy-toggle.private:hover {
+  background: var(--orange-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.45);
+}
+
+.privacy-toggle.private:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.privacy-toggle.private::before {
+  background: #fbbf24;
+  box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+  animation: pulse 2s infinite;
+}
+
+/* ===== PUBLIC State (Green) ===== */
+.privacy-toggle.public {
+  background: var(--green);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+}
+
+.privacy-toggle.public:hover {
+  background: var(--green-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+}
+
+.privacy-toggle.public:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.privacy-toggle.public::before {
+  background: #34d399;
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+  animation: pulse 2s infinite;
+}
+
+/* ===== EVERYONE State (Blue) ===== */
+.privacy-toggle.everyone {
+  background: var(--brand);
+  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.35);
+}
+
+.privacy-toggle.everyone:hover {
+  background: var(--brand-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(47, 109, 246, 0.45);
+}
+
+.privacy-toggle.everyone:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(47, 109, 246, 0.3);
+}
+
+.privacy-toggle.everyone::before {
+  background: #60a5fa;
+  box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+  animation: pulse 2s infinite;
+}
+
+/* ===== FRIENDS ONLY State (Purple) ===== */
+.privacy-toggle.friends-only {
+  background: var(--purple);
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+}
+
+.privacy-toggle.friends-only:hover {
+  background: var(--purple-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.45);
+}
+
+.privacy-toggle.friends-only:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.privacy-toggle.friends-only::before {
+  background: #a78bfa;
+  box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.7);
+  animation: pulse 2s infinite;
+}
+
+/* ===== ON State (Blue - same as notification) ===== */
+.privacy-toggle.on {
+  background: var(--brand);
+  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.35);
+}
+
+.privacy-toggle.on:hover {
+  background: var(--brand-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(47, 109, 246, 0.45);
+}
+
+.privacy-toggle.on:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(47, 109, 246, 0.3);
+}
+
+.privacy-toggle.on::before {
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse 2s infinite;
+}
+
+/* ===== OFF State (Gray - same as notification) ===== */
+.privacy-toggle.off {
+  background: var(--gray-light);
+  color: var(--gray-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.privacy-toggle.off:hover {
+  background: #d1d5db;
+  color: #4b5563;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.privacy-toggle.off:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.privacy-toggle.off::before {
+  background: var(--gray);
+  box-shadow: none;
+  animation: none;
+}
+
+/* ===== Pulse Animation ===== */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+/* ===== Accessibility - Focus states ===== */
+.privacy-toggle:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 600px) {
+  .PrivacyPage {
+    padding: 0 16px 40px;
+    margin: 40px auto;
+  }
 
   .privacy-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 14px;
     text-align: left;
-    gap: 12px;
-    padding: 18px;
   }
 
   .privacy-toggle {
