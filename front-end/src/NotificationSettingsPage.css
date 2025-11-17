@@ -10,6 +10,9 @@
   --radius: 16px;
   --radius-sm: 10px;
   --accent: #ffc107;
+  --gray: #9ca3af;
+  --gray-light: #e5e7eb;
+  --gray-dark: #6b7280;
 }
 
 /* ===== Page Container ===== */
@@ -76,7 +79,7 @@
   line-height: 1.5;
 }
 
-/* ===== Toggle Buttons ===== */
+/* ===== Toggle Buttons - Enhanced with Interactive States ===== */
 .notif-toggle {
   min-width: 90px;
   height: 40px;
@@ -84,26 +87,106 @@
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-size: 0.95rem;
-  color: #fff;
-  background: var(--brand);
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.25);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.notif-toggle:hover {
+/* ON State - Blue with vibrant glow */
+.notif-toggle:not(.off) {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.35);
+}
+
+.notif-toggle:not(.off):hover {
   background: var(--brand-dark);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(47, 109, 246, 0.45);
 }
 
+.notif-toggle:not(.off):active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(47, 109, 246, 0.3);
+}
+
+/* OFF State - Gray with subtle styling */
 .notif-toggle.off {
-  background: #f3f4f6;
-  color: #111;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  background: var(--gray-light);
+  color: var(--gray-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .notif-toggle.off:hover {
-  background: #e4e6eb;
+  background: #d1d5db;
+  color: #4b5563;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.notif-toggle.off:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Add a subtle ripple effect on click */
+.notif-toggle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out;
+  opacity: 0;
+}
+
+.notif-toggle:active::after {
+  width: 100px;
+  height: 100px;
+  opacity: 1;
+}
+
+/* Status indicator dot (visual enhancement) */
+.notif-toggle::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  vertical-align: middle;
+}
+
+/* Green pulsing dot for ON state */
+.notif-toggle:not(.off)::before {
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Gray static dot for OFF state */
+.notif-toggle.off::before {
+  background: var(--gray);
+  box-shadow: none;
+  animation: none;
 }
 
 /* ===== Accent Option (if used for special notifications) ===== */
@@ -111,6 +194,17 @@
   background: var(--accent);
   color: #111;
   font-weight: 700;
+  box-shadow: 0 6px 18px rgba(255, 193, 7, 0.35);
+}
+
+.notif-toggle.accent:hover {
+  background: #ffa000;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.45);
+}
+
+.notif-toggle.accent::before {
+  background: #ff9800;
 }
 
 /* ===== Responsive Design ===== */
@@ -135,4 +229,14 @@
     font-size: 0.9rem;
     padding: 8px 14px;
   }
+}
+
+/* ===== Accessibility - Focus states ===== */
+.notif-toggle:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.notif-toggle.off:focus {
+  outline: 2px solid var(--gray);
 }

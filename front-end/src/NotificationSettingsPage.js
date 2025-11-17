@@ -137,7 +137,7 @@ export default function NotificationSettingsPage() {
         <div className="notif-row">
           <div className="notif-label">Board Updates</div>
           <button
-            className="notif-toggle"
+            className={`notif-toggle ${boardUpdatesOn ? '' : 'off'}`}
             onClick={toggleBoardUpdates}
           >
             {boardUpdatesOn ? "On" : "Off"}
@@ -148,7 +148,7 @@ export default function NotificationSettingsPage() {
         <div className="notif-row">
           <div className="notif-label">New Messages</div>
           <button
-            className="notif-toggle"
+            className={`notif-toggle ${messagesOn ? '' : 'off'}`}
             onClick={toggleMessages}
           >
             {messagesOn ? "On" : "Off"}
@@ -159,7 +159,7 @@ export default function NotificationSettingsPage() {
         <div className="notif-row">
           <div className="notif-label">New Follower</div>
           <button
-            className="notif-toggle"
+            className={`notif-toggle ${followersOn ? '' : 'off'}`}
             onClick={toggleFollowers}
           >
             {followersOn ? "On" : "Off"}
