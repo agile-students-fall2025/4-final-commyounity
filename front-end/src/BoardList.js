@@ -1,49 +1,80 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-// import logo from './logo.svg';
 import './BoardList.css'
 import BoardThumb from './BoardThumb'
-
+import SearchBar from './SearchBar'
 
 const BoardList = props => {
-  // start a state varaible with a blank array
   const [data, setData] = useState([])
   const [error, setError] = useState(null)
-  // the following side-effect will be called once upon initial render
+  const [yourBoardsSearch, setYourBoardsSearch] = useState('')
+  const [notYourBoardsSearch, setNotYourBoardsSearch] = useState('')
+
   useEffect(() => {
-    // fetch some mock data about animals for sale
     console.log('fetching 10 random boards...')
     axios('http://localhost:4000/api/boards')
       .then(response => {
-        // extract the data from the server response
         setData(response.data.data)
       })
       .catch(err => {
         console.error('Backend request failed:', err)
         setError('Could not load boards.')
       })
-  }, []) // only run it once!
+  }, [])
 
+  // Filter function for boards
+  const filterBoards = (boards, searchTerm) => {
+    if (!searchTerm.trim()) return boards
+    
+    const lowerSearch = searchTerm.toLowerCase()
+    return boards.filter(board => 
+      board.title?.toLowerCase().includes(lowerSearch) ||
+      board.descriptionLong?.toLowerCase().includes(lowerSearch)
+    )
+  }
+
+  // Get filtered boards for "Your Boards"
+  const yourBoards = data.filter(item => item.isOwner)
+  const filteredYourBoards = filterBoards(yourBoards, yourBoardsSearch)
+
+  // Get filtered boards for "Not Your Boards"
+  const notYourBoards = data.filter(item => !item.isOwner && item.isJoined)
+  const filteredNotYourBoards = filterBoards(notYourBoards, notYourBoardsSearch)
 
   return (
     <div className="BoardList">
-      <h3 style = {{ 'paddingLeft' : '20px'}}>Your Boards:</h3>
+      <h3 style={{ 'paddingLeft': '20px' }}>Your Boards:</h3>
+      <SearchBar 
+        onSearch={setYourBoardsSearch}
+        placeholder="Search your boards..."
+      />
       <section className="yourBoards">
-        {data
-             .filter(item => item.isOwner)        
-             .map(item => (                      
-              <BoardThumb key={item.id} details={item} />
-            ))
-        }
+        {filteredYourBoards.length > 0 ? (
+          filteredYourBoards.map(item => (
+            <BoardThumb key={item.id} details={item} />
+          ))
+        ) : (
+          <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
+            {yourBoardsSearch ? 'No boards found matching your search.' : 'No boards available.'}
+          </p>
+        )}
       </section>
-      <h3 style = {{ 'paddingLeft' : '20px'}}>Boards Your Are a Member Of:</h3>
+
+      <h3 style={{ 'paddingLeft': '20px' }}>Boards You Are a Member Of:</h3>
+      <SearchBar 
+        onSearch={setNotYourBoardsSearch}
+        placeholder="Search member boards..."
+      />
       <section className="NotYourBoards">
-        {data
-             .filter(item => !item.isOwner && item.isJoined)        
-             .map(item => (                      
-              <BoardThumb key={item.id} details={item} />
-            ))
-        }
+        {filteredNotYourBoards.length > 0 ? (
+          filteredNotYourBoards.map(item => (
+            <BoardThumb key={item.id} details={item} />
+          ))
+        ) : (
+          <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
+            {notYourBoardsSearch ? 'No boards found matching your search.' : 'No boards available.'}
+          </p>
+        )}
       </section>
     </div>
   )

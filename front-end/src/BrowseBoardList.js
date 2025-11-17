@@ -1,40 +1,57 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-// import logo from './logo.svg';
 import "./BrowseBoardList.css"
 import BoardThumb from './BoardThumb'
-
+import SearchBar from './SearchBar'
 
 const BrowseBoardList = props => {
-  // start a state varaible with a blank array
   const [data, setData] = useState([])
   const [error, setError] = useState(null)
-  // the following side-effect will be called once upon initial render
+  const [searchTerm, setSearchTerm] = useState('')
+
   useEffect(() => {
-    // fetch some mock data about animals for sale
     console.log('fetching 10 random boards...')
     axios('http://localhost:4000/api/boards')
       .then(response => {
-        // extract the data from the server response
         setData(response.data.data)
       })
       .catch(err => {
         console.error('Backend request failed:', err)
         setError('Could not load boards.')
       })
-  }, [])  // only run it once!
+  }, [])
 
+  // Filter boards based on search term
+  const filterBoards = (boards) => {
+    if (!searchTerm.trim()) return boards
+    
+    const lowerSearch = searchTerm.toLowerCase()
+    return boards.filter(board => 
+      board.title?.toLowerCase().includes(lowerSearch) ||
+      board.descriptionLong?.toLowerCase().includes(lowerSearch)
+    )
+  }
+
+  const suggestedBoards = data.filter(item => !item.isJoined)
+  const filteredBoards = filterBoards(suggestedBoards)
 
   return (
-    <div className="BoardList">
-      <h3 style = {{ 'paddingLeft' : '20px'}}>Suggested Boards:</h3>
+    <div className="BrowseBoardList">
+      <h3 style={{ 'paddingLeft': '20px' }}>Suggested Boards:</h3>
+      <SearchBar 
+        onSearch={setSearchTerm}
+        placeholder="Search suggested boards..."
+      />
       <section className="yourBoards">
-        {data
-             .filter(item => !item.isJoined)        
-             .map(item => (                      
-              <BoardThumb key={item.id} details={item} />
-            ))
-        }
+        {filteredBoards.length > 0 ? (
+          filteredBoards.map(item => (
+            <BoardThumb key={item.id} details={item} />
+          ))
+        ) : (
+          <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
+            {searchTerm ? 'No boards found matching your search.' : 'No boards available.'}
+          </p>
+        )}
       </section>
     </div>
   )
