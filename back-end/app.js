@@ -406,6 +406,82 @@ const filterFriendsByQuery = (list, query) => {
     }
   });
 
+// Search boards
+app.get("/api/boards/search", async (req, res) => {
+  const { query, filter } = req.query;
+  
+  // Validate query parameter
+  if (!query || typeof query !== 'string' || query.trim() === '') {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Query parameter is required',
+    });
+  }
+
+  const searchTerm = query.trim().toLowerCase();
+  
+  console.log('[BOARD SEARCH]', {
+    query: searchTerm,
+    filter: filter || 'all',
+    timestamp: new Date().toISOString()
+  });
+
+  try {
+    // Fetch all boards from Mockaroo (or use fallback)
+    let boards;
+    try {
+      const response = await axios.get(MOCKAROO_URL);
+      boards = Array.isArray(response.data) ? response.data : [];
+      boards = boards.map(enrichBoard);
+    } catch (err) {
+      console.warn("Mockaroo failed for search, using fallback data.");
+      boards = fallbackBoards;
+    }
+
+    // Filter boards based on search term
+    let filteredBoards = boards.filter(board => {
+      const titleMatch = board.title?.toLowerCase().includes(searchTerm);
+      const descriptionMatch = board.descriptionLong?.toLowerCase().includes(searchTerm);
+      return titleMatch || descriptionMatch;
+    });
+
+    // Apply additional filter if specified
+    if (filter) {
+      switch(filter) {
+        case 'my_boards':
+          filteredBoards = filteredBoards.filter(b => b.isOwner === true);
+          break;
+        case 'joined_boards':
+          filteredBoards = filteredBoards.filter(b => !b.isOwner && b.isJoined === true);
+          break;
+        case 'not_joined':
+          filteredBoards = filteredBoards.filter(b => b.isJoined === false);
+          break;
+        // 'all' or any other value returns all matched boards
+      }
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: filteredBoards,
+      meta: {
+        query: searchTerm,
+        filter: filter || 'all',
+        totalResults: filteredBoards.length,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+  } catch (err) {
+    console.error('[BOARD SEARCH ERROR]', err);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Failed to search boards',
+      error: err.message
+    });
+  }
+});
+
   //get mock data for invite firends
   app.get("/api/friends", async (req, res) => {
     const rawUsername =
@@ -1017,7 +1093,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/profile", profileRouter);
 
 
-//board routes 
+//board routes
 app.use("/api/boards", boardFeedRouter);
 
 // export the express app we created to make it available to other modules
