@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Board = require("../models/Board");
 
-// GET all boards
+//this currently uses a mock user before we set up signup!!
+
+
 router.get("/", async (req, res) => {
   try {
     // Same placeholder user used in createBoard.js
@@ -13,7 +15,6 @@ router.get("/", async (req, res) => {
 
     const userId = String(currentUser._id);
 
-    // No populate → no User model required
     const boards = await Board.find();
 
     const processedBoards = boards.map((b) => {
@@ -34,7 +35,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET single board
 router.get("/:id", async (req, res) => {
   try {
     const currentUser = {
@@ -63,7 +63,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// SEARCH
 router.get("/search", async (req, res) => {
   const query = (req.query.query || "").trim();
 

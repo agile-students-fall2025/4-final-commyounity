@@ -12,6 +12,7 @@ const profileRouter = require("./routes/profile");
 const boardFeedRouter = require("./routes/boardfeed");
 const createBoardRouter = require("./routes/createBoard");
 const viewBoardsRouter = require("./routes/viewBoards");
+const editBoardRouter = require("./routes/editBoard");
 const {
   ensureFriendsCache,
   filterFriendsByQuery,
@@ -454,51 +455,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
 // POST 
 
-//edit form
-
-//multer
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  fileFilter: (req, file, cb) => {
-    if (file && !file.mimetype.startsWith('image/')) {
-      return cb(new Error('Only image uploads are allowed'));
-    }
-    cb(null, true);
-  },
-});
-
-app.post('/api/boards/:id/edit', upload.single('photo'), (req, res) => {
-  const { id } = req.params;
-  const { title, descriptionLong } = req.body;
-
-  const fileMeta = req.file
-    ? {
-        filename: req.file.originalname,
-        mimetype: req.file.mimetype,
-        size: req.file.size,
-      }
-    : null;
-
-  console.log('[BOARD EDIT RECEIVED]', {
-    boardId: id,
-    title,
-    descriptionLong,
-    file: fileMeta || '(no file)',
-  });
-
-  return res.status(202).json({
-    status: 'received',
-    boardId: id,
-    received: {
-      title: title ?? null,
-      descriptionLong: descriptionLong ?? null,
-      photo: fileMeta,
-    },
-    updatedAt: new Date().toISOString(),
-  });
-});
-
 //leave board button
 
 app.post('/api/boards/:id/leave', (req, res) => {
@@ -786,6 +742,9 @@ app.use("/api/boards", boardFeedRouter);
 
 //createBoard router
 app.use("/api/boards/create", createBoardRouter);
+
+//edit form Boards
+app.use("/api/boards", editBoardRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app

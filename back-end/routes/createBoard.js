@@ -5,9 +5,8 @@ const path = require("path");
 const fs = require("fs");
 const Board = require("../models/Board");
 
-// ----------------------------
-// Multer Disk Storage
-// ----------------------------
+//this currently uses a mock user before we set up signup!!!
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(process.cwd(), "uploads"));
@@ -28,7 +27,7 @@ const upload = multer({
   },
 });
 
-// helper to delete uploaded file if we don't want to keep it
+
 function deleteUploadedFile(file) {
   if (!file || !file.path) return;
   fs.unlink(file.path, (err) => {
@@ -38,16 +37,13 @@ function deleteUploadedFile(file) {
   });
 }
 
-// ----------------------------
-// CREATE BOARD
-// ----------------------------
 router.post("/", upload.single("photo"), async (req, res) => {
   try {
     const title = (req.body.title || "").trim();
     const descriptionLong = (req.body.descriptionLong || "").trim();
 
     if (!title) {
-      deleteUploadedFile(req.file); // 🧹 cleanup
+      deleteUploadedFile(req.file);
       return res.status(400).json({
         status: "error",
         message: "Title is required."
@@ -101,7 +97,6 @@ router.post("/", upload.single("photo"), async (req, res) => {
     });
 
   } catch (err) {
-    // 🧹 If DB or other error happens, remove uploaded file
     deleteUploadedFile(req.file);
 
     console.error("[BOARD CREATE ERROR]", err);

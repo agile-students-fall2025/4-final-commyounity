@@ -82,9 +82,6 @@ const BoardDetail = () => {
               <button
                 className="edit-button"
                 onClick={() => {
-                  alert(
-                    "If you are seeing this button in the 'Not Your Boards' section that is because Mockaroo has refreshed the data and the isOwner field is now set to true. Please disregard!"
-                  );
                   navigate(`/boards/${board.id}/edit`, { state: { board } });
                 }}
               >
