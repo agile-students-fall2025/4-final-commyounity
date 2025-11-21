@@ -11,6 +11,7 @@ const path = require("path");
 const profileRouter = require("./routes/profile");
 const boardFeedRouter = require("./routes/boardfeed");
 const createBoardRouter = require("./routes/createBoard");
+const viewBoardsRouter = require("./routes/viewBoards");
 const {
   ensureFriendsCache,
   filterFriendsByQuery,
@@ -149,7 +150,6 @@ const enrichMember = (b) => {
     }
   });
 
-  //get mock boards
   // Homepage route - get data from Mockaroo
   app.get("/api/home", async (req, res) => {
     try {
@@ -207,112 +207,6 @@ const enrichMember = (b) => {
     }
   });
 
-  //get mock boards for viewBoards
-  app.get("/api/boards", async (req, res) => {
-    try {
-      const response = await axios.get(MOCKAROO_URL);
-      console.log("Data loaded from Mockaroo");
-      const boards = Array.isArray(response.data) ? response.data : [];
-      const enriched = boards.map(enrichBoard);
-      res.json({ data: enriched });
-    } catch (err) {
-      console.warn("Mockaroo failed, using fallback data instead.");
-      res.json({ data: fallbackBoards });
-    }
-  });
-
-  //get data for single board
-  app.get("/api/boards/:id", async (req, res) => {
-    const boardId = parseInt(req.params.id, 10);
-    try {
-      const response = await axios.get(MOCKAROO_URL);
-      const boards = Array.isArray(response.data) ? response.data : [];
-      const board = boards.find(b => Number(b.id) === boardId);
-      if (!board) return res.status(404).json({ error: "Board not found" });
-      return res.json({ data: enrichBoard(board) });
-    } catch (err) {
-      console.warn("Mockaroo failed, using fallback for single board.");
-      const board = fallbackBoards.find(b => b.id === boardId);
-      if (!board) return res.status(404).json({ error: "Board not found" });
-      res.json({ data: board });
-    }
-  });
-
-// Search boards
-app.get("/api/boards/search", async (req, res) => {
-  const { query, filter } = req.query;
-  
-  // Validate query parameter
-  if (!query || typeof query !== 'string' || query.trim() === '') {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Query parameter is required',
-    });
-  }
-
-  const searchTerm = query.trim().toLowerCase();
-  
-  console.log('[BOARD SEARCH]', {
-    query: searchTerm,
-    filter: filter || 'all',
-    timestamp: new Date().toISOString()
-  });
-
-  try {
-    // Fetch all boards from Mockaroo (or use fallback)
-    let boards;
-    try {
-      const response = await axios.get(MOCKAROO_URL);
-      boards = Array.isArray(response.data) ? response.data : [];
-      boards = boards.map(enrichBoard);
-    } catch (err) {
-      console.warn("Mockaroo failed for search, using fallback data.");
-      boards = fallbackBoards;
-    }
-
-    // Filter boards based on search term
-    let filteredBoards = boards.filter(board => {
-      const titleMatch = board.title?.toLowerCase().includes(searchTerm);
-      const descriptionMatch = board.descriptionLong?.toLowerCase().includes(searchTerm);
-      return titleMatch || descriptionMatch;
-    });
-
-    // Apply additional filter if specified
-    if (filter) {
-      switch(filter) {
-        case 'my_boards':
-          filteredBoards = filteredBoards.filter(b => b.isOwner === true);
-          break;
-        case 'joined_boards':
-          filteredBoards = filteredBoards.filter(b => !b.isOwner && b.isJoined === true);
-          break;
-        case 'not_joined':
-          filteredBoards = filteredBoards.filter(b => b.isJoined === false);
-          break;
-        // 'all' or any other value returns all matched boards
-      }
-    }
-
-    return res.status(200).json({
-      status: 'success',
-      data: filteredBoards,
-      meta: {
-        query: searchTerm,
-        filter: filter || 'all',
-        totalResults: filteredBoards.length,
-        timestamp: new Date().toISOString()
-      }
-    });
-
-  } catch (err) {
-    console.error('[BOARD SEARCH ERROR]', err);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Failed to search boards',
-      error: err.message
-    });
-  }
-});
 
   //get mock data for invite firends
   app.get("/api/friends", async (req, res) => {
@@ -884,6 +778,8 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 //profile routes
 app.use("/api/profile", profileRouter);
 
+// view boards router 
+app.use("/api/boards", viewBoardsRouter);
 
 //board routes
 app.use("/api/boards", boardFeedRouter);
