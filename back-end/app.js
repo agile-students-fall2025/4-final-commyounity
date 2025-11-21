@@ -10,6 +10,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require("path");
 const profileRouter = require("./routes/profile");
 const boardFeedRouter = require("./routes/boardfeed");
+const createBoardRouter = require("./routes/createBoard");
 const {
   ensureFriendsCache,
   filterFriendsByQuery,
@@ -877,64 +878,6 @@ app.post('/api/boards/:id/join', (req, res) => {
   });
 });
 
-//create form
-
-const createdBoards =
-  global.__CREATED_BOARDS__ || (global.__CREATED_BOARDS__ = []);
-
-//in memory storage for posts
-const boardPosts = global.__BOARD_POSTS__ || (global.__BOARD_POSTS__ = []);
-
-app.post('/api/boards/create', upload.single('photo'), (req, res) => {
-  const title =
-    (req.body.title || req.body.boardName || '').toString().trim();
-  const descriptionLong =
-    (req.body.descriptionLong || req.body.description || '').toString();
-
-  if (!title) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Title (board name) is required',
-    });
-  }
-
-  const fileMeta = req.file
-    ? {
-        filename: req.file.originalname,
-        mimetype: req.file.mimetype,
-        size: req.file.size,
-      }
-    : null;
-
-
-  const id = Date.now();
-  const newBoard = {
-    id,
-    title,
-    descriptionLong,
-    isOwner: true,
-    isJoined: true,
-    memberCount: 1,
-    coverPhotoURL: `https://picsum.photos/800/400?seed=board-${id}`,
-    _createdAt: new Date().toISOString(),
-    _file: fileMeta,
-  };
-
-  createdBoards.unshift(newBoard);
-
-  console.log('[BOARD CREATE RECEIVED]', {
-    boardId: id,
-    title,
-    descriptionLong,
-    file: fileMeta || '(no file)',
-  });
-
-  return res.status(201).json({
-    status: 'created',
-    data: newBoard,
-  });
-});
-
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
@@ -944,6 +887,9 @@ app.use("/api/profile", profileRouter);
 
 //board routes
 app.use("/api/boards", boardFeedRouter);
+
+//createBoard router
+app.use("/api/boards/create", createBoardRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app
