@@ -13,6 +13,8 @@ const boardFeedRouter = require("./routes/boardfeed");
 const createBoardRouter = require("./routes/createBoard");
 const viewBoardsRouter = require("./routes/viewBoards");
 const editBoardRouter = require("./routes/editBoard");
+const leaveBoardRouter = require("./routes/leaveBoard");
+
 const {
   ensureFriendsCache,
   filterFriendsByQuery,
@@ -455,27 +457,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
 // POST 
 
-//leave board button
-
-app.post('/api/boards/:id/leave', (req, res) => {
-  const { id } = req.params;
-
-  console.log('[LEAVE BOARD]', {
-    boardId: id,
-  });
-
-  return res.status(202).json({
-    status: 'received',
-    boardId: id,
-    message: 'User left the board (mock).',
-    updated: {
-      isJoined: false,
-      memberCountDelta: -1, 
-    },
-    timestamp: new Date().toISOString(),
-  });
-});
-
 // invite friend to board
 
 app.post('/api/boards/:id/invite', (req, res) => {
@@ -745,6 +726,9 @@ app.use("/api/boards/create", createBoardRouter);
 
 //edit form Boards
 app.use("/api/boards", editBoardRouter);
+
+//leave board
+app.use("/api/boards", leaveBoardRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app

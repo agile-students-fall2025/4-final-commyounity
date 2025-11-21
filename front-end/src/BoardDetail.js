@@ -8,6 +8,8 @@ import BoardFeed from "./BoardFeed";
 import Header from "./Header";
 import Footer from "./Footer";
 
+const PLACEHOLDER_USER_ID = "674000000000000000000001";
+
 const BoardDetail = () => {
   const { id } = useParams();            
   const [board, setBoard] = useState(null);
@@ -30,18 +32,35 @@ const BoardDetail = () => {
   }, [id]);
 
   const handleLeaveBoard = async () => {
-    if (leaving) return; 
+    if (!board) return;
+    if (leaving) return;
+  
+    // If owner + only member → warn that board will be deleted
+    if (board.isOwner && board.memberCount === 1) {
+      const confirmDelete = window.confirm(
+        "You are the only member of this board. " +
+          "If you leave, the entire board and its content will be permanently deleted.\n\n" +
+          "Do you still want to leave?"
+      );
+  
+      if (!confirmDelete) {
+        // User changed their mind; just stay on the page
+        return;
+      }
+    }
+  
     setLeaving(true);
+  
     try {
-      const response = await axios.post(`http://localhost:4000/api/boards/${id}/leave`);
-      console.log("Leave request acknowledged by backend:", response.data);
-
-      alert("You have left this board! (mock confirmation from backend)");
-
+      const response = await axios.post(
+        `http://localhost:4000/api/boards/${id}/leave`
+      );
+  
+      alert(response.data.message || "You left the board.");
       navigate("/viewboards");
-    } catch (error) {
-      console.error(" Leave board failed:", error);
-      alert("Could not communicate with backend. Check console for details.");
+    } catch (err) {
+      console.error("Leave error:", err);
+      alert("Error leaving the board. Check console for details.");
     } finally {
       setLeaving(false);
     }
