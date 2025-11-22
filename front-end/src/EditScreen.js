@@ -67,7 +67,6 @@ const EditScreen = () => {
       );
 
       console.log("Edit posted:", res.data);
-      alert("Edits sent to backend (no database yet).");
       navigate("/viewboards");
     } catch (err) {
       console.error("Save failed:", err);
