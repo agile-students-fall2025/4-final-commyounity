@@ -14,8 +14,6 @@ const createBoardRouter = require("./routes/createBoard");
 const viewBoardsRouter = require("./routes/viewBoards");
 const editBoardRouter = require("./routes/editBoard");
 const leaveBoardRouter = require("./routes/leaveBoard");
-const signupRouter = require("./routes/signup");
-const { setupGoogleSignupStrategy } = require("./routes/signup");
 
 const {
   ensureFriendsCache,
@@ -384,10 +382,61 @@ app.get("/logout", (req, res) => {
   });
 });
 
-//signup - setup Google OAuth strategy
-setupGoogleSignupStrategy(passport);
+//signup
+
+const googleSignupUsers =
+  global.__GOOGLE_SIGNUP_USERS__ || (global.__GOOGLE_SIGNUP_USERS__ = []);
 
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    'google-signup',
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: 'http://localhost:4000/auth/google/signup/callback',
+      },
+      (accessToken, refreshToken, profile, done) => {
+        try {
+          const email = profile.emails?.[0]?.value || null;
+          const name = profile.displayName || 'Google User';
+          const googleId = profile.id;
+          let user =
+            googleSignupUsers.find((u) => u.googleId === googleId) ||
+            (email
+              ? googleSignupUsers.find(
+                  (u) => (u.email || '').toLowerCase() === email.toLowerCase()
+                )
+              : null);
+          if (!user) {
+            const nextId =
+              googleSignupUsers.length > 0
+                ? Math.max(...googleSignupUsers.map((u) => u.id || 0)) + 1
+                : 1;
+
+            user = {
+              id: nextId,
+              googleId,
+              email,
+              name,
+              username: email ? email.split('@')[0] : `google_${googleId}`,
+              authProvider: 'google',
+            };
+
+            googleSignupUsers.push(user);
+            console.log('[GOOGLE SIGNUP SUCCESS]', user);
+          } else {
+            console.log('[GOOGLE SIGNUP - EXISTING USER]', user);
+          }
+
+          return done(null, user);
+        } catch (err) {
+          return done(err);
+        }
+      }
+    )
+  );
+
   app.get(
     '/auth/google/signup',
     passport.authenticate('google-signup', { scope: ['profile', 'email'] })
@@ -397,19 +446,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     '/auth/google/signup/callback',
     passport.authenticate('google-signup', {
       failureRedirect: 'http://localhost:3000/signup?error=google_signup_failed',
-    }),
-    (req, res) => {
-      // Set session user after successful authentication
-      if (req.user && req.session) {
-        req.session.user = {
-          id: req.user._id.toString(),
-          username: req.user.username,
-          name: req.user.name,
-          email: req.user.email,
-        };
-      }
-      res.redirect('http://localhost:3000/home');
-    }
+      successRedirect: 'http://localhost:3000/home',
+    })
   );
 } else {
   app.get('/auth/google/signup', (req, res) => {
@@ -568,7 +606,84 @@ app.get('/api/auth/me', (req, res) => {
   return res.status(401).json({ ok: false, error: 'Not authenticated' });
 });
 
-//signup routes - handled by signup router
+//signup manual
+
+const registeredUsers =
+  global.__REGISTERED_USERS__ ||
+  [
+    { id: 1, username: 'testuser', email: 'test@demo.com', password: '12345', name: 'Test User' },
+    { id: 2, username: 'carina', email: 'carina@demo.com', password: 'carina123', name: 'Carina Ilie' },
+  ];
+global.__REGISTERED_USERS__ = registeredUsers;
+
+const USERNAME_RE = /^[A-Za-z0-9._-]{3,24}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateSignup({ username, email, password, confirmPassword }) {
+  if (!username || !email || !password) {
+    return 'username, email, and password are required.';
+  }
+  if (!USERNAME_RE.test(username)) {
+    return 'Username must be 3–24 chars and may include letters, digits, ., _, or -';
+  }
+  if (!EMAIL_RE.test(email)) {
+    return 'Please provide a valid email address.';
+  }
+  if (String(password).length < 6) {
+    return 'Password must be at least 6 characters long.';
+  }
+  if (confirmPassword !== undefined && confirmPassword !== password) {
+    return 'Passwords do not match.';
+  }
+  return null;
+}
+
+app.post('/auth/signup', (req, res) => {
+  const { username, email, password, confirmPassword } = req.body || {};
+
+  const errMsg = validateSignup({ username, email, password, confirmPassword });
+  if (errMsg) {
+    return res.status(400).json({ ok: false, error: errMsg });
+  }
+
+  const existingUsername = registeredUsers.find(
+    (u) => u.username.toLowerCase() === String(username).toLowerCase()
+  );
+  if (existingUsername) {
+    return res.status(409).json({ ok: false, error: 'Username already taken.' });
+  }
+
+  const existingEmail = registeredUsers.find(
+    (u) => u.email.toLowerCase() === String(email).toLowerCase()
+  );
+  if (existingEmail) {
+    return res.status(409).json({ ok: false, error: 'Email already registered.' });
+  }
+
+  const nextId =
+    registeredUsers.length > 0
+      ? Math.max(...registeredUsers.map((u) => u.id)) + 1
+      : 1;
+
+  const newUser = {
+    id: nextId,
+    username: String(username),
+    email: String(email),
+    password: String(password), 
+    name: String(username),
+  };
+
+  registeredUsers.push(newUser);
+  req.session.user = { id: newUser.id, username: newUser.username, name: newUser.name, email: newUser.email };
+
+  console.log('[SIGNUP SUCCESS]', newUser);
+
+  res.status(201).json({
+    ok: true,
+    message: 'Account created successfully.',
+    user: { id: newUser.id, username: newUser.username, email: newUser.email, name: newUser.name },
+  });
+});
 
 //join board button
 
@@ -614,9 +729,6 @@ app.use("/api/boards", editBoardRouter);
 
 //leave board
 app.use("/api/boards", leaveBoardRouter);
-
-//signup routes
-app.use("/", signupRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app
