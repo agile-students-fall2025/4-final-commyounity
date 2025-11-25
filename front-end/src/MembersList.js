@@ -39,17 +39,30 @@ const MembersList = () => {
       ← Back
     </button>
     <div className="MemberList">
-      <section className="member-grid">
-        {data.map((member) => (
-         <MemberThumb
-         key={member.id}
-         details={member}
-         canKick={canKick}
-         boardId={initialBoardId}
-         memberCount={memberCount}
-       />
-        ))}
-      </section>
+    <section className="member-grid">
+      {/* If only 1 member total */}
+      {memberCount === 1 ? (
+        <p style={{ 
+          padding: "20px", 
+          textAlign: "center", 
+          width: "100%", 
+          color: "#888",
+          fontStyle: "italic"
+        }}>
+          You are the only member of this board.
+        </p>
+      ) : (
+        data.map((member) => (
+          <MemberThumb
+            key={member.id}
+            details={member}
+            canKick={canKick}
+            boardId={initialBoardId}
+            memberCount={memberCount}
+          />
+        ))
+      )}
+    </section>
     </div>
     <Footer />
     </>
