@@ -16,6 +16,7 @@ const editBoardRouter = require("./routes/editBoard");
 const leaveBoardRouter = require("./routes/leaveBoard");
 const signupRouter = require("./routes/signup");
 const { setupGoogleSignupStrategy } = require("./routes/signup");
+const membersRouter = require("./routes/members");
 
 const {
   ensureFriendsCache,
@@ -38,57 +39,6 @@ app.use(express.json());
 // we will put some server logic here later...
 
 //fall-back data
-const fallbackBoards = [
-    {
-        id: 1,
-        title: 'Your Cool Boards',
-        isOwner: true,
-        isJoined:true, 
-        memberCount: 10,
-        coverPhotoURL: `https://picsum.photos/800/400?seed=board-1`,
-        descriptionShort:
-          'purus eu magna vulputate luctus cum sociis natoque penatibus et magnis',
-        descriptionLong:
-          'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
-      },
-      {
-        id: 2,
-        title: 'Not Your Cool Boards',
-        isOwner: false,
-        isJoined: true, 
-        memberCount: 10,
-        coverPhotoURL: 'https://picsum.photos/800/400?seed=board-2',
-        descriptionShort:
-          'purus eu magna vulputate luctus cum sociis natoque penatibus et magnis',
-        descriptionLong:
-            'non velit nec nisi vulputate nonummy maecenas tincidunt lacus at velit vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin leo odio porttitor id consequat in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero'
-      },
-      {
-        id: 3,
-        title: 'Art & Culture Exchange',
-        isOwner: false,
-        isJoined: false,
-        memberCount: 24,
-        coverPhotoURL: 'https://picsum.photos/800/400?seed=board-3',
-        descriptionShort:
-          'connect with artists and creators sharing cross-cultural experiences',
-        descriptionLong:
-          'explore the intersection of art, music, and culture in this vibrant community. members host weekly digital exhibits, share creative inspiration, and collaborate across disciplines. perfect for painters, photographers, and anyone with a creative spark.'
-      },
-      {
-        id: 4,
-        title: 'Language Learners Hub',
-        isOwner: false,
-        isJoined: false,
-        memberCount: 18,
-        coverPhotoURL: 'https://picsum.photos/800/400?seed=board-4',
-        descriptionShort:
-          'practice languages with friendly native speakers from around the world',
-        descriptionLong:
-          'a global space for language enthusiasts to connect, exchange tips, and build fluency through conversation. join themed events like “spanish tuesdays” and “french friday” to improve your skills and make friends from every corner of the world.'
-      }
-  ];
-
   const fallbackMembers = [
     {
       id: 1,
@@ -140,77 +90,6 @@ const enrichMember = (b) => {
  //ROUTES
 
   //GET
-
-  //get mock members
-  app.get("/api/members", async (req, res) => {
-    try {
-      const response = await axios.get(MOCKAROO_URL_MEMBERS);
-      console.log("Data loaded from Mockaroo");
-      const members = Array.isArray(response.data) ? response.data : [];
-      const enriched = members.map(enrichMember);
-      res.json({ data: enriched });
-    } catch (err) {
-      console.warn("Mockaroo failed, using fallback data instead.");
-      res.json({ data: fallbackMembers });
-    }
-  });
-
-  // Homepage route - get data from Mockaroo
-  app.get("/api/home", async (req, res) => {
-    try {
-      // Fetch boards data from Mockaroo to calculate homepage stats
-      const response = await axios.get(MOCKAROO_URL);
-      const boards = Array.isArray(response.data) ? response.data : [];
-      
-      // Calculate stats from Mockaroo data
-      const totalBoards = boards.length;
-      const activeCommunities = boards.filter(b => b.isJoined === true || b.isJoined === "true").length;
-      
-      // Get recent activity from boards data
-      const recentActivity = boards.slice(0, 3).map(board => ({
-        type: "board_joined",
-        message: `You joined '${board.title || "Community Board"}'`,
-        timestamp: new Date().toISOString()
-      }));
-      
-      const homeData = {
-        welcomeMessage: "Welcome to CommYOUnity",
-        userStats: {
-          totalBoards: totalBoards,
-          totalFriends: 12, 
-          activeCommunities: activeCommunities
-        },
-        recentActivity: recentActivity.length > 0 ? recentActivity : [
-          {
-            type: "board_joined",
-            message: "Welcome to CommYOUnity!",
-            timestamp: new Date().toISOString()
-          }
-        ]
-      };
-      
-      res.json({ data: homeData });
-    } catch (err) {
-      console.warn("Mockaroo failed for homepage, using fallback data.");
-      // Fallback data
-      const fallbackData = {
-        welcomeMessage: "Welcome to CommYOUnity",
-        userStats: {
-          totalBoards: fallbackBoards.length,
-          totalFriends: 12,
-          activeCommunities: fallbackBoards.filter(b => b.isJoined).length
-        },
-        recentActivity: [
-          {
-            type: "board_joined",
-            message: `You joined '${fallbackBoards[0]?.title || "Community Board"}'`,
-            timestamp: new Date().toISOString()
-          }
-        ]
-      };
-      res.json({ data: fallbackData });
-    }
-  });
 
 
   //get mock data for invite firends
@@ -617,6 +496,9 @@ app.use("/api/boards", leaveBoardRouter);
 
 //signup routes
 app.use("/", signupRouter);
+
+// members routes
+app.use("/api/members", membersRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app
