@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const userSchema = new Schema(
   {
@@ -91,6 +92,23 @@ userSchema.pre('save', function (next) {
 // compare a given password with the database hash
 userSchema.methods.validPassword = function (password) {
   return bcrypt.compareSync(password, this.password)
+}
+
+// return a JWT token for the user
+userSchema.methods.generateJWT = function () {
+  const today = new Date()
+  const exp = new Date(today)
+  exp.setDate(today.getDate() + (process.env.JWT_EXP_DAYS || 7))
+
+  return jwt.sign(
+    {
+      id: this._id,
+      username: this.username,
+      email: this.email,
+      exp: parseInt(exp.getTime() / 1000),
+    },
+    process.env.JWT_SECRET
+  )
 }
 
 module.exports = mongoose.model("User", userSchema);

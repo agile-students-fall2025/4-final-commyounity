@@ -16,6 +16,9 @@ const editBoardRouter = require("./routes/editBoard");
 const leaveBoardRouter = require("./routes/leaveBoard");
 const signupRouter = require("./routes/signup");
 const { setupGoogleSignupStrategy } = require("./routes/signup");
+const jwtStrategy = require('./config/jwt-config.js')
+passport.use(jwtStrategy)
+const authenticationRoutes = require('./routes/authentication-routes.js')
 
 const {
   ensureFriendsCache,
@@ -617,6 +620,9 @@ app.use("/api/boards", leaveBoardRouter);
 
 //signup routes
 app.use("/", signupRouter);
+
+// JWT authentication routes
+app.use('/auth', authenticationRoutes())
 
 // export the express app we created to make it available to other modules
 module.exports = app
