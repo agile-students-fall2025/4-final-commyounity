@@ -7,6 +7,7 @@ const multer = require('multer');
 const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const jwtStrategy = require('./config/jwt-config.js')
 const path = require("path");
 const profileRouter = require("./routes/profile");
 const boardFeedRouter = require("./routes/boardfeed");
@@ -17,6 +18,7 @@ const leaveBoardRouter = require("./routes/leaveBoard");
 const signupRouter = require("./routes/signup");
 const { setupGoogleSignupStrategy } = require("./routes/signup");
 const membersRouter = require("./routes/members");
+const authenticationRoutes = require('./routes/authentication-routes.js');
 
 const {
   ensureFriendsCache,
@@ -211,6 +213,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+passport.use(jwtStrategy);
 
 // Only configure Google OAuth if credentials are provided
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -496,6 +499,9 @@ app.use("/api/boards", leaveBoardRouter);
 
 //signup routes
 app.use("/", signupRouter);
+
+// JWT authentication routes
+app.use('/auth', authenticationRoutes())
 
 // members routes
 app.use("/api/members", membersRouter);
