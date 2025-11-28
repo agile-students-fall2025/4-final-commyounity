@@ -1,130 +1,173 @@
-const express = require('express')
-const User = require('../models/User.js')
+const express = require('express');
+const User = require('../models/User.js');
 
+
+const USERNAME_RE = /^[A-Za-z0-9._-]{3,24}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateSignup({ username, email, password, confirmPassword }) {
+  if (!username || !email || !password) {
+    return 'username, email, and password are required.';
+  }
+  if (!USERNAME_RE.test(username)) {
+    return 'Username must be 3–24 chars and may include letters, digits, ., _, or -';
+  }
+  if (!EMAIL_RE.test(email)) {
+    return 'Please provide a valid email address.';
+  }
+  if (String(password).length < 6) {
+    return 'Password must be at least 6 characters long.';
+  }
+  if (confirmPassword !== undefined && confirmPassword !== password) {
+    return 'Passwords do not match.';
+  }
+  return null;
+}
+
+// -----------------------------
+// Auth router
+// -----------------------------
 const authenticationRouter = () => {
-  const router = express.Router()
+  const router = express.Router();
 
+  // SIGNUP: POST /auth/signup
   router.post('/signup', async (req, res) => {
-    const username = req.body.username
-    const email = req.body.email
-    const password = req.body.password
+    const { username, email, password, confirmPassword } = req.body || {};
 
-    if (!username || !email || !password) {
-      res.status(401).json({
+    const errMsg = validateSignup({ username, email, password, confirmPassword });
+    if (errMsg) {
+      return res.status(400).json({
+        ok: false,
         success: false,
-        message: `No username, email, or password supplied.`,
-      })
-      return
+        error: errMsg,
+      });
     }
 
     try {
-      const existingUsername = await User.findOne({ username: username.toLowerCase() })
+      // check username
+      const existingUsername = await User.findOne({
+        username: username.toLowerCase(),
+      });
       if (existingUsername) {
-        res.status(409).json({
+        return res.status(409).json({
+          ok: false,
           success: false,
-          message: 'Username already taken.',
-        })
-        return
+          error: 'Username already taken.',
+        });
       }
 
-      const existingEmail = await User.findOne({ email: email.toLowerCase() })
+      // check email
+      const existingEmail = await User.findOne({
+        email: email.toLowerCase(),
+      });
       if (existingEmail) {
-        res.status(409).json({
+        return res.status(409).json({
+          ok: false,
           success: false,
-          message: 'Email already registered.',
-        })
-        return
+          error: 'Email already registered.',
+        });
       }
 
+      // create user
       const user = await new User({
         username: username.toLowerCase(),
         email: email.toLowerCase(),
-        password: password,
+        password: String(password),
         name: username,
         authProvider: 'local',
-      }).save()
-      
-      console.error(`New user: ${user}`)
-      const token = user.generateJWT()
-      res.json({
+      }).save();
+
+      console.error(`New user: ${user}`);
+
+      const token = user.generateJWT();
+
+      return res.status(201).json({
+        ok: true,               
         success: true,
         message: 'User saved successfully.',
-        token: token,
+        token,
         username: user.username,
         email: user.email,
         name: user.name,
-      })
-      return
+      });
     } catch (err) {
-      console.error(`Failed to save user: ${err}`)
-      res.status(500).json({
+      console.error(`Failed to save user: ${err}`);
+      return res.status(500).json({
+        ok: false,
         success: false,
-        message: 'Error saving user to database.',
-        error: err,
-      })
-      return
+        error: 'Error saving user to database.',
+      });
     }
-  })
+  });
 
+  // LOGIN: POST /auth/login
   router.post('/login', async function (req, res) {
-    const username = req.body.username
-    const password = req.body.password
+    const { username, password } = req.body || {};
 
     if (!username || !password) {
-      res.status(401).json({ success: false, message: `No username or password supplied.` })
-      return
+      return res.status(400).json({
+        ok: false,
+        success: false,
+        error: 'No username or password supplied.',
+      });
     }
 
     try {
-      const user = await User.findOne({ username: username.toLowerCase() }).exec()
+      const user = await User.findOne({
+        username: username.toLowerCase(),
+      }).exec();
+
       if (!user) {
-        console.error(`User not found.`)
-        res.status(401).json({
+        console.error('User not found.');
+        return res.status(401).json({
+          ok: false,
           success: false,
-          message: 'User not found in database.',
-        })
-        return
+          error: 'User not found in database.',
+        });
       }
-      else if (!user.validPassword(password)) {
-        console.error(`Incorrect password.`)
-        res.status(401).json({
+
+      if (!user.validPassword(password)) {
+        console.error('Incorrect password.');
+        return res.status(401).json({
+          ok: false,
           success: false,
-          message: 'Incorrect password.',
-        })
-        return
+          error: 'Incorrect password.',
+        });
       }
-      console.log('User logged in successfully.')
-      const token = user.generateJWT()
-      res.json({
+
+      console.log('User logged in successfully.');
+      const token = user.generateJWT();
+
+      return res.json({
+        ok: true,                 
         success: true,
         message: 'User logged in successfully.',
-        token: token,
+        token,
         username: user.username,
         email: user.email,
         name: user.name,
-      })
-      return
+      });
     } catch (err) {
-      console.error(`Error looking up user: ${err}`)
-      res.status(500).json({
+      console.error(`Error looking up user: ${err}`);
+      return res.status(500).json({
+        ok: false,
         success: false,
-        message: 'Error looking up user in database.',
-        error: err,
-      })
-      return
+        error: 'Error looking up user in database.',
+      });
     }
-  })
+  });
 
+  // LOGOUT (still just informational for JWT)
   router.get('/logout', function (req, res) {
     res.json({
+      ok: true,
       success: true,
-      message: "There is actually nothing to do on the server side... you simply need to delete your token from the browser's local storage!",
-    })
-    return
-  })
+      message:
+        "With JWT, logging out is handled on the client by deleting the token from storage.",
+    });
+  });
 
-  return router
-}
+  return router;
+};
 
-module.exports = authenticationRouter
-
+module.exports = authenticationRouter;
