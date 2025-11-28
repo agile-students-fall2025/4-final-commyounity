@@ -9,7 +9,9 @@ const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
     process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
   "http://localhost:4000";
+
 const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
+const BOARD_INVITES_ENDPOINT = `${BACKEND_BASE}/api/boards/invites`;
 
 const REQUESTS_CACHE_KEY = "friend-requests";
 
@@ -77,6 +79,10 @@ const FriendRequestsPage = () => {
   const [requests, setRequests] = useState(loadCachedRequests);
   const [loading, setLoading] = useState(requests.length === 0);
   const [error, setError] = useState(null);
+
+  const [boardInvites, setBoardInvites] = useState([]);
+  const [boardInvitesError, setBoardInvitesError] = useState(null);
+
   const [feedback, setFeedback] = useState(null);
   const hadCachedRequestsRef = useRef(requests.length > 0);
 
@@ -131,7 +137,44 @@ const FriendRequestsPage = () => {
       }
     };
 
+    const fetchBoardInvites = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          // not logged in, no board invites
+          setBoardInvites([]);
+          return;
+        }
+
+        const res = await fetch(BOARD_INVITES_ENDPOINT, {
+          headers: {
+            Authorization: `jwt ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server responded with status ${res.status}`);
+        }
+
+        const payload = await res.json();
+        const list = Array.isArray(payload?.data) ? payload.data : [];
+
+        if (!isMounted) return;
+
+        setBoardInvites(list);
+        setBoardInvitesError(null);
+      } catch (err) {
+        if (!isMounted) return;
+        console.warn("Unable to load board invites.", err);
+        setBoardInvites([]);
+        setBoardInvitesError(
+          "We couldn't load your board invites right now."
+        );
+      }
+    };
+
     fetchRequests();
+    fetchBoardInvites();
 
     return () => {
       isMounted = false;
@@ -243,6 +286,90 @@ const FriendRequestsPage = () => {
     }
   };
 
+  const handleBoardInviteAccept = async (invite) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setFeedback({
+          type: "error",
+          message: "Your session expired. Please log in again.",
+        });
+        return;
+      }
+
+      const res = await fetch(
+        `${BOARD_INVITES_ENDPOINT}/${encodeURIComponent(invite.id)}/accept`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `jwt ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Server responded with status ${res.status}`);
+      }
+
+      await res.json();
+
+      setBoardInvites((prev) => prev.filter((i) => i.id !== invite.id));
+
+      setFeedback({
+        type: "success",
+        message: `You joined “${invite.boardTitle}”.`,
+      });
+    } catch (err) {
+      console.warn("Unable to accept board invite.", err);
+      setFeedback({
+        type: "error",
+        message: "We couldn’t accept the board invite. Please try again.",
+      });
+    }
+  };
+
+  const handleBoardInviteDecline = async (invite) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setFeedback({
+          type: "error",
+          message: "Your session expired. Please log in again.",
+        });
+        return;
+      }
+
+      const res = await fetch(
+        `${BOARD_INVITES_ENDPOINT}/${encodeURIComponent(invite.id)}/decline`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `jwt ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Server responded with status ${res.status}`);
+      }
+
+      await res.json();
+
+      setBoardInvites((prev) => prev.filter((i) => i.id !== invite.id));
+
+      setFeedback({
+        type: "info",
+        message: `You declined the invite to “${invite.boardTitle}”.`,
+      });
+    } catch (err) {
+      console.warn("Unable to decline board invite.", err);
+      setFeedback({
+        type: "error",
+        message: "We couldn’t decline the board invite. Please try again.",
+      });
+    }
+  };
+
   return (
     <>
       <Header title="Friend Requests" />
@@ -319,7 +446,7 @@ const FriendRequestsPage = () => {
               </section>
             ) : (
               <div className="request-empty">
-                <h2>No pending requests</h2>
+                <h2>No pending friend requests</h2>
                 <p>
                   You’re all caught up for now. Check back later or keep building
                   your commYOUnity.
@@ -329,6 +456,68 @@ const FriendRequestsPage = () => {
                 </Link>
               </div>
             )}
+
+            {/* ===== BOARD INVITES SECTION ===== */}
+            <section className="boardinvites-section">
+              <div className="boardinvites-header">
+                <h2>Board Invites</h2>
+                <p>Boards other members have invited you to join.</p>
+              </div>
+
+              {boardInvitesError && (
+                <div className="request-error" role="alert">
+                  {boardInvitesError}
+                </div>
+              )}
+
+              {boardInvites.length > 0 ? (
+                <div className="boardinvites-list">
+                  {boardInvites.map((invite) => (
+                    <article key={invite.id} className="boardinvite-card">
+                      {invite.boardCoverPhotoURL && (
+                        <img
+                          className="boardinvite-cover"
+                          src={invite.boardCoverPhotoURL}
+                          alt={invite.boardTitle}
+                        />
+                      )}
+                      <div className="boardinvite-meta">
+                        <h3>{invite.boardTitle}</h3>
+                        <p>
+                          Invited by{" "}
+                          <strong>
+                            {invite.invitedByName}
+                            {invite.invitedByUsername
+                              ? ` (@${invite.invitedByUsername})`
+                              : ""}
+                          </strong>
+                        </p>
+                      </div>
+                      <div className="boardinvite-buttons">
+                        <button
+                          className="accept"
+                          onClick={() => handleBoardInviteAccept(invite)}
+                        >
+                          Join Board
+                        </button>
+                        <button
+                          className="decline"
+                          onClick={() => handleBoardInviteDecline(invite)}
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                !boardInvitesError && (
+                  <p className="boardinvites-empty">
+                    No board invitations at the moment.
+                  </p>
+                )
+              )}
+            </section>
           </>
         )}
       </div>
