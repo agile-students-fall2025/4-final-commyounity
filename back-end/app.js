@@ -194,40 +194,31 @@ passport.use(jwtStrategy);
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-//profile routes
+// ------------------------
+// SPECIFIC /api/boards/... ROUTES FIRST
+// ------------------------
+
+app.use("/api/boards/create", createBoardRouter);      // POST /api/boards/create
+app.use("/api/boards/:id/invite", boardInvitesRouter); // POST /api/boards/:id/invite
+app.use("/api/boards/:id/edit", editBoardRouter);      // POST /api/boards/:id/edit
+app.use("/api/boards/:id/leave", leaveBoardRouter);    // POST /api/boards/:id/leave
+app.use("/api/boards/:id/kick-member", kickMemberRouter); // POST /api/boards/:id/kick-member
+
+// ------------------------
+// GENERIC /api/boards ROUTES AFTERWARD
+// ------------------------
+
+app.use("/api/boards", viewBoardsRouter);    // GET /api/boards, GET /api/boards/:id
+app.use("/api/boards", boardFeedRouter);     // GET /api/boards/:id/feed
+
+// ------------------------
+// OTHER ROUTES
+// ------------------------
+
 app.use("/api/profile", profileRouter);
-
-//invites
-app.use("/api/boards", boardInvitesRouter);
-
-// view boards router 
-app.use("/api/boards", viewBoardsRouter);
-
-//board routes
-app.use("/api/boards", boardFeedRouter);
-
-//createBoard router
-app.use("/api/boards/create", createBoardRouter);
-
-//edit form Boards
-app.use("/api/boards", editBoardRouter);
-
-//leave board
-app.use("/api/boards", leaveBoardRouter);
-
-// JWT authentication routes
-app.use('/auth', authenticationRoutes())
-
-// members routes
+app.use('/auth', authenticationRoutes());
 app.use("/api/members", membersRouter);
-
-// protected routes (everything here requires JWT)
-app.use('/protected', protectedRoutes()) // /protected, /protected/profile, /protected/settings, etc.
-
-//kick
-app.use("/api/boards", kickMemberRouter);
-
-//find members
+app.use('/protected', protectedRoutes());
 app.use("/api/searches", findMembersRouter);
 
 // export the express app we created to make it available to other modules
