@@ -1,3 +1,4 @@
+// MemberList.js
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -12,6 +13,7 @@ const MembersList = () => {
   const canKick = !!(state && state.isBoardOwner);
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+
   const initialBoardId = state?.boardId ?? id;
   const [memberCount, setMemberCount] = useState(state?.memberCount);
 
@@ -25,42 +27,44 @@ const MembersList = () => {
           return;
         }
 
-        const response = await axios.get("http://localhost:4000/api/members", {
-          headers: {
-            Authorization: `JWT ${token}`, 
-          },
-        });
+        const response = await axios.get(
+          `http://localhost:4000/api/members/${initialBoardId}`,
+          {
+            headers: {
+              Authorization: `jwt ${token}`,  // keep scheme consistent with your other calls
+            },
+          }
+        );
 
-        setData(response.data.data);
+        console.log("[MEMBERS LIST RESPONSE]", response.data);
+
+        const members = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+
+        setData(members);
+        setError(null);
+
+        // if you want memberCount to come from the backend instead of state
+        if (typeof memberCount !== "number") {
+          setMemberCount(members.length);
+        }
       } catch (err) {
         console.error("Backend request failed:", err);
         setError("Could not load members.");
+        setData([]);
       }
     };
 
     fetchMembers();
-  }, [id]);
+  }, [id]); // board id changing should refetch
 
   const handleBack = () => {
     window.history.back();
   };
 
-  if (error) {
-    return (
-      <>
-        <Header title="Members" />
-        <button className="back-btn" onClick={handleBack}>
-          ← Back
-        </button>
-        <div className="MemberList">
-          <p style={{ padding: "20px", textAlign: "center", color: "#888" }}>
-            {error}
-          </p>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+  const effectiveMemberCount =
+    typeof memberCount === "number" ? memberCount : data.length;
 
   return (
     <>
@@ -68,33 +72,53 @@ const MembersList = () => {
       <button className="back-btn" onClick={handleBack}>
         ← Back
       </button>
+
       <div className="MemberList">
-        <section className="member-grid">
-          {memberCount === 1 ? (
-            <p
-              style={{
-                padding: "20px",
-                textAlign: "center",
-                width: "100%",
-                color: "#888",
-                fontStyle: "italic",
-              }}
-            >
-              You are the only member of this board.
-            </p>
-          ) : (
-            data.map((member) => (
-              <MemberThumb
-                key={member.id || member._id}
-                details={member}
-                canKick={canKick}
-                boardId={initialBoardId}
-                memberCount={memberCount}
-              />
-            ))
-          )}
-        </section>
+        {error ? (
+          <p style={{ padding: "20px", textAlign: "center", color: "#888" }}>
+            {error}
+          </p>
+        ) : (
+          <section className="member-grid">
+            {effectiveMemberCount <= 1 ? (
+              <p
+                style={{
+                  padding: "20px",
+                  textAlign: "center",
+                  width: "100%",
+                  color: "#888",
+                  fontStyle: "italic",
+                }}
+              >
+                You are the only member of this board.
+              </p>
+            ) : data.length === 0 ? (
+              <p
+                style={{
+                  padding: "20px",
+                  textAlign: "center",
+                  width: "100%",
+                  color: "#888",
+                  fontStyle: "italic",
+                }}
+              >
+                No members found.
+              </p>
+            ) : (
+              data.map((member) => (
+                <MemberThumb
+                  key={member.id || member._id}
+                  details={member}
+                  canKick={canKick}
+                  boardId={initialBoardId}
+                  memberCount={effectiveMemberCount}
+                />
+              ))
+            )}
+          </section>
+        )}
       </div>
+
       <Footer />
     </>
   );
