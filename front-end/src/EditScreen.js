@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios'
 import './EditScreen.css'
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -18,14 +16,25 @@ const EditScreen = () => {
   const [photoUrl, setPhotoUrl] = useState("");                      
   const [pendingPhotoFile, setPendingPhotoFile] = useState(null);    
 
-
   useEffect(() => {
     console.log("Fetching boards from backend...");
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('No JWT token found in localStorage');
+      setError('You must be logged in to edit boards.');
+      return;
+    }
+
     axios
-      .get("http://localhost:4000/api/boards")
+      .get("http://localhost:4000/api/boards", {
+        headers: {
+          Authorization: `JWT ${token}`,  
+        },
+      })
       .then((response) => {
         const boards = response.data.data; 
-        const selected = boards.find((b) => String(b.id) === String(id));
+        const selected = boards.find((b) => String(b.id || b._id) === String(id));
         if (selected) {
           setBoard(selected);
           setPendingTitle(selected.title || '');
@@ -54,16 +63,29 @@ const EditScreen = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You must be logged in to save changes.');
+        navigate('/login');
+        return;
+      }
+
       const formData = new FormData();
       formData.append('title', pendingTitle);
       formData.append('descriptionLong', pendingDescription);
       if (pendingPhotoFile) {
         formData.append('photo', pendingPhotoFile); 
       }
+
       const res = await axios.post(
         `http://localhost:4000/api/boards/${id}/edit`, 
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { 
+          headers: { 
+            "Content-Type": "multipart/form-data",
+            Authorization: `JWT ${token}`, 
+          } 
+        }
       );
 
       console.log("Edit posted:", res.data);
@@ -80,16 +102,15 @@ const EditScreen = () => {
   const displayImage = photoUrl || board.coverPhotoURL;
 
   return (
-    <><Header title="Edit Board" />
-    <Link to={`/boards/${board.id}`} className="back-btn">
-          ← Back
-    </Link>
-    <div className="EditScreen">
-      
-
-      <div className="edit-content">
-      <div className="board-photo">
-      <img src={displayImage} alt={board.title} className="board-image" />
+    <>
+      <Header title="Edit Board" />
+      <Link to={`/boards/${board.id}`} className="back-btn">
+        ← Back
+      </Link>
+      <div className="EditScreen">
+        <div className="edit-content">
+          <div className="board-photo">
+            <img src={displayImage} alt={board.title} className="board-image" />
             <h2>{board.title}</h2>
             <div className="upload-wrap">
               <label htmlFor="board-photo-input" className="upload-button">
@@ -105,8 +126,8 @@ const EditScreen = () => {
             </div>
           </div>
 
-        <form className="edit-form" onSubmit={handleSave}>
-        <label>Board Name</label>
+          <form className="edit-form" onSubmit={handleSave}>
+            <label>Board Name</label>
             <input
               type="text"
               value={pendingTitle}
@@ -119,22 +140,31 @@ const EditScreen = () => {
               onChange={(e) => setPendingDescription(e.target.value)}
             />
             <p className="char-limit">• max 500 characters</p>
-          <div className="member-actions">
-            <button type="button" className="invite" onClick={() => navigate(`/boards/${board.id}/invite`)}>
-              Invite Friends
-            </button>
-            <button type="button" className="find" onClick={() => navigate(`/boards/${board.id}/findmembers`)}>
-              Find Members
-            </button>
-          </div>
 
-          <button type="submit" className="save-button">
-            Save Changes
-          </button>
-        </form>
+            <div className="member-actions">
+              <button
+                type="button"
+                className="invite"
+                onClick={() => navigate(`/boards/${board.id}/invite`)}
+              >
+                Invite Friends
+              </button>
+              <button
+                type="button"
+                className="find"
+                onClick={() => navigate(`/boards/${board.id}/findmembers`)}
+              >
+                Find Members
+              </button>
+            </div>
+
+            <button type="submit" className="save-button">
+              Save Changes
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-    <Footer />
+      <Footer />
     </>
   )
 }

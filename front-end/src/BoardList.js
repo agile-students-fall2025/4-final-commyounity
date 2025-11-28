@@ -11,8 +11,21 @@ const BoardList = props => {
   const [notYourBoardsSearch, setNotYourBoardsSearch] = useState('')
 
   useEffect(() => {
-    console.log('fetching 10 random boards...')
-    axios('http://localhost:4000/api/boards')
+    console.log('fetching boards...')
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      console.error('No JWT token found in localStorage')
+      setError('You must be logged in to see boards.')
+      return
+    }
+
+    axios
+      .get('http://localhost:4000/api/boards', {
+        headers: {
+          Authorization: `JWT ${token}`,  
+        },
+      })
       .then(response => {
         setData(response.data.data)
       })
@@ -22,7 +35,6 @@ const BoardList = props => {
       })
   }, [])
 
-  // Filter function for boards
   const filterBoards = (boards, searchTerm) => {
     if (!searchTerm.trim()) return boards
     
@@ -33,17 +45,15 @@ const BoardList = props => {
     )
   }
 
-  // Get filtered boards for "Your Boards"
   const yourBoards = data.filter(item => item.isOwner)
   const filteredYourBoards = filterBoards(yourBoards, yourBoardsSearch)
 
-  // Get filtered boards for "Not Your Boards"
   const notYourBoards = data.filter(item => !item.isOwner && item.isJoined)
   const filteredNotYourBoards = filterBoards(notYourBoards, notYourBoardsSearch)
 
   return (
     <div className="BoardList">
-      <h3 style={{ 'paddingLeft': '20px' }}>Your Boards:</h3>
+      <h3 style={{ paddingLeft: '20px' }}>Your Boards:</h3>
       <SearchBar 
         onSearch={setYourBoardsSearch}
         placeholder="Search your boards..."
@@ -51,7 +61,7 @@ const BoardList = props => {
       <section className="yourBoards">
         {filteredYourBoards.length > 0 ? (
           filteredYourBoards.map(item => (
-            <BoardThumb key={item.id} details={item} />
+            <BoardThumb key={item.id || item._id} details={item} />
           ))
         ) : (
           <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
@@ -60,7 +70,7 @@ const BoardList = props => {
         )}
       </section>
 
-      <h3 style={{ 'paddingLeft': '20px' }}>Boards You Are a Member Of:</h3>
+      <h3 style={{ paddingLeft: '20px' }}>Boards You Are a Member Of:</h3>
       <SearchBar 
         onSearch={setNotYourBoardsSearch}
         placeholder="Search member boards..."
@@ -68,7 +78,7 @@ const BoardList = props => {
       <section className="NotYourBoards">
         {filteredNotYourBoards.length > 0 ? (
           filteredNotYourBoards.map(item => (
-            <BoardThumb key={item.id} details={item} />
+            <BoardThumb key={item.id || item._id} details={item} />
           ))
         ) : (
           <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
