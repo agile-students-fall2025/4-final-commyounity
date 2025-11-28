@@ -23,6 +23,7 @@ const SignUpPage = () => {
     }
   
     setLoading(true);
+  
     try {
       const res = await fetch('http://localhost:4000/auth/signup', {
         method: 'POST',
@@ -31,19 +32,41 @@ const SignUpPage = () => {
         body: JSON.stringify({ username, email, password, confirmPassword }),
       });
   
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
   
-      if (!res.ok || !data.ok) {
-        setError(data.error || 'Signup failed.');
+      // Consider it a failure if:
+      //  - HTTP not ok OR backend explicitly says success === false / ok === false
+      const failed =
+        !res.ok ||
+        data.success === false ||
+        data.ok === false;
+  
+      if (failed) {
+        let msg = data.error || data.message || 'Signup failed.';
+  
+        // Customize for common cases
+        if (res.status === 409 && data.message === 'Email already registered.') {
+          msg =
+            'An account already exists with this email. Please go to Login instead.';
+        } else if (res.status === 409 && data.message === 'Username already taken.') {
+          msg = 'That username is already taken. Please choose a different one.';
+        }
+  
+        setError(msg);
         setLoading(false);
         return;
       }
   
+      // success path
       if (data.token) {
         localStorage.setItem('token', data.token);
       }
   
-      // now Protected will see the token and allow /home
       navigate('/home');
     } catch (err) {
       console.error('Signup error:', err);
