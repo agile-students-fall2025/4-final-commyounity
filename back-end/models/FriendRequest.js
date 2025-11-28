@@ -28,5 +28,6 @@ const friendRequestSchema = new Schema(
 );
 
 friendRequestSchema.index({ owner: 1, requester: 1 }, { unique: true });
+friendRequestSchema.index({ owner: 1, status: 1 });
 
 module.exports = mongoose.model("FriendRequest", friendRequestSchema);
