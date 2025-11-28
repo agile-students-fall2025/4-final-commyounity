@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./MemberThumb.css"; 
+import "./MemberThumb.css";
 
 const MemberThumb = (props) => {
   const [kickMsg, setKickMsg] = useState("");
@@ -12,37 +12,58 @@ const MemberThumb = (props) => {
 
     const boardId = props.boardId;
     const memberId = props.details.id;
-    const memberCount = props.memberCount;
 
-    // --- CHANGED: nicer message if memberCount is still loading
-    if (memberCount === undefined) {
-      setKickErr("memberCount isn’t available yet. Please wait a moment and try again.");
+    // Get JWT from localStorage (same as other protected calls)
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setKickErr("You’re not logged in. Please log in again.");
       return;
     }
 
+    const confirmed = window.confirm(
+      `Remove ${props.details.first_name} from this board?`
+    );
+    if (!confirmed) return;
+
     try {
       setKicking(true);
-      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/kick-member`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId, memberCount }),
-      });
+
+      const res = await fetch(
+        `http://localhost:4000/api/boards/${boardId}/kick-member`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `jwt ${token}`,
+          },
+          body: JSON.stringify({ memberId }),
+        }
+      );
 
       const data = await res.json();
       console.log("Kick response:", data);
 
-      if (!res.ok) {
+      if (!res.ok || data.status !== "success") {
         throw new Error(data?.message || data?.error || "Kick failed.");
       }
 
-      const next = data?.data?.memberCount;
-      const prev = data?.meta?.memberCountPrev;
-      if (typeof next === "number" && typeof prev === "number") {
-        setKickMsg(`Kick recorded. memberCount would go from ${prev} → ${next}.`);
+      const remaining = data?.data?.memberCount;
+      if (typeof remaining === "number") {
+        setKickMsg(
+          `Member removed. There are now ${remaining} member${
+            remaining === 1 ? "" : "s"
+          } on this board.`
+        );
       } else {
-        setKickMsg(data?.message || "Kick recorded.");
+        setKickMsg(data?.message || "Member removed from the board.");
+      }
+
+      // Let parent list know so it can remove this card from UI
+      if (typeof props.onKicked === "function") {
+        props.onKicked(memberId);
       }
     } catch (err) {
+      console.error("Kick error:", err);
       setKickErr(err.message || "Something went wrong.");
     } finally {
       setKicking(false);
@@ -63,7 +84,11 @@ const MemberThumb = (props) => {
       <p className="description">Interests: {props.details.description}</p>
 
       {props.canKick && (
-        <button className="kick-button" onClick={handleKick} disabled={kicking}>
+        <button
+          className="kick-button"
+          onClick={handleKick}
+          disabled={kicking}
+        >
           {kicking ? "Kicking..." : `Kick ${props.details.first_name}`}
         </button>
       )}
