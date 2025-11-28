@@ -94,6 +94,12 @@
   background: var(--danger-dark);
   transform: translateY(-2px);
 }
+.role-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-top: 4px;
+}
 
 /* ===== Responsive Tweaks ===== */
 @media (max-width: 700px) {
