@@ -278,6 +278,9 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 //profile routes
 app.use("/api/profile", profileRouter);
 
+//invites
+app.use("/api/boards", boardInvitesRouter);
+
 // view boards router 
 app.use("/api/boards", viewBoardsRouter);
 
@@ -302,8 +305,7 @@ app.use("/api/members", membersRouter);
 // protected routes (everything here requires JWT)
 app.use('/protected', protectedRoutes()) // /protected, /protected/profile, /protected/settings, etc.
 
-//invites
-app.use("/api/boards", boardInvitesRouter);
+
 
 // export the express app we created to make it available to other modules
 module.exports = app

@@ -4,20 +4,13 @@ const passport = require("passport");
 const mongoose = require("mongoose");
 const Board = require("../models/Board");
 const BoardInvite = require("../models/BoardInvite");
-const User = require("../models/User");   // ⬅️ NEW: to query users
+const User = require("../models/User");
 
 const router = express.Router();
 
 /**
  * GET /api/boards/:id/friends
- *
- * Return a list of "friends" the user can invite to this board.
- * For now: all users except:
- *  - the current logged-in user
- *  - users who are already board members
- *  - users who already have a pending invite for this board
- *
- * Optional query param: ?q=searchTerm to filter by username or name.
+ * → candidates to invite to a specific board
  */
 router.get(
   "/:id/friends",
@@ -66,9 +59,9 @@ router.get(
       const userQuery = {
         _id: {
           $nin: [
-            currentUserId,                // not myself
-            ...Array.from(memberIds),     // not existing members
-            ...Array.from(pendingIds),    // not already invited (pending)
+            currentUserId,            // not myself
+            ...Array.from(memberIds), // not existing members
+            ...Array.from(pendingIds) // not already invited (pending)
           ],
         },
       };
@@ -85,7 +78,7 @@ router.get(
       // 5) Get possible invitees
       const users = await User.find(userQuery)
         .select("_id username name email")
-        .limit(50)               // just to be safe
+        .limit(50)
         .lean();
 
       return res.json({
@@ -219,6 +212,173 @@ router.post(
       return res.status(500).json({
         status: "error",
         message: "Failed to create invite.",
+        error: err.message,
+      });
+    }
+  }
+);
+
+/**
+ * GET /api/boards/invites
+ * → Pending board invites for the CURRENT USER
+ */
+router.get(
+  "/invites",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const userId = req.user._id;
+
+      const invites = await BoardInvite.find({
+        invitedUserId: userId,
+        status: "pending",
+      })
+        .populate("boardId", "title coverPhotoURL")
+        .populate("invitedBy", "username name email")
+        .lean();
+
+      const data = invites.map((inv) => ({
+        id: inv._id.toString(),
+        boardId: inv.boardId?._id?.toString(),
+        boardTitle: inv.boardId?.title || "Untitled board",
+        boardCoverPhotoURL: inv.boardId?.coverPhotoURL || null,
+        invitedById: inv.invitedBy?._id?.toString(),
+        invitedByName: inv.invitedBy?.name || inv.invitedBy?.username || "Someone",
+        invitedByUsername: inv.invitedBy?.username || null,
+        status: inv.status,
+        createdAt: inv.createdAt,
+      }));
+
+      return res.json({
+        status: "success",
+        data,
+      });
+    } catch (err) {
+      console.error("[BOARD INVITES LIST ERROR]", err);
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to load board invites.",
+        error: err.message,
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/boards/invites/:inviteId/accept
+ */
+router.post(
+  "/invites/:inviteId/accept",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const { inviteId } = req.params;
+      const userId = req.user._id;
+
+      if (!mongoose.isValidObjectId(inviteId)) {
+        return res.status(400).json({
+          status: "error",
+          message: "Invalid invite id",
+        });
+      }
+
+      const invite = await BoardInvite.findOne({
+        _id: inviteId,
+        invitedUserId: userId,
+        status: "pending",
+      }).exec();
+
+      if (!invite) {
+        return res.status(404).json({
+          status: "error",
+          message: "Invite not found or already handled.",
+        });
+      }
+
+      const board = await Board.findById(invite.boardId).exec();
+      if (!board) {
+        invite.status = "declined";
+        await invite.save();
+        return res.status(404).json({
+          status: "error",
+          message: "Board no longer exists.",
+        });
+      }
+
+      const alreadyMember = (board.members || []).some(
+        (m) => m.toString() === userId.toString()
+      );
+
+      if (!alreadyMember) {
+        board.members.push(userId);
+        await board.save();
+      }
+
+      invite.status = "accepted";
+      await invite.save();
+
+      return res.json({
+        status: "success",
+        message: "You joined the board.",
+        data: {
+          boardId: board._id.toString(),
+          boardTitle: board.title,
+        },
+      });
+    } catch (err) {
+      console.error("[BOARD INVITE ACCEPT ERROR]", err);
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to accept invite.",
+        error: err.message,
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/boards/invites/:inviteId/decline
+ */
+router.post(
+  "/invites/:inviteId/decline",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const { inviteId } = req.params;
+      const userId = req.user._id;
+
+      if (!mongoose.isValidObjectId(inviteId)) {
+        return res.status(400).json({
+          status: "error",
+          message: "Invalid invite id",
+        });
+      }
+
+      const invite = await BoardInvite.findOne({
+        _id: inviteId,
+        invitedUserId: userId,
+        status: "pending",
+      }).exec();
+
+      if (!invite) {
+        return res.status(404).json({
+          status: "error",
+          message: "Invite not found or already handled.",
+        });
+      }
+
+      invite.status = "declined";
+      await invite.save();
+
+      return res.json({
+        status: "success",
+        message: "Board invite declined.",
+      });
+    } catch (err) {
+      console.error("[BOARD INVITE DECLINE ERROR]", err);
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to decline invite.",
         error: err.message,
       });
     }

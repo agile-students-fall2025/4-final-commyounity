@@ -26,4 +26,5 @@ const boardInviteSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ⬅️ THIS line is the important part
 module.exports = mongoose.model("BoardInvite", boardInviteSchema);
