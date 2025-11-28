@@ -15,7 +15,12 @@ const userSchema = new Schema(
       maxlength: 24,
       match: /^[A-Za-z0-9._-]+$/,
     },
-
+    friends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     email: {
       type: String,
       required: true,

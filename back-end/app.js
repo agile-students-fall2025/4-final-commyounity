@@ -13,6 +13,9 @@ const leaveBoardRouter = require("./routes/leaveBoard");
 const membersRouter = require("./routes/members");
 const authenticationRoutes = require('./routes/authentication-routes.js');
 const protectedRoutes = require('./routes/protected-routes'); 
+const boardInvitesRouter = require("./routes/boardInvites");
+const passport = require('passport');
+const jwtStrategy = require('./config/jwt-config.js');
 
 
 
@@ -33,6 +36,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+app.use(passport.initialize());
+passport.use(jwtStrategy);
 
 // we will put some server logic here later...
 
@@ -182,31 +188,6 @@ const avatarUrl = (id) => `https://i.pravatar.cc/100?img=${id}`;
 
 // POST 
 
-// invite friend to board
-
-app.post('/api/boards/:id/invite', (req, res) => {
-  const { id } = req.params;
-  const { friendId } = req.body;
-
-  if (!friendId) {
-    return res.status(400).json({ status: 'error', message: 'friendId is required' });
-  }
-
-  console.log('[INVITE]', {
-    boardId: id,
-    friendId,
-    at: new Date().toISOString(),
-  });
-
-  return res.status(202).json({
-    status: 'received',
-    boardId: id,
-    friendId,
-    message: 'Invite recorded (mock).',
-    timestamp: new Date().toISOString(),
-  });
-});
-
 // search bar
 
 app.post("/api/searches", (req, res) => {
@@ -320,6 +301,9 @@ app.use("/api/members", membersRouter);
 
 // protected routes (everything here requires JWT)
 app.use('/protected', protectedRoutes()) // /protected, /protected/profile, /protected/settings, etc.
+
+//invites
+app.use("/api/boards", boardInvitesRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app
