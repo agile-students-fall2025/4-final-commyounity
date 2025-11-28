@@ -164,7 +164,7 @@
   transform: translateY(-2px);
 }
 
-/* ===== Empty State ===== */
+/* ===== Empty State (Friends) ===== */
 .request-empty {
   margin-top: 48px;
   padding: 40px 32px;
@@ -201,6 +201,112 @@
   transform: translateY(-2px);
 }
 
+/* ===== Board Invites Section ===== */
+.boardinvites-section {
+  margin-top: 56px;
+  text-align: left;
+}
+
+.boardinvites-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+
+.boardinvites-header p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* List of board invites */
+.boardinvites-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* Individual invite card */
+.boardinvite-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid #e0e0e0;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Optional cover image */
+.boardinvite-cover {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+/* Board + inviter info */
+.boardinvite-meta {
+  padding: 16px 18px 8px;
+}
+
+.boardinvite-meta h3 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+
+.boardinvite-meta p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* Buttons on the card */
+.boardinvite-buttons {
+  display: flex;
+  gap: 10px;
+  padding: 10px 18px 16px;
+}
+
+.boardinvite-buttons .accept,
+.boardinvite-buttons .decline {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Make Join Board primary / black like Accept */
+.boardinvite-buttons .accept {
+  background: #000;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.boardinvite-buttons .accept:hover {
+  background: #222;
+  transform: translateY(-1px);
+}
+
+/* Decline button */
+.boardinvite-buttons .decline {
+  background: #f3f4f6;
+  color: #111;
+}
+
+.boardinvite-buttons .decline:hover {
+  background: #e0e0e0;
+  transform: translateY(-1px);
+}
+
+/* Empty state text for board invites */
+.boardinvites-empty {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .FriendRequestsPage {
@@ -228,6 +334,10 @@
     padding: 14px;
     font-size: 0.95rem;
   }
+
+  .boardinvites-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 420px) {
@@ -240,5 +350,12 @@
   }
   .request-card h2 {
     font-size: 1rem;
+  }
+
+  .boardinvite-meta {
+    padding: 14px 14px 6px;
+  }
+  .boardinvite-buttons {
+    padding: 8px 14px 14px;
   }
 }

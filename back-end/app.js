@@ -17,6 +17,10 @@ const boardInvitesRouter = require("./routes/boardInvites");
 const passport = require('passport');
 const jwtStrategy = require('./config/jwt-config.js');
 const kickMemberRouter = require("./routes/kickMember");
+const findMembersRouter = require("./routes/searchMembers");
+
+
+
 
 
 const {
@@ -69,9 +73,6 @@ passport.use(jwtStrategy);
   const MOCKAROO_URL = `https://my.api.mockaroo.com/mock_boards_data.json?key=${MOCKAROO_API_KEY}`;
   const MOCKAROO_URL_MEMBERS = `https://my.api.mockaroo.com/members.json?key=${MOCKAROO_API_KEY}`;
 
-
-//mock photos for members
-const avatarUrl = (id) => `https://i.pravatar.cc/100?img=${id}`;
 
  //ROUTES
 
@@ -188,32 +189,6 @@ const avatarUrl = (id) => `https://i.pravatar.cc/100?img=${id}`;
 
 // POST 
 
-// search bar
-
-app.post("/api/searches", (req, res) => {
-  const { query } = req.body || {};
-  const username = String(query || "").trim();
-  if (!username) {
-    return res.status(400).json({
-      ok: false,
-      error: "Username is required.",
-    });
-  }
-  if (!/^[A-Za-z0-9_]+$/.test(username)) {
-    return res.status(400).json({
-      ok: false,
-      error:
-        "Illegal username. Only letters, digits (0–9), and underscores (_) are allowed.",
-    });
-  }
-  console.log(`[SEARCH RECEIVED] username=${username}`);
-
-  return res.status(200).json({
-    ok: true,
-    message: `Backend received search for username "${username}".`,
-    timestamp: new Date().toISOString(),
-  });
-});
 
 
 //serve static files from uploads folder
@@ -251,6 +226,9 @@ app.use('/protected', protectedRoutes()) // /protected, /protected/profile, /pro
 
 //kick
 app.use("/api/boards", kickMemberRouter);
+
+//find members
+app.use("/api/searches", findMembersRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app
