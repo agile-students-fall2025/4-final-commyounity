@@ -3,11 +3,6 @@ require("dotenv").config({ silent: true });
 const express = require("express") // CommonJS import style!
 const axios = require("axios"); 
 const cors = require("cors");
-const multer = require('multer');
-const session = require('express-session');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const jwtStrategy = require('./config/jwt-config.js')
 const path = require("path");
 const profileRouter = require("./routes/profile");
 const boardFeedRouter = require("./routes/boardfeed");
@@ -15,11 +10,11 @@ const createBoardRouter = require("./routes/createBoard");
 const viewBoardsRouter = require("./routes/viewBoards");
 const editBoardRouter = require("./routes/editBoard");
 const leaveBoardRouter = require("./routes/leaveBoard");
-const signupRouter = require("./routes/signup");
-const { setupGoogleSignupStrategy } = require("./routes/signup");
 const membersRouter = require("./routes/members");
 const authenticationRoutes = require('./routes/authentication-routes.js');
-const cookieParser = require('cookie-parser')
+const protectedRoutes = require('./routes/protected-routes'); 
+
+
 
 const {
   ensureFriendsCache,
@@ -72,14 +67,6 @@ app.use(express.json());
 //mock photos for members
 const avatarUrl = (id) => `https://i.pravatar.cc/100?img=${id}`;
 
-const enrichMember = (b) => {
-  if (!b || typeof b !== "object") return b;
-  const id = String(b.id ?? "").trim() || "unknown";
-  return {
-    ...b,
-    avatar: avatarUrl(id),
-  };
-};
  //ROUTES
 
   //GET
@@ -192,103 +179,6 @@ const enrichMember = (b) => {
     });
   });
 
-//log-in with Google
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'default-secret-key-change-in-production',
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(jwtStrategy);
-
-// Only configure Google OAuth if credentials are provided
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:4000/auth/google/callback",
-      },
-      (accessToken, refreshToken, profile, done) => {
-        console.log("Google profile:", profile);
-        return done(null, profile);
-      }
-    )
-  );
-} else {
-  console.warn("Google OAuth credentials not found. Google login will be disabled.");
-}
-
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
-
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-  app.get(
-    "/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
-  );
-
-  app.get(
-    "/auth/google/callback",
-    passport.authenticate("google", {
-      failureRedirect: "/login-failed",
-      successRedirect: "http://localhost:3000/home", 
-    })
-  );
-} else {
-  app.get("/auth/google", (req, res) => {
-    res.status(503).json({ error: "Google OAuth is not configured" });
-  });
-}
-
-app.get("/login-failed", (req, res) => {
-  res.status(401).json({ error: "Login failed" });
-});
-
-app.get("/logout", (req, res) => {
-  req.logout(() => {
-    res.redirect("http://localhost:3000/");
-  });
-});
-
-//signup - setup Google OAuth strategy
-setupGoogleSignupStrategy(passport);
-
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-  app.get(
-    '/auth/google/signup',
-    passport.authenticate('google-signup', { scope: ['profile', 'email'] })
-  );
-
-  app.get(
-    '/auth/google/signup/callback',
-    passport.authenticate('google-signup', {
-      failureRedirect: 'http://localhost:3000/signup?error=google_signup_failed',
-    }),
-    (req, res) => {
-      // Set session user after successful authentication
-      if (req.user && req.session) {
-        req.session.user = {
-          id: req.user._id.toString(),
-          username: req.user.username,
-          name: req.user.name,
-          email: req.user.email,
-        };
-      }
-      res.redirect('http://localhost:3000/home');
-    }
-  );
-} else {
-  app.get('/auth/google/signup', (req, res) => {
-    res.status(503).json({ error: "Google OAuth is not configured" });
-  });
-}
 
 // POST 
 
@@ -428,6 +318,8 @@ app.use('/auth', authenticationRoutes())
 // members routes
 app.use("/api/members", membersRouter);
 
+// protected routes (everything here requires JWT)
+app.use('/protected', protectedRoutes()) // /protected, /protected/profile, /protected/settings, etc.
 
 // export the express app we created to make it available to other modules
 module.exports = app

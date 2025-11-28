@@ -39,7 +39,6 @@ const SignUpPage = () => {
         return;
       }
   
-      // 🔥 STORE THE TOKEN AFTER SUCCESSFUL SIGNUP
       if (data.token) {
         localStorage.setItem('token', data.token);
       }
@@ -56,7 +55,7 @@ const SignUpPage = () => {
 //goole auth disabled for now!!!
   // --- Google signup redirect ---
   const handleGoogleSignup = () => {
-    window.location.href = 'http://localhost:4000/auth/google/signup';
+    window.location.href = 'http://localhost:4000/auth/google';
   };
 
   return (
