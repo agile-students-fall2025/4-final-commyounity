@@ -16,7 +16,7 @@ const protectedRoutes = require('./routes/protected-routes');
 const boardInvitesRouter = require("./routes/boardInvites");
 const passport = require('passport');
 const jwtStrategy = require('./config/jwt-config.js');
-
+const kickMemberRouter = require("./routes/kickMember");
 
 
 const {
@@ -215,62 +215,6 @@ app.post("/api/searches", (req, res) => {
   });
 });
 
-//kick button
-
-app.post('/api/boards/:id/kick-member', (req, res) => {
-  const { id } = req.params;
-  const { memberId, memberCount } = req.body || {};
-
-  if (memberCount === undefined || memberCount === null) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'memberCount is required',
-    });
-  }
-
-  const prev = Number(memberCount);
-  if (!Number.isFinite(prev) || prev < 0) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'memberCount must be a non-negative number',
-    });
-  }
-
-  if (prev === 0) {
-    return res.status(409).json({
-      status: 'error',
-      message: 'Cannot kick from an empty board',
-      data: { id, memberCount: prev },
-      timestamp: new Date().toISOString(),
-    });
-  }
-
-  const next = Math.max(0, prev - 1);
-
-  console.log('[KICK MEMBER]', {
-    id,                    
-    memberId: memberId ?? null,
-    memberCountPrev: prev,  
-    memberCountNew: next,
-    at: new Date().toISOString(),
-  });
-
-  return res.status(202).json({
-    status: 'received',
-    message: 'Kick recorded (no persistence).',
-    data: {
-      id,                
-      memberCount: next,  
-    },
-    meta: {
-      memberId: memberId ?? null,
-      memberCountPrev: prev,
-      memberCountDelta: -1,
-    },
-    timestamp: new Date().toISOString(),
-  });
-});
-
 
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -305,7 +249,8 @@ app.use("/api/members", membersRouter);
 // protected routes (everything here requires JWT)
 app.use('/protected', protectedRoutes()) // /protected, /protected/profile, /protected/settings, etc.
 
-
+//kick
+app.use("/api/boards", kickMemberRouter);
 
 // export the express app we created to make it available to other modules
 module.exports = app

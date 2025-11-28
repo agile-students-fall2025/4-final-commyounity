@@ -44,11 +44,11 @@ const FriendThumb = ({
       const response = await axios.post(
         `http://localhost:4000/api/boards/${boardId}/invite`,
         {
-          invitedUserId: details.id, // 🔑 this matches the backend route
+          invitedUserId: details.id, 
         },
         {
           headers: {
-            Authorization: `jwt ${token}`, // 🔑 required for passport-jwt
+            Authorization: `jwt ${token}`, 
           },
         }
       );
