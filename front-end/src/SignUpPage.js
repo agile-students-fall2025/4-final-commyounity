@@ -27,18 +27,28 @@ const SignUpPage = () => {
       const res = await fetch('http://localhost:4000/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        // credentials: 'include', // not needed for pure JWT-in-body approach
         body: JSON.stringify({ username, email, password }),
       });
 
       const data = await res.json();
 
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Signup failed.');
+      // backend sends: { success: true, message, token, username, email, name }
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Signup failed.');
       }
 
       console.log('Signup success:', data);
-      navigate('/home');
+
+      // 🔥 store JWT so Protected.js can see it
+      localStorage.setItem('token', data.token);
+
+      // (optional) store username/email if you want:
+      // localStorage.setItem('username', data.username);
+      // localStorage.setItem('email', data.email);
+
+      // navigate to /home after successful signup
+      navigate('/home', { replace: true });
     } catch (err) {
       console.error('Signup error:', err);
       setError(err.message || 'Signup failed.');

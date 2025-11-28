@@ -26,37 +26,189 @@ import ChangePasswordPage from "./ChangePasswordPage";
 import BrowseBoard from './BrowseBoard';
 import JoinBoardDetail from './JoinBoardDetail';
 
+import Protected from './Protected'; // ⬅️ add this
+
 function App() {
   console.log("ke", process.env.REACT_APP_KEY)
   return (
     <div className="App">
       <Router>
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/friends" element={<FriendsHomePage />} />
-            <Route path="/friends/list" element={<FriendsListPage />} />
-            <Route path="/friends/requests" element={<FriendRequestsPage />} />
-            <Route path="/friends/find" element={<FindFriendsPage />} />
-            <Route path="/profilepage" element={<ProfilePage />} />
-            <Route path="/edit-profile" element={<EditProfilePage />} />
-            <Route path="/settings/change-password" element={<ChangePasswordPage />} />
-            <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
-            <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/delete-profile" element={<DeleteProfilePage />} />
-            <Route path="/viewboards" element={<ViewBoard />} />
-            <Route path="/boards/:id" element={<BoardDetail />} />
-            <Route path="/joinboards/:id" element={<JoinBoardDetail />} />
-            <Route path="/boards/:id/members" element={<MembersList />} />
-            <Route path="/boards/:id/edit" element={<EditScreen />} />
-            <Route path="/boards/:id/invite" element={<InviteFriendsList />} />
-            <Route path="/boards/:id/findmembers" element={<FindMembers />} />
-            <Route path="/browseboards" element ={<BrowseBoard />} />
-            <Route path="/createboard" element={<CreateBoard />} />
-          </Routes>
+        <Routes>
+          {/* PUBLIC ROUTES */}
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+
+          {/* PROTECTED ROUTES */}
+          <Route
+            path="/home"
+            element={
+              <Protected>
+                <Home />
+              </Protected>
+            }
+          />
+          <Route
+            path="/friends"
+            element={
+              <Protected>
+                <FriendsHomePage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/friends/list"
+            element={
+              <Protected>
+                <FriendsListPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/friends/requests"
+            element={
+              <Protected>
+                <FriendRequestsPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/friends/find"
+            element={
+              <Protected>
+                <FindFriendsPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/profilepage"
+            element={
+              <Protected>
+                <ProfilePage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/edit-profile"
+            element={
+              <Protected>
+                <EditProfilePage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/settings/change-password"
+            element={
+              <Protected>
+                <ChangePasswordPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/settings/notifications"
+            element={
+              <Protected>
+                <NotificationSettingsPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/settings/privacy"
+            element={
+              <Protected>
+                <PrivacySettingsPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Protected>
+                <SettingsPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/delete-profile"
+            element={
+              <Protected>
+                <DeleteProfilePage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/viewboards"
+            element={
+              <Protected>
+                <ViewBoard />
+              </Protected>
+            }
+          />
+          <Route
+            path="/boards/:id"
+            element={
+              <Protected>
+                <BoardDetail />
+              </Protected>
+            }
+          />
+          <Route
+            path="/joinboards/:id"
+            element={
+              <Protected>
+                <JoinBoardDetail />
+              </Protected>
+            }
+          />
+          <Route
+            path="/boards/:id/members"
+            element={
+              <Protected>
+                <MembersList />
+              </Protected>
+            }
+          />
+          <Route
+            path="/boards/:id/edit"
+            element={
+              <Protected>
+                <EditScreen />
+              </Protected>
+            }
+          />
+          <Route
+            path="/boards/:id/invite"
+            element={
+              <Protected>
+                <InviteFriendsList />
+              </Protected>
+            }
+          />
+          <Route
+            path="/boards/:id/findmembers"
+            element={
+              <Protected>
+                <FindMembers />
+              </Protected>
+            }
+          />
+          <Route
+            path="/browseboards"
+            element={
+              <Protected>
+                <BrowseBoard />
+              </Protected>
+            }
+          />
+          <Route
+            path="/createboard"
+            element={
+              <Protected>
+                <CreateBoard />
+              </Protected>
+            }
+          />
+        </Routes>
       </Router>
     </div>
   );
