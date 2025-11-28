@@ -15,6 +15,11 @@ const friendSchema = new Schema(
     last_name: { type: String, default: "" },
     avatar: { type: String, default: "" },
     online: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "declined"],
+      default: "accepted",
+    },
   },
   {
     timestamps: true,
@@ -22,5 +27,6 @@ const friendSchema = new Schema(
 );
 
 friendSchema.index({ owner: 1, contact: 1 }, { unique: true });
+friendSchema.index({ owner: 1, status: 1 });
 
 module.exports = mongoose.model("Friend", friendSchema);
