@@ -6,31 +6,19 @@ import Header from "./Header";
 const LoginPage = () => {
   const [username, setUsername] = useState('');     
   const [password, setPassword] = useState('');     
-  const [checking, setChecking] = useState(true);   
+  const [checking, setChecking] = useState(true);   // checking if already logged in
   const [error, setError] = useState('');          
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // 🔐 On mount: if we already have a JWT token, go straight to /home
   useEffect(() => {
-    const check = async () => {
-      try {
-        const res = await fetch('http://localhost:4000/api/auth/me', {
-          credentials: 'include',
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.ok) {
-            navigate('/home');
-            return;
-          }
-        }
-      } catch (e) {
-        console.warn('Session check failed:', e);
-      } finally {
-        setChecking(false);
-      }
-    };
-    check();
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/home');
+    } else {
+      setChecking(false);
+    }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
@@ -42,14 +30,23 @@ const LoginPage = () => {
       const res = await fetch('http://localhost:4000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        // credentials: 'include', // not needed if you're using JWT in body, not cookies
         body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Login failed');
+
+      // backend sends: { success: true, token, username, email, name, ... }
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Login failed');
       }
+
+      // 🔥 store JWT so Protected.js can use it
+      localStorage.setItem('token', data.token);
+
+      // (optional) store username etc if you want:
+      // localStorage.setItem('username', data.username);
+
       navigate('/home');
     } catch (err) {
       setError(err.message || 'Login failed.');
@@ -70,7 +67,6 @@ const LoginPage = () => {
     );
   }
 
-  // -------- RETURN UPDATED BELOW --------
   return (
     <div className="login-page">
       <Header title="Welcome back!" />
@@ -80,7 +76,6 @@ const LoginPage = () => {
       </header>
 
       <form className="login-form" onSubmit={handleSubmit}>
-        {/* show any login error inside the card */}
         {error && <div className="login-error" role="alert">{error}</div>}
 
         <div className="form-group">
@@ -111,20 +106,15 @@ const LoginPage = () => {
           {loading ? 'Logging in…' : 'Login'}
         </button>
 
-        {/* Divider inside the card */}
         <div className="login-divider">
           <span>or</span>
         </div>
 
-        {/* Inline text link for Google OAuth inside the card */}
         <p className="oauth-inline">
           Continue with{' '}
           <a
             className="oauth-link"
             href="http://localhost:4000/auth/google"
-            onClick={(e) => {
-              // allow normal navigation; keep for SPA analytics if needed
-            }}
           >
             <img
               className="oauth-icon"

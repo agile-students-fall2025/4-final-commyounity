@@ -19,6 +19,7 @@ const signupRouter = require("./routes/signup");
 const { setupGoogleSignupStrategy } = require("./routes/signup");
 const membersRouter = require("./routes/members");
 const authenticationRoutes = require('./routes/authentication-routes.js');
+const cookieParser = require('cookie-parser')
 
 const {
   ensureFriendsCache,
@@ -67,17 +68,7 @@ app.use(express.json());
   const MOCKAROO_URL = `https://my.api.mockaroo.com/mock_boards_data.json?key=${MOCKAROO_API_KEY}`;
   const MOCKAROO_URL_MEMBERS = `https://my.api.mockaroo.com/members.json?key=${MOCKAROO_API_KEY}`;
 
-//mock photos for boards
-const picsumUrl = (id, w = 800, h = 400) => `https://picsum.photos/${w}/${h}?seed=board-${id}`;
 
-const enrichBoard = (b) => {
-  if (!b || typeof b !== "object") return b;
-  const id = String(b.id ?? "").trim() || "unknown";
-  return {
-    ...b,
-    coverPhotoURL: picsumUrl(id, 800, 400),
-  };
-};
 //mock photos for members
 const avatarUrl = (id) => `https://i.pravatar.cc/100?img=${id}`;
 
@@ -409,72 +400,6 @@ app.post('/api/boards/:id/kick-member', (req, res) => {
   });
 });
 
-// Local login (manual username/password) 
-
-const users = [
-  { id: 1, username: 'testuser', password: '12345', name: 'Test User' },
-  { id: 2, username: 'carina', password: 'carina123', name: 'Carina Ilie' },
-];
-
-app.post('/auth/login', (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ ok: false, error: 'Username and password are required.' });
-  }
-
-  const user = users.find(
-    (u) => u.username === username && u.password === password
-  );
-
-  if (!user) {
-    return res.status(401).json({ ok: false, error: 'Invalid credentials.' });
-  }
-  req.session.user = user;
-  console.log('[LOGIN SUCCESS]', user);
-
-  res.json({
-    ok: true,
-    message: `Welcome, ${user.name}!`,
-    user: { id: user.id, username: user.username, name: user.name },
-  });
-});
-
-app.get('/api/auth/me', (req, res) => {
-  if (req.isAuthenticated && req.isAuthenticated()) {
-    return res.json({ ok: true, method: 'google', user: req.user });
-  }
-  if (req.session && req.session.user) {
-    return res.json({ ok: true, method: 'local', user: req.session.user });
-  }
-  return res.status(401).json({ ok: false, error: 'Not authenticated' });
-});
-
-//signup routes - handled by signup router
-
-//join board button
-
-app.post('/api/boards/:id/join', (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body || {}; 
-
-  console.log('[JOIN BOARD]', {
-    boardId: id,
-    userId: userId ?? '(anonymous)',
-    at: new Date().toISOString(),
-  });
-
-  return res.status(200).json({
-    status: 'success',
-    boardId: id,
-    message: `User${userId ? ` ${userId}` : ''} joined the board.`,
-    updated: {
-      isJoined: true,
-      memberCountDelta: +1,
-    },
-    timestamp: new Date().toISOString(),
-  });
-});
 
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -497,14 +422,12 @@ app.use("/api/boards", editBoardRouter);
 //leave board
 app.use("/api/boards", leaveBoardRouter);
 
-//signup routes
-app.use("/", signupRouter);
-
 // JWT authentication routes
 app.use('/auth', authenticationRoutes())
 
 // members routes
 app.use("/api/members", membersRouter);
+
 
 // export the express app we created to make it available to other modules
 module.exports = app

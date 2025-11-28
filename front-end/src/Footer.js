@@ -7,15 +7,22 @@ const Footer = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:4000/logout", {
+      // optional: tell the backend we're "logging out"
+      await fetch("http://localhost:4000/auth/logout", {
         method: "GET",
-        credentials: "include",
       });
-      navigate("/");
     } catch (err) {
-      console.error("Logout failed:", err);
-      window.location.href = "http://localhost:3000/";
+      console.error("Logout request to backend failed (ignoring):", err);
     }
+
+    // 🔥 actual logout for the frontend: remove JWT
+    localStorage.removeItem("token");
+    // if you stored other auth stuff, clear it too:
+    // localStorage.removeItem("username");
+    // localStorage.removeItem("email");
+
+    // go back to login screen
+    navigate("/login", { replace: true });
   };
 
   return (
