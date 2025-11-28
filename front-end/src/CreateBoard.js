@@ -15,6 +15,7 @@ const CreateBoard = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
   const handlePhotoUpload = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -33,32 +34,58 @@ const CreateBoard = () => {
       alert("Please enter a board name before creating.");
       return;
     }
-  
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You must be logged in to create a board.");
+      navigate("/login");
+      return;
+    }
+
     try {
+      setSubmitting(true);
+      setError("");
+
       const formData = new FormData();
       formData.append("title", boardName);
       formData.append("descriptionLong", description);
-      const fileInput = document.getElementById("photo-input");
-      if (fileInput?.files?.[0]) {
-        formData.append("photo", fileInput.files[0]);
+
+      if (photoFile) {
+        formData.append("photo", photoFile);
+      } else {
+        const fileInput = document.getElementById("photo-input");
+        if (fileInput?.files?.[0]) {
+          formData.append("photo", fileInput.files[0]);
+        }
       }
+
       const response = await fetch("http://localhost:4000/api/boards/create", {
         method: "POST",
+        headers: {
+          // IMPORTANT: don't set Content-Type with FormData
+          Authorization: `JWT ${token}`,   
+        },
         body: formData,
       });
-  
+
+      if (!response.ok) {
+        // might be plain text like "Unauthorized"
+        const text = await response.text();
+        console.error("[CREATE BOARD ERROR]", text);
+        alert(`Error: ${text || "Failed to create board."}`);
+        return;
+      }
+
       const data = await response.json();
       console.log("[CREATE BOARD RESPONSE]", data);
-  
-      if (response.ok) {
-        alert(`Board "${boardName}" created successfully!`);
-        navigate("/home");
-      } else {
-        alert(`Error: ${data.message || "Failed to create board."}`);
-      }
+
+      alert(`Board "${boardName}" created successfully!`);
+      navigate("/home");
     } catch (err) {
       console.error("Board creation failed:", err);
       alert("Something went wrong while creating the board.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
