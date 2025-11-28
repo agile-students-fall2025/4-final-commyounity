@@ -16,47 +16,44 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     if (password !== confirmPassword) {
       setError("Passwords don't match!");
       return;
     }
-
+  
     setLoading(true);
     try {
       const res = await fetch('http://localhost:4000/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // credentials: 'include', // not needed for pure JWT-in-body approach
-        body: JSON.stringify({ username, email, password }),
+        credentials: 'include',
+        body: JSON.stringify({ username, email, password, confirmPassword }),
       });
-
+  
       const data = await res.json();
-
-      // backend sends: { success: true, message, token, username, email, name }
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Signup failed.');
+  
+      if (!res.ok || !data.ok) {
+        setError(data.error || 'Signup failed.');
+        setLoading(false);
+        return;
       }
-
-      console.log('Signup success:', data);
-
-      // 🔥 store JWT so Protected.js can see it
-      localStorage.setItem('token', data.token);
-
-      // (optional) store username/email if you want:
-      // localStorage.setItem('username', data.username);
-      // localStorage.setItem('email', data.email);
-
-      // navigate to /home after successful signup
-      navigate('/home', { replace: true });
+  
+      // 🔥 STORE THE TOKEN AFTER SUCCESSFUL SIGNUP
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+  
+      // now Protected will see the token and allow /home
+      navigate('/home');
     } catch (err) {
       console.error('Signup error:', err);
-      setError(err.message || 'Signup failed.');
+      setError('Unexpected error — please try again.');
     } finally {
       setLoading(false);
     }
   };
-
+//goole auth disabled for now!!!
   // --- Google signup redirect ---
   const handleGoogleSignup = () => {
     window.location.href = 'http://localhost:4000/auth/google/signup';
