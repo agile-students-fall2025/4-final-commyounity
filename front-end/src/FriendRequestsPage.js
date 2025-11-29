@@ -10,8 +10,12 @@ const BACKEND_BASE =
     process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
   "http://localhost:4000";
 
+// friend requests stay the same
 const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
-const BOARD_INVITES_ENDPOINT = `${BACKEND_BASE}/api/boards/invites`;
+
+// ✅ board invites now use /api/boardinvites
+const BOARD_INVITES_BASE = `${BACKEND_BASE}/api/boardinvites`;
+const BOARD_INVITES_LIST_ENDPOINT = `${BOARD_INVITES_BASE}/invites`;
 
 const REQUESTS_CACHE_KEY = "friend-requests";
 
@@ -146,9 +150,10 @@ const FriendRequestsPage = () => {
           return;
         }
 
-        const res = await fetch(BOARD_INVITES_ENDPOINT, {
+        const res = await fetch(BOARD_INVITES_LIST_ENDPOINT, {
           headers: {
-            Authorization: `jwt ${token}`,
+            // ✅ match backend passport JWT strategy
+            Authorization: `JWT ${token}`,
           },
         });
 
@@ -298,11 +303,11 @@ const FriendRequestsPage = () => {
       }
 
       const res = await fetch(
-        `${BOARD_INVITES_ENDPOINT}/${encodeURIComponent(invite.id)}/accept`,
+        `${BOARD_INVITES_BASE}/invites/${encodeURIComponent(invite.id)}/accept`,
         {
           method: "POST",
           headers: {
-            Authorization: `jwt ${token}`,
+            Authorization: `JWT ${token}`,
           },
         }
       );
@@ -340,11 +345,11 @@ const FriendRequestsPage = () => {
       }
 
       const res = await fetch(
-        `${BOARD_INVITES_ENDPOINT}/${encodeURIComponent(invite.id)}/decline`,
+        `${BOARD_INVITES_BASE}/invites/${encodeURIComponent(invite.id)}/decline`,
         {
           method: "POST",
           headers: {
-            Authorization: `jwt ${token}`,
+            Authorization: `JWT ${token}`,
           },
         }
       );
@@ -457,7 +462,7 @@ const FriendRequestsPage = () => {
               </div>
             )}
 
-            {/* ===== BOARD INVITES SECTION ===== */}
+            {/* BOARD INVITES SECTION */}
             <section className="boardinvites-section">
               <div className="boardinvites-header">
                 <h2>Board Invites</h2>

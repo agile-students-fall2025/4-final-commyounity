@@ -42,13 +42,13 @@ const FriendThumb = ({
       console.log(`[FRONTEND] Inviting ${displayName} to board ${boardId}…`);
 
       const response = await axios.post(
-        `http://localhost:4000/api/boards/${boardId}/invite`,
+        `http://localhost:4000/api/boardinvites/${boardId}/invite`,
         {
           invitedUserId: details.id, 
         },
         {
           headers: {
-            Authorization: `jwt ${token}`, 
+            Authorization: `JWT ${token}`, 
           },
         }
       );

@@ -26,10 +26,10 @@ const InviteFriendsList = () => {
         console.log("[InviteFriendsList] fetching invite candidates…");
 
         const res = await axios.get(
-          `http://localhost:4000/api/boards/${boardId}/friends`,
+          `http://localhost:4000/api/boardinvites/${boardId}/friends`,
           {
             headers: {
-              Authorization: `jwt ${token}`,
+              Authorization: `JWT ${token}`,
             },
           }
         );

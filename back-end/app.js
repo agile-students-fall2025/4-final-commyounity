@@ -194,31 +194,40 @@ passport.use(jwtStrategy);
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// ------------------------
-// SPECIFIC /api/boards/... ROUTES FIRST
-// ------------------------
-
-app.use("/api/boards/create", createBoardRouter);      // POST /api/boards/create
-app.use("/api/boards/:id/invite", boardInvitesRouter); // POST /api/boards/:id/invite
-app.use("/api/boards/:id/edit", editBoardRouter);      // POST /api/boards/:id/edit
-app.use("/api/boards/:id/leave", leaveBoardRouter);    // POST /api/boards/:id/leave
-app.use("/api/boards/:id/kick-member", kickMemberRouter); // POST /api/boards/:id/kick-member
-
-// ------------------------
-// GENERIC /api/boards ROUTES AFTERWARD
-// ------------------------
-
-app.use("/api/boards", viewBoardsRouter);    // GET /api/boards, GET /api/boards/:id
-app.use("/api/boards", boardFeedRouter);     // GET /api/boards/:id/feed
-
-// ------------------------
-// OTHER ROUTES
-// ------------------------
-
+//profile routes
 app.use("/api/profile", profileRouter);
-app.use('/auth', authenticationRoutes());
+
+// view boards router 
+app.use("/api/boards", viewBoardsRouter);
+
+//invites
+app.use("/api/boardinvites", boardInvitesRouter);
+
+//board routes
+app.use("/api/boards", boardFeedRouter);
+
+//createBoard router
+app.use("/api/boards/create", createBoardRouter);
+
+//edit form Boards
+app.use("/api/boards", editBoardRouter);
+
+//leave board
+app.use("/api/boards", leaveBoardRouter);
+
+// JWT authentication routes
+app.use('/auth', authenticationRoutes())
+
+// members routes
 app.use("/api/members", membersRouter);
-app.use('/protected', protectedRoutes());
+
+// protected routes (everything here requires JWT)
+app.use('/protected', protectedRoutes()) // /protected, /protected/profile, /protected/settings, etc.
+
+//kick
+app.use("/api/boards", kickMemberRouter);
+
+//find members
 app.use("/api/searches", findMembersRouter);
 
 // export the express app we created to make it available to other modules
