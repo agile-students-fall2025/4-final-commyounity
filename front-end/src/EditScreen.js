@@ -29,7 +29,7 @@ const EditScreen = () => {
     axios
       .get("http://localhost:4000/api/boards", {
         headers: {
-          Authorization: `JWT ${token}`,  
+          Authorization: `jwt ${token}`,  
         },
       })
       .then((response) => {

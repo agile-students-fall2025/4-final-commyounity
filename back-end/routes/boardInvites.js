@@ -9,8 +9,8 @@ const User = require("../models/User");
 const router = express.Router();
 
 /**
- * GET /api/boards/:id/friends
- * → candidates to invite to a specific board
+ * GET /api/boardinvites/:id/friends
+ * Candidates to invite to a specific board (ONLY your friends).
  */
 router.get(
   "/:id/friends",
@@ -55,18 +55,43 @@ router.get(
         pendingInvites.map((inv) => inv.invitedUserId.toString())
       );
 
-      // 4) Build base query for users
+      // 4) Load current user's friends (expects a "friends" array on User, but
+      //    will safely fall back to an empty array if it doesn't exist yet).
+      const me = await User.findById(currentUserId)
+        .select("friends")
+        .lean();
+
+      const friendIds = Array.isArray(me?.friends)
+        ? me.friends.map((id) => id.toString())
+        : [];
+
+      // If there are no friends recorded, return an empty list
+      if (friendIds.length === 0) {
+        return res.json({
+          status: "success",
+          data: [],
+          meta: {
+            count: 0,
+            search,
+          },
+        });
+      }
+
+      // 5) Build base query for users:
+      //    - must be in my friends list
+      //    - must NOT be me, existing members, or already invited
       const userQuery = {
         _id: {
+          $in: friendIds,
           $nin: [
-            currentUserId,            // not myself
-            ...Array.from(memberIds), // not existing members
-            ...Array.from(pendingIds) // not already invited (pending)
+            currentUserId,
+            ...Array.from(memberIds),
+            ...Array.from(pendingIds),
           ],
         },
       };
 
-      // Optional text filter
+      // Optional search filter
       if (search) {
         userQuery.$or = [
           { username: { $regex: search, $options: "i" } },
@@ -75,7 +100,7 @@ router.get(
         ];
       }
 
-      // 5) Get possible invitees
+      // 6) Get possible invitees
       const users = await User.find(userQuery)
         .select("_id username name email")
         .limit(50)
@@ -106,7 +131,7 @@ router.get(
 );
 
 /**
- * POST /api/boards/:id/invite
+ * POST /api/boardinvites/:id/invite
  * Body: { invitedUserId: "<User._id of the friend>" }
  */
 router.post(
@@ -124,7 +149,10 @@ router.post(
         });
       }
 
-      if (!mongoose.isValidObjectId(id) || !mongoose.isValidObjectId(invitedUserId)) {
+      if (
+        !mongoose.isValidObjectId(id) ||
+        !mongoose.isValidObjectId(invitedUserId)
+      ) {
         return res.status(400).json({
           status: "error",
           message: "Invalid boardId or invitedUserId",
@@ -219,8 +247,8 @@ router.post(
 );
 
 /**
- * GET /api/boards/invites
- * → Pending board invites for the CURRENT USER
+ * GET /api/boardinvites/invites
+ * Pending board invites for the CURRENT USER
  */
 router.get(
   "/invites",
@@ -243,7 +271,8 @@ router.get(
         boardTitle: inv.boardId?.title || "Untitled board",
         boardCoverPhotoURL: inv.boardId?.coverPhotoURL || null,
         invitedById: inv.invitedBy?._id?.toString(),
-        invitedByName: inv.invitedBy?.name || inv.invitedBy?.username || "Someone",
+        invitedByName:
+          inv.invitedBy?.name || inv.invitedBy?.username || "Someone",
         invitedByUsername: inv.invitedBy?.username || null,
         status: inv.status,
         createdAt: inv.createdAt,
@@ -265,7 +294,7 @@ router.get(
 );
 
 /**
- * POST /api/boards/invites/:inviteId/accept
+ * POST /api/boardinvites/invites/:inviteId/accept
  */
 router.post(
   "/invites/:inviteId/accept",
@@ -337,7 +366,7 @@ router.post(
 );
 
 /**
- * POST /api/boards/invites/:inviteId/decline
+ * POST /api/boardinvites/invites/:inviteId/decline
  */
 router.post(
   "/invites/:inviteId/decline",

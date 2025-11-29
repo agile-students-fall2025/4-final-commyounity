@@ -67,12 +67,12 @@ const FindMembers = () => {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://localhost:4000/api/boards/${boardId}/invite`,
+        `http://localhost:4000/api/boardinvites/${boardId}/invite`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `jwt ${token}`
+            Authorization: `JWT ${token}`
           },
           body: JSON.stringify({ invitedUserId: userId }),
         }
