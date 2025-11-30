@@ -11,11 +11,12 @@ const MembersList = () => {
   const { id } = useParams();
   const { state } = useLocation();
   const canKick = !!(state && state.isBoardOwner);
+
+  // Prefer boardId from state, fall back to URL param
+  const initialBoardId = state?.boardId ?? id;
+
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-
-  const initialBoardId = state?.boardId ?? id;
-  const [memberCount, setMemberCount] = useState(state?.memberCount);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -24,6 +25,7 @@ const MembersList = () => {
         if (!token) {
           console.error("No JWT token found in localStorage");
           setError("You must be logged in to see members.");
+          setData([]);
           return;
         }
 
@@ -31,7 +33,7 @@ const MembersList = () => {
           `http://localhost:4000/api/members/${initialBoardId}`,
           {
             headers: {
-              Authorization: `jwt ${token}`,  // keep scheme consistent with your other calls
+              Authorization: `jwt ${token}`, // keep same scheme as other calls
             },
           }
         );
@@ -44,11 +46,6 @@ const MembersList = () => {
 
         setData(members);
         setError(null);
-
-        // if you want memberCount to come from the backend instead of state
-        if (typeof memberCount !== "number") {
-          setMemberCount(members.length);
-        }
       } catch (err) {
         console.error("Backend request failed:", err);
         setError("Could not load members.");
@@ -56,15 +53,18 @@ const MembersList = () => {
       }
     };
 
-    fetchMembers();
-  }, [id]); // board id changing should refetch
+    if (initialBoardId) {
+      fetchMembers();
+    }
+  }, [initialBoardId]);
 
   const handleBack = () => {
     window.history.back();
   };
 
-  const effectiveMemberCount =
-    typeof memberCount === "number" ? memberCount : data.length;
+  // If there is exactly one member and it's the current user, show the special message
+  const isOnlySelf =
+    data.length === 1 && data[0]?.isSelf === true;
 
   return (
     <>
@@ -80,7 +80,19 @@ const MembersList = () => {
           </p>
         ) : (
           <section className="member-grid">
-            {effectiveMemberCount <= 1 ? (
+            {data.length === 0 ? (
+              <p
+                style={{
+                  padding: "20px",
+                  textAlign: "center",
+                  width: "100%",
+                  color: "#888",
+                  fontStyle: "italic",
+                }}
+              >
+                No members found for this board.
+              </p>
+            ) : isOnlySelf ? (
               <p
                 style={{
                   padding: "20px",
@@ -92,18 +104,6 @@ const MembersList = () => {
               >
                 You are the only member of this board.
               </p>
-            ) : data.length === 0 ? (
-              <p
-                style={{
-                  padding: "20px",
-                  textAlign: "center",
-                  width: "100%",
-                  color: "#888",
-                  fontStyle: "italic",
-                }}
-              >
-                No members found.
-              </p>
             ) : (
               data.map((member) => (
                 <MemberThumb
@@ -111,7 +111,7 @@ const MembersList = () => {
                   details={member}
                   canKick={canKick}
                   boardId={initialBoardId}
-                  memberCount={effectiveMemberCount}
+                  memberCount={data.length}
                 />
               ))
             )}

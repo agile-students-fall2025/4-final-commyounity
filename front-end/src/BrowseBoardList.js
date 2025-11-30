@@ -4,24 +4,35 @@ import "./BrowseBoardList.css"
 import BoardThumb from './BoardThumb'
 import SearchBar from './SearchBar'
 
-const BrowseBoardList = props => {
+const BrowseBoardList = () => {
   const [data, setData] = useState([])
   const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    console.log('fetching 10 random boards...')
-    axios('http://localhost:4000/api/boards/browse')
-      .then(response => {
-        setData(response.data.data)
-      })
-      .catch(err => {
-        console.error('Backend request failed:', err)
-        setError('Could not load boards.')
-      })
+    console.log('fetching suggested boards...')
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      console.error('No JWT token found in localStorage')
+      setError('You must be logged in to browse boards.')
+      return
+    }
+
+    axios.get('http://localhost:4000/api/browse/boards', {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    })
+    .then(response => {
+      setData(response.data.data)
+    })
+    .catch(err => {
+      console.error('Backend request failed:', err)
+      setError('Could not load suggested boards.')
+    })
   }, [])
 
-  // Filter boards based on search term
   const filterBoards = (boards) => {
     if (!searchTerm.trim()) return boards
     
@@ -32,12 +43,21 @@ const BrowseBoardList = props => {
     )
   }
 
-  const suggestedBoards = data.filter(item => !item.isJoined)
-  const filteredBoards = filterBoards(suggestedBoards)
+  const filteredBoards = filterBoards(data)
+
+  if (error) {
+    return (
+      <div className="BrowseBoardList">
+        <p style={{ padding: '20px', color: '#c00', textAlign: 'center' }}>
+          {error}
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="BrowseBoardList">
-      <h3 style={{ 'paddingLeft': '20px' }}>Suggested Boards:</h3>
+      <h3 style={{ paddingLeft: '20px' }}>Suggested Boards:</h3>
       <SearchBar 
         onSearch={setSearchTerm}
         placeholder="Search suggested boards..."
