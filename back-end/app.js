@@ -96,6 +96,7 @@ passport.use(jwtStrategy);
       String(req.query.simulateError || "").toLowerCase() === "true";
     const hasExactUsername = rawUsername.length > 0;
     const hasSearch = !hasExactUsername && rawSearch.length > 0;
+    const ownerId = req.user?._id;
 
     if (simulateError) {
       return res.status(503).json({
@@ -114,76 +115,104 @@ passport.use(jwtStrategy);
       });
     }
 
-    const friends = await ensureFriendsCache();
-    let filteredList = friends;
-    let filtered = false;
-    let filterType = null;
+    try {
+      let friends;
+      let filtered = false;
+      let filterType = null;
 
-    if (hasExactUsername) {
-      filtered = true;
-      filterType = "username";
-      const term = rawUsername.toLowerCase();
-      filteredList = friends.filter(
-        (friend) => String(friend.username ?? "").toLowerCase() === term
-      );
-    } else if (hasSearch) {
-      filtered = true;
-      filterType = "search";
-      filteredList = filterFriendsByQuery(friends, rawSearch);
+      if (hasExactUsername) {
+        filtered = true;
+        filterType = "username";
+        friends = await ensureFriendsCache({
+          ownerId,
+          username: rawUsername,
+        });
+      } else if (hasSearch) {
+        filtered = true;
+        filterType = "search";
+        friends = await filterFriendsByQuery(rawSearch, { ownerId });
+      } else {
+        friends = await ensureFriendsCache({ ownerId });
+      }
+
+      const data = limit ? friends.slice(0, limit) : friends;
+      const cacheMeta = getFriendsCacheMeta();
+      res.json({
+        data,
+        meta: {
+          total: friends.length,
+          count: data.length,
+          filtered,
+          filterType,
+          cacheSource: cacheMeta.cacheSource,
+          cachedAt: cacheMeta.cachedAt,
+          ttlMs: cacheMeta.ttlMs,
+        },
+      });
+    } catch (error) {
+      console.error("Unable to load friends from Mongo.", error);
+      res.status(500).json({ error: "Unable to load friends list." });
     }
-
-    const data = limit ? filteredList.slice(0, limit) : filteredList;
-
-    const cacheMeta = getFriendsCacheMeta();
-    res.json({
-      data,
-      meta: {
-        total: friends.length,
-        count: data.length,
-        filtered,
-        filterType,
-        cacheSource: cacheMeta.cacheSource,
-        cachedAt: cacheMeta.cachedAt,
-        ttlMs: cacheMeta.ttlMs,
-      },
-    });
   });
 
-  app.get("/api/friend-requests", (req, res) => {
-    res.json({
-      data: getFriendRequests(),
-      meta: { count: getFriendRequestsCount() },
-    });
+  app.get("/api/friend-requests", async (req, res) => {
+    try {
+      const ownerId = req.user?._id;
+      const data = await getFriendRequests(ownerId);
+      const count = await getFriendRequestsCount(ownerId);
+      res.json({
+        data,
+        meta: { count },
+      });
+    } catch (error) {
+      console.error("Unable to load friend requests.", error);
+      res.status(500).json({ error: "Unable to load friend requests." });
+    }
   });
 
-  app.post("/api/friend-requests/:id/accept", (req, res) => {
+  app.post("/api/friend-requests/:id/accept", async (req, res) => {
     const { id } = req.params;
-    const match = findFriendRequest(id);
-    if (!match) {
-      return res.status(404).json({ error: "Friend request not found." });
-    }
+    const ownerId = req.user?._id;
+    try {
+      const match = await findFriendRequest(id, ownerId);
+      if (!match) {
+        return res.status(404).json({ error: "Friend request not found." });
+      }
 
-    removeFriendRequest(id);
-    res.json({
-      status: "accepted",
-      friend: addFriendFromRequest(match),
-      remainingRequests: getFriendRequestsCount(),
-    });
+      const friend = await addFriendFromRequest(match, ownerId);
+      await removeFriendRequest(id, ownerId);
+      const remainingRequests = await getFriendRequestsCount(ownerId);
+      res.json({
+        status: "accepted",
+        friend,
+        remainingRequests,
+      });
+    } catch (error) {
+      console.error("Unable to accept friend request.", error);
+      res.status(500).json({ error: "Unable to accept friend request." });
+    }
   });
 
-  app.post("/api/friend-requests/:id/decline", (req, res) => {
+  app.post("/api/friend-requests/:id/decline", async (req, res) => {
     const { id } = req.params;
-    const match = findFriendRequest(id);
-    if (!match) {
-      return res.status(404).json({ error: "Friend request not found." });
-    }
+    const ownerId = req.user?._id;
+    try {
+      const match = await findFriendRequest(id, ownerId);
+      if (!match) {
+        return res.status(404).json({ error: "Friend request not found." });
+      }
 
-    removeFriendRequest(id);
-    res.json({
-      status: "declined",
-      declinedRequest: { id: match.id, username: match.username },
-      remainingRequests: getFriendRequestsCount(),
-    });
+      await removeFriendRequest(id, ownerId);
+      const remainingRequests = await getFriendRequestsCount(ownerId);
+      res.json({
+        status: "declined",
+        declinedRequest: { id: match.id, username: match.username },
+        remainingRequests,
+      });
+    } catch (error) {
+      console.error("Unable to decline friend request.", error);
+      res.status(500).json({ error: "Unable to decline friend request." });
+    }
   });
 
 
