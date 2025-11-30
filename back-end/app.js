@@ -18,8 +18,8 @@ const passport = require('passport');
 const jwtStrategy = require('./config/jwt-config.js');
 const kickMemberRouter = require("./routes/kickMember");
 const findMembersRouter = require("./routes/searchMembers");
-
-
+const browseBoardsRouter = require("./routes/browseBoards");
+const joinBoardRouter = require("./routes/joinBoard");
 
 
 
@@ -189,7 +189,8 @@ passport.use(jwtStrategy);
 
 // POST 
 
-
+//BROWSE boards
+app.use("/api/browse", browseBoardsRouter);
 
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -214,6 +215,9 @@ app.use("/api/boards", editBoardRouter);
 
 //leave board
 app.use("/api/boards", leaveBoardRouter);
+
+// join board
+app.use("/api/boards", joinBoardRouter);
 
 // JWT authentication routes
 app.use('/auth', authenticationRoutes())

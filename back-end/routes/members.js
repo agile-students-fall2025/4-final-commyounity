@@ -31,26 +31,29 @@ router.get(
 
       const currentUserId = req.user._id.toString();
 
-      // Build a participants list: owner + members (no duplicates, skip current user)
+      // --- Build participants: OWNER + ALL MEMBERS (no duplicates) ---
       const participants = [];
       const seen = new Set();
 
-      // owner
+      // owner (always include)
       if (board.owner) {
         const ownerId = board.owner.toString();
-        if (ownerId !== currentUserId) {
-          participants.push({ userId: ownerId, isOwner: true });
-          seen.add(ownerId);
-        }
+        participants.push({ userId: ownerId, isOwner: true });
+        seen.add(ownerId);
       }
 
-      // members
+      // members (always include)
       (board.members || []).forEach((m) => {
         const id = (m._id || m).toString();
-        if (id === currentUserId) return; // skip yourself
         if (seen.has(id)) return;
         seen.add(id);
         participants.push({ userId: id, isOwner: false });
+      });
+
+      console.log("[MEMBERS DEBUG] boardId=", boardId, {
+        owner: board.owner?.toString(),
+        members: (board.members || []).map(m => (m._id || m).toString()),
+        participants,
       });
 
       if (participants.length === 0) {
@@ -61,15 +64,13 @@ router.get(
         });
       }
 
-      // Fetch user docs for those participants
+      // Fetch user docs for all participants
       const userIds = participants.map((p) => p.userId);
       const users = await User.find({ _id: { $in: userIds } })
         .select("username name email avatar")
         .lean();
 
-      const userById = new Map(
-        users.map((u) => [u._id.toString(), u])
-      );
+      const userById = new Map(users.map((u) => [u._id.toString(), u]));
 
       const members = participants
         .map((p) => {
@@ -81,10 +82,13 @@ router.get(
             name: u.name,
             email: u.email,
             avatar: u.avatar || `https://i.pravatar.cc/100?u=${p.userId}`,
-            isOwner: p.isOwner, // 🔹 THIS FLAG DRIVES THE BADGE
+            isOwner: p.isOwner,
+            isSelf: p.userId === currentUserId, // optional for UI badges
           };
         })
         .filter(Boolean);
+
+      console.log("[MEMBERS DEBUG] response count=", members.length);
 
       return res.json({
         status: "success",
