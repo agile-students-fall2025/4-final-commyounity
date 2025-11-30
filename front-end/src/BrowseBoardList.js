@@ -11,7 +11,7 @@ const BrowseBoardList = props => {
 
   useEffect(() => {
     console.log('fetching 10 random boards...')
-    axios('http://localhost:4000/api/boards')
+    axios('http://localhost:4000/api/boards/browse')
       .then(response => {
         setData(response.data.data)
       })
@@ -45,7 +45,7 @@ const BrowseBoardList = props => {
       <section className="yourBoards">
         {filteredBoards.length > 0 ? (
           filteredBoards.map(item => (
-            <BoardThumb key={item.id} details={item} />
+            <BoardThumb key={item.id || item._id} details={item} />
           ))
         ) : (
           <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
