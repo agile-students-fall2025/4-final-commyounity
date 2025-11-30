@@ -33,6 +33,7 @@ const {
   removeFriendRequest,
   addFriendFromRequest,
 } = require("./services/friendsService");
+const { param, validationResult } = require("express-validator");
 const app = express() // instantiate an Express object
 
 app.use(cors({
@@ -170,50 +171,76 @@ passport.use(jwtStrategy);
     }
   });
 
-  app.post("/api/friend-requests/:id/accept", async (req, res) => {
-    const { id } = req.params;
-    const ownerId = req.user?._id;
-    try {
-      const match = await findFriendRequest(id, ownerId);
-      if (!match) {
-        return res.status(404).json({ error: "Friend request not found." });
-      }
-
-      const friend = await addFriendFromRequest(match, ownerId);
-      await removeFriendRequest(id, ownerId);
-      const remainingRequests = await getFriendRequestsCount(ownerId);
-      res.json({
-        status: "accepted",
-        friend,
-        remainingRequests,
-      });
-    } catch (error) {
-      console.error("Unable to accept friend request.", error);
-      res.status(500).json({ error: "Unable to accept friend request." });
+  const requireJwt = passport.authenticate("jwt", { session: false });
+  const idValidator = [
+    param("id")
+      .isMongoId()
+      .withMessage("Invalid friend request id."),
+  ];
+  const handleValidation = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  });
+    return next();
+  };
 
-  app.post("/api/friend-requests/:id/decline", async (req, res) => {
-    const { id } = req.params;
-    const ownerId = req.user?._id;
-    try {
-      const match = await findFriendRequest(id, ownerId);
-      if (!match) {
-        return res.status(404).json({ error: "Friend request not found." });
+  app.post(
+    "/api/friend-requests/:id/accept",
+    requireJwt,
+    idValidator,
+    handleValidation,
+    async (req, res) => {
+      const { id } = req.params;
+      const ownerId = req.user?._id;
+      try {
+        const match = await findFriendRequest(id, ownerId);
+        if (!match) {
+          return res.status(404).json({ error: "Friend request not found." });
+        }
+
+        const friend = await addFriendFromRequest(match, ownerId);
+        await removeFriendRequest(id, ownerId);
+        const remainingRequests = await getFriendRequestsCount(ownerId);
+        res.json({
+          status: "accepted",
+          friend,
+          remainingRequests,
+        });
+      } catch (error) {
+        console.error("Unable to accept friend request.", error);
+        res.status(500).json({ error: "Unable to accept friend request." });
       }
-
-      await removeFriendRequest(id, ownerId);
-      const remainingRequests = await getFriendRequestsCount(ownerId);
-      res.json({
-        status: "declined",
-        declinedRequest: { id: match.id, username: match.username },
-        remainingRequests,
-      });
-    } catch (error) {
-      console.error("Unable to decline friend request.", error);
-      res.status(500).json({ error: "Unable to decline friend request." });
     }
-  });
+  );
+
+  app.post(
+    "/api/friend-requests/:id/decline",
+    requireJwt,
+    idValidator,
+    handleValidation,
+    async (req, res) => {
+      const { id } = req.params;
+      const ownerId = req.user?._id;
+      try {
+        const match = await findFriendRequest(id, ownerId);
+        if (!match) {
+          return res.status(404).json({ error: "Friend request not found." });
+        }
+
+        await removeFriendRequest(id, ownerId);
+        const remainingRequests = await getFriendRequestsCount(ownerId);
+        res.json({
+          status: "declined",
+          declinedRequest: { id: match.id, username: match.username },
+          remainingRequests,
+        });
+      } catch (error) {
+        console.error("Unable to decline friend request.", error);
+        res.status(500).json({ error: "Unable to decline friend request." });
+      }
+    }
+  );
 
 
 // POST 
