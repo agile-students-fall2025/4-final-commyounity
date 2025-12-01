@@ -249,6 +249,10 @@ const requireJwt = passport.authenticate("jwt", { session: false });
 
 // POST 
 
+
+//boardfeed routes
+app.use("/api/boards", boardFeedRouter);
+
 //BROWSE boards
 app.use("/api/browse", browseBoardsRouter);
 
@@ -264,8 +268,7 @@ app.use("/api/boards", viewBoardsRouter);
 //invites
 app.use("/api/boardinvites", boardInvitesRouter);
 
-//board routes
-app.use("/api/boards", boardFeedRouter);
+
 
 //createBoard router
 app.use("/api/boards/create", createBoardRouter);
