@@ -22,6 +22,9 @@ npm test              # run mocha/chai tests
 npm run coverage      # run mocha via c8 to verify code coverage
 ```
 
+> For CI/review environments that cannot start mongodb-memory-server, set a reachable test URI:  
+> `MONGODB_URI_TEST="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority" npm test`
+
 ## Environment Variables
 
 Set these in `back-end/.env` (never commit secrets):
@@ -89,3 +92,9 @@ npm run coverage       # c8 + mocha (target ≥10% coverage)
 `friends.test.js` hits `/api/friends` normally and again with `simulateError=true` to exercise the fallback/error handling logic. This keeps the friends API’s behavior in sync with the front-end integration. 
 
 `friendRequests.test.js` covers the GET + POST routes for the friend requests module so the mocked accept/decline flow stays in sync with the React page.
+
+**Friends tests note:** Friends/friend-requests suites require a reachable Mongo URI. Set `MONGODB_URI_TEST` (or `MONGODB_URI`) before running `npm test`/`npm run coverage`, e.g.:
+
+```bash
+MONGODB_URI_TEST="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority" npm test
+```
