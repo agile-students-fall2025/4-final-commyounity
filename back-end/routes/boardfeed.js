@@ -5,6 +5,7 @@ const path = require("path");
 const passport = require("passport");
 
 const FEED_DATA_DIR = path.join(__dirname, "..", "data", "feeds");
+const requireJwt = passport.authenticate("jwt", { session: false });
 
 // Ensure data folder exists
 if (!fs.existsSync(FEED_DATA_DIR)) {
@@ -47,67 +48,46 @@ router.get("/:id/feed", (req, res) => {
 });
 
 // POST /api/boards/:id/feed (new post)
-router.post(
-    "/:id/feed",
-    passport.authenticate("jwt", { session: false }),
-    (req, res) => {
-      const { id } = req.params;
-      const { message } = req.body;
-  
-      if (!message || typeof message !== "string") {
-        return res.status(400).json({ error: "Message is required" });
-      }
-  
-      const feed = readFeed(id);
-      const newPost = {
-        id: Date.now(),
-        author: req.user.username,   // ✅ Now taken from JWT
-        avatar: req.user.avatar || null,
-        message: message.trim(),
-        ts: new Date().toISOString(),
-        likes: 0,
-        likedBy: [],                     // You’ll need this for like protection
-      };
-  
-      feed.unshift(newPost);
-      writeFeed(id, feed);
-      res.status(200).json(newPost);
-    }
-  );
+router.post("/:id/feed", requireJwt, (req, res) => {
+  const { id } = req.params;
+  const { message } = req.body;
+
+  if (!message || typeof message !== "string") {
+    return res.status(400).json({ error: "Message is required" });
+  }
+
+  const feed = readFeed(id);
+  const newPost = {
+    id: Date.now(),
+    author: req.user?.username || "Anonymous",
+    avatar: req.user?.avatar || `https://i.pravatar.cc/64?u=${Date.now()}`,
+    message: message.trim(),
+    ts: new Date().toISOString(),
+    likes: 0,
+  };
+
+  feed.unshift(newPost);
+  writeFeed(id, feed);
+  res.status(200).json(newPost);
+});
 
 // POST /api/boards/:id/feed/:postId/like
-router.post(
-    "/:id/feed/:postId/like",
-    passport.authenticate("jwt", { session: false }),
-    (req, res) => {
-      const { id, postId } = req.params;
-      const userId = req.user._id.toString();
-  
-      const feed = readFeed(id);
-      const post = feed.find((p) => String(p.id) === String(postId));
-  
-      if (!post) {
-        return res.status(404).json({ error: "Post not found" });
-      }
-  
-      // initialize likedBy if missing (old posts)
-      if (!post.likedBy) post.likedBy = [];
-  
-      if (post.likedBy.includes(userId)) {
-        return res.status(400).json({ error: "Already liked" });
-      }
-  
-      post.likes += 1;
-      post.likedBy.push(userId);
-  
-      writeFeed(id, feed);
-      res.json(post);
-    }
-  );
-  
+router.post("/:id/feed/:postId/like", requireJwt, (req, res) => {
+  const { id, postId } = req.params;
+  const feed = readFeed(id);
+  const post = feed.find((p) => String(p.id) === String(postId));
+
+  if (!post) {
+    return res.status(404).json({ error: "Post not found" });
+  }
+
+  post.likes += 1;
+  writeFeed(id, feed);
+  res.json(post); // 200
+});
 
 // DELETE /api/boards/:id/feed/:postId
-router.delete("/:id/feed/:postId", (req, res) => {
+router.delete("/:id/feed/:postId", requireJwt, (req, res) => {
   const { id, postId } = req.params;
   const feed = readFeed(id);
   const newFeed = feed.filter((p) => String(p.id) !== String(postId));

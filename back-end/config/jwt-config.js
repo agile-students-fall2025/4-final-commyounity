@@ -5,9 +5,14 @@ const passportJWT = require('passport-jwt')
 const ExtractJwt = passportJWT.ExtractJwt
 const JwtStrategy = passportJWT.Strategy
 
+const jwtFromRequest = ExtractJwt.fromExtractors([
+  ExtractJwt.fromAuthHeaderWithScheme('JWT'), // expected
+  ExtractJwt.fromAuthHeaderWithScheme('jwt'), // tolerate lowercase scheme
+  ExtractJwt.fromAuthHeaderAsBearerToken(), // allow Bearer for flexibility
+])
+
 let jwtOptions = {
-  // match what you send from frontend: Authorization: "JWT <token>"
-  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
+  jwtFromRequest,
   secretOrKey: process.env.JWT_SECRET,
 }
 
@@ -26,7 +31,14 @@ const jwtVerifyToken = async function (jwt_payload, next) {
     if (user) {
       next(null, user)
     } else {
-      next(null, false, { message: 'User not found' })
+      // If the token is valid but user record is missing, allow the payload through
+      // so authenticated requests don't 401 when the DB user was just created or pruned.
+      next(null, {
+        _id: jwt_payload.id,
+        id: jwt_payload.id,
+        username: jwt_payload.username,
+        email: jwt_payload.email,
+      })
     }
   } catch (err) {
     console.error('Error in jwtVerifyToken:', err)
