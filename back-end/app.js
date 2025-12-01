@@ -45,6 +45,7 @@ app.use(express.json());
 
 app.use(passport.initialize());
 passport.use(jwtStrategy);
+const requireJwt = passport.authenticate("jwt", { session: false });
 
 // we will put some server logic here later...
 
@@ -82,7 +83,7 @@ passport.use(jwtStrategy);
 
 
   //get mock data for invite firends
-  app.get("/api/friends", async (req, res) => {
+  app.get("/api/friends", requireJwt, async (req, res) => {
     const rawUsername =
       typeof req.query.username === "string" ? req.query.username.trim() : "";
     const rawSearch =
@@ -157,7 +158,7 @@ passport.use(jwtStrategy);
     }
   });
 
-  app.get("/api/friend-requests", async (req, res) => {
+  app.get("/api/friend-requests", requireJwt, async (req, res) => {
     try {
       const ownerId = req.user?._id;
       const data = await getFriendRequests(ownerId);
@@ -172,7 +173,6 @@ passport.use(jwtStrategy);
     }
   });
 
-  const requireJwt = passport.authenticate("jwt", { session: false });
   const idValidator = [
     param("id")
       .isMongoId()
