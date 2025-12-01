@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --timeout 8000 --exit",
-    "coverage": "c8 mocha --timeout 8000 --exit",
+    "test": "mocha --timeout 8000 --require ./test/setup.js --exit",
+    "coverage": "c8 mocha --timeout 8000 --require ./test/setup.js --exit",
     "dev": "nodemon server.js"
   },
   "author": "",
@@ -33,7 +33,9 @@
     "chai": "^6.2.0",
     "chai-http": "^5.1.2",
     "mocha": "^11.7.5",
+    "mongodb-memory-server": "^10.1.4",
     "node-html-parser": "^7.0.1",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
   }
 }

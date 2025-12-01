@@ -1,19 +1,59 @@
 // test/friendRequests.test.js
-import { use, expect } from 'chai';
-import chaiHttp, { request } from 'chai-http';
-import app from '../app.js';
+const chai = require('chai');
+const request = require('supertest');
+const mongoose = require('mongoose');
+const app = require('../app');
+const User = require('../models/User');
+const FriendRequest = require('../models/FriendRequest');
+const Friend = require('../models/Friend');
 
-use(chaiHttp);
+const { expect } = chai;
+
+let token;
+let ownerId;
+
+beforeEach(async () => {
+  await User.deleteMany({});
+  await FriendRequest.deleteMany({});
+  await Friend.deleteMany({});
+
+  const user = await new User({
+    username: `fr_test_${Math.floor(Math.random() * 1e6)}`,
+    email: `fr_test_${Date.now()}@example.com`,
+    password: 'password123',
+    name: 'FR Tester',
+  }).save();
+  token = user.generateJWT();
+  ownerId = user._id;
+
+  await FriendRequest.insertMany([
+    {
+      owner: ownerId,
+      requester: new mongoose.Types.ObjectId(),
+      username: 'wil.hoff',
+      first_name: 'Wilhem',
+      last_name: 'Hoffmann',
+      status: 'pending',
+    },
+    {
+      owner: ownerId,
+      requester: new mongoose.Types.ObjectId(),
+      username: 'kara.codes',
+      first_name: 'Kara',
+      last_name: 'Singh',
+      status: 'pending',
+    },
+  ]);
+});
 
 // 1) GET /api/friend-requests
 it('GET /api/friend-requests returns cached requests', done => {
-  request
-    .execute(app)
+  request(app)
     .get('/api/friend-requests')
+    .set('Authorization', `JWT ${token}`)
     .end((err, res) => {
       expect(err).to.be.null;
-      expect(res).to.have.status(200);
-      expect(res).to.be.json;
+      expect(res.status).to.equal(200);
 
       expect(res.body)
         .to.have.property('data')
@@ -34,12 +74,12 @@ it('GET /api/friend-requests returns cached requests', done => {
 
 // 2) POST /api/friend-requests/:id/accept
 it('POST /api/friend-requests/:id/accept removes the request and returns friend payload', done => {
-  request
-    .execute(app)
+  request(app)
     .get('/api/friend-requests')
+    .set('Authorization', `JWT ${token}`)
     .end((err, res) => {
       expect(err).to.be.null;
-      expect(res).to.have.status(200);
+      expect(res.status).to.equal(200);
       expect(res.body)
         .to.have.property('data')
         .that.is.an('array');
@@ -51,13 +91,12 @@ it('POST /api/friend-requests/:id/accept removes the request and returns friend 
         return done();
       }
 
-      request
-        .execute(app)
+      request(app)
         .post(`/api/friend-requests/${encodeURIComponent(target.id)}/accept`)
+        .set('Authorization', `JWT ${token}`)
         .end((err2, res2) => {
           expect(err2).to.be.null;
-          expect(res2).to.have.status(200);
-          expect(res2).to.be.json;
+          expect(res2.status).to.equal(200);
 
           expect(res2.body)
             .to.have.property('status')
@@ -86,12 +125,12 @@ it('POST /api/friend-requests/:id/accept removes the request and returns friend 
 
 // 3) POST /api/friend-requests/:id/decline
 it('POST /api/friend-requests/:id/decline removes the request and echoes declined data', done => {
-  request
-    .execute(app)
+  request(app)
     .get('/api/friend-requests')
+    .set('Authorization', `JWT ${token}`)
     .end((err, res) => {
       expect(err).to.be.null;
-      expect(res).to.have.status(200);
+      expect(res.status).to.equal(200);
       expect(res.body)
         .to.have.property('data')
         .that.is.an('array');
@@ -102,13 +141,12 @@ it('POST /api/friend-requests/:id/decline removes the request and echoes decline
         return done();
       }
 
-      request
-        .execute(app)
+      request(app)
         .post(`/api/friend-requests/${encodeURIComponent(target.id)}/decline`)
+        .set('Authorization', `JWT ${token}`)
         .end((err2, res2) => {
           expect(err2).to.be.null;
-          expect(res2).to.have.status(200);
-          expect(res2).to.be.json;
+          expect(res2.status).to.equal(200);
 
           expect(res2.body)
             .to.have.property('status')
