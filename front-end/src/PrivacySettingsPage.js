@@ -22,9 +22,12 @@ export default function PrivacySettingsPage() {
   const fetchPrivacySettings = async () => {
     try {
       console.log('[PrivacySettings] Fetching from backend...');
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile", {
         method: "GET",
-        credentials: "include",
+        headers: {
+          "Authorization": `JWT ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -60,12 +63,13 @@ export default function PrivacySettingsPage() {
     try {
       console.log('[PrivacySettings] Saving settings:', newSettings);
       
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile/privacy", {
         method: "PUT",
         headers: {
+          "Authorization": `JWT ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(newSettings)
       });
 
