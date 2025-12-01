@@ -28,9 +28,12 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile", {
         method: "GET",
-        credentials: "include",
+        headers: {
+          "Authorization": `JWT ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -70,9 +73,12 @@ export default function ProfilePage() {
     }
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile", {
         method: "DELETE",
-        credentials: "include",
+        headers: {
+          "Authorization": `JWT ${token}`,
+        },
       });
 
       const data = await response.json();

@@ -1,46 +1,53 @@
-
+// routes/browseBoards.js
 const express = require("express");
-const router = express.Router();
-const Board = require("../models/Board");
 const passport = require("passport");
+const Board = require("../models/Board");
 
+const router = express.Router();
+
+/**
+ * GET /api/browse/boards
+ * Return boards that the current user does NOT own and is NOT a member of
+ */
 router.get(
-  "/browse",
+  "/boards",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     try {
       const userId = req.user._id;
 
-      const boards = await Board.aggregate([
-        {
-          $match: {
-            owner: { $ne: userId },
-            members: { $ne: userId },
-          },
-        },
-        { $sample: { size: 10 } },
-        {
-          $project: {
-            id: "$_id",
-            title: 1,
-            descriptionLong: 1,
-            coverPhotoURL: 1,
-            isJoined: false,
-            memberCount: { $size: "$members" },
-          },
-        },
-      ]);
+      // Find boards where:
+      //  - owner is NOT the current user
+      //  - members array does NOT contain the current user
+      const boards = await Board.find({
+        owner: { $ne: userId },
+        members: { $ne: userId },
+      })
+        .sort({ createdAt: -1 })
+        .limit(20)
+        .lean();
 
-      res.json({
+      const data = boards.map((b) => ({
+        id: b._id.toString(),
+        title: b.title,
+        descriptionLong: b.descriptionLong || "",
+        coverPhotoURL: b.coverPhotoURL || "",
+        memberCount: Array.isArray(b.members) ? b.members.length : 0,
+      }));
+
+      return res.json({
         status: "success",
-        data: boards,
+        data,
       });
     } catch (err) {
       console.error("[BROWSE BOARDS ERROR]", err);
-      res.status(500).json({
+      return res.status(500).json({
         status: "error",
         message: "Failed to load suggested boards",
+        error: err.message,
       });
     }
   }
 );
+
+module.exports = router;

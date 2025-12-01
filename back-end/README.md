@@ -2,6 +2,17 @@
 
 This directory hosts the Express.js server that powers CommYOUnity’s friends and boards features.
 
+## Authentication
+
+Protected friends endpoints require a JWT. Send an `Authorization` header with your token. Example:
+
+```bash
+# replace <token> with a real JWT
+curl -H "Authorization: Bearer <token>" http://localhost:4000/api/friends
+```
+
+> If your client uses the `JWT <token>` scheme (as in the current passport config), swap `Bearer` for `JWT`.
+
 ## Scripts
 
 ```bash
@@ -11,6 +22,10 @@ npm test              # run mocha/chai tests
 npm run coverage      # run mocha via c8 to verify code coverage
 ```
 
+> For CI/review environments that cannot start mongodb-memory-server, set a reachable test URI:  
+> `MONGODB_URI_TEST="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority" npm test`
+> Scripts set `NODE_ENV=test` automatically.
+
 ## Environment Variables
 
 Set these in `back-end/.env` (never commit secrets):
@@ -18,24 +33,26 @@ Set these in `back-end/.env` (never commit secrets):
 | Variable | Purpose |
 | --- | --- |
 | `PORT` | Port for the Express server (defaults to `4000`). |
+| `MONGODB_URI` | MongoDB Atlas connection string. |
+| `JWT_SECRET` | Secret used to sign JWTs. |
+| `JWT_EXP_DAYS` | Days until JWT expiration (defaults to 7 if unset). |
 | `MOCKAROO_API_KEY` | API key used to proxy Mockaroo friends data. |
 | `MOCKAROO_FRIENDS_URL` | Base URL for the friends dataset (defaults to Mockaroo friends endpoint). |
 | `FRIENDS_FETCH_COUNT` | How many friends to request per fetch (defaults to 20). |
 | `FRIENDS_CACHE_TTL_MS` | Cache lifetime for the friends roster in milliseconds (defaults to 5 minutes). |
-| — | Friend requests currently use a simple in-memory cache seeded from fallback data; no env vars required yet. |
 
 ## Key Routes
 
 | Method | Route | Description |
 | --- | --- | --- |
-| `GET` | `/api/friends` | Returns the canonical friends roster that the front-end uses for hydration, filtering, and local storage seeding. |
+| `GET` | `/api/friends` | Returns the canonical friends roster (JWT required). Supports filtering and uses Mongo-backed cache. |
 | `GET` | `/api/friends?username=<exact>` | Exact, case-insensitive username match. Rejects invalid characters with `400`. |
 | `GET` | `/api/friends?search=<term>` | Partial match across username and full name. |
 | `GET` | `/api/friends?limit=5` | Optional cap on returned entries (applies after filtering). |
 | `GET` | `/api/friends?simulateError=true` | Dev/test helper that forces a `503` response, used by the mocha/chai suite. |
-| `GET` | `/api/friend-requests` | Returns the in-memory list of pending friend requests (cached from fallback data until a real backend exists). |
-| `POST` | `/api/friend-requests/:id/accept` | Simulates accepting a request. Removes it from the cache and returns the normalized friend object that the front end persists locally. |
-| `POST` | `/api/friend-requests/:id/decline` | Simulates declining a request. Removes it from the cache and echoes the declined id/username. |
+| `GET` | `/api/friend-requests` | Returns the pending friend requests for the authenticated user (JWT required). |
+| `POST` | `/api/friend-requests/:id/accept` | Accept a request (JWT required). Moves FriendRequest → Friend and deletes the request. |
+| `POST` | `/api/friend-requests/:id/decline` | Decline a request (JWT required). Deletes the pending request only. |
 
 The `/api/friends` response shape matches the React components’ expectations:
 
@@ -76,3 +93,9 @@ npm run coverage       # c8 + mocha (target ≥10% coverage)
 `friends.test.js` hits `/api/friends` normally and again with `simulateError=true` to exercise the fallback/error handling logic. This keeps the friends API’s behavior in sync with the front-end integration. 
 
 `friendRequests.test.js` covers the GET + POST routes for the friend requests module so the mocked accept/decline flow stays in sync with the React page.
+
+**Friends tests note:** Friends/friend-requests suites require a reachable Mongo URI. Set `MONGODB_URI_TEST` (or `MONGODB_URI`) before running `npm test`/`npm run coverage`, e.g.:
+
+```bash
+MONGODB_URI_TEST="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority" npm test
+```

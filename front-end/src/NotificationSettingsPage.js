@@ -22,9 +22,12 @@ export default function NotificationSettingsPage() {
   const fetchNotificationSettings = async () => {
     try {
       console.log('[NotificationSettings] Fetching from backend...');
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile", {
         method: "GET",
-        credentials: "include",
+        headers: {
+          "Authorization": `JWT ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -60,12 +63,14 @@ export default function NotificationSettingsPage() {
     try {
       console.log('[NotificationSettings] Saving settings:', newSettings);
       
+      const token = localStorage.getItem('token');
+      
       const response = await fetch("http://localhost:4000/api/profile/notifications", {
         method: "PUT",
         headers: {
+          "Authorization": `JWT ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(newSettings)
       });
 

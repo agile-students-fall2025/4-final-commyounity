@@ -18,8 +18,8 @@ const passport = require('passport');
 const jwtStrategy = require('./config/jwt-config.js');
 const kickMemberRouter = require("./routes/kickMember");
 const findMembersRouter = require("./routes/searchMembers");
-
-
+const browseBoardsRouter = require("./routes/browseBoards");
+const joinBoardRouter = require("./routes/joinBoard");
 
 
 
@@ -29,10 +29,12 @@ const {
   getFriendsCacheMeta,
   getFriendRequests,
   getFriendRequestsCount,
+  acceptFriendRequest,
   findFriendRequest,
   removeFriendRequest,
   addFriendFromRequest,
 } = require("./services/friendsService");
+const { param, validationResult } = require("express-validator");
 const app = express() // instantiate an Express object
 
 app.use(cors({
@@ -43,6 +45,7 @@ app.use(express.json());
 
 app.use(passport.initialize());
 passport.use(jwtStrategy);
+const requireJwt = passport.authenticate("jwt", { session: false });
 
 // we will put some server logic here later...
 
@@ -80,7 +83,7 @@ passport.use(jwtStrategy);
 
 
   //get mock data for invite firends
-  app.get("/api/friends", async (req, res) => {
+  app.get("/api/friends", requireJwt, async (req, res) => {
     const rawUsername =
       typeof req.query.username === "string" ? req.query.username.trim() : "";
     const rawSearch =
@@ -96,6 +99,7 @@ passport.use(jwtStrategy);
       String(req.query.simulateError || "").toLowerCase() === "true";
     const hasExactUsername = rawUsername.length > 0;
     const hasSearch = !hasExactUsername && rawSearch.length > 0;
+    const ownerId = req.user?._id;
 
     if (simulateError) {
       return res.status(503).json({
@@ -114,82 +118,143 @@ passport.use(jwtStrategy);
       });
     }
 
-    const friends = await ensureFriendsCache();
-    let filteredList = friends;
-    let filtered = false;
-    let filterType = null;
+    try {
+      let friends;
+      let filtered = false;
+      let filterType = null;
 
-    if (hasExactUsername) {
-      filtered = true;
-      filterType = "username";
-      const term = rawUsername.toLowerCase();
-      filteredList = friends.filter(
-        (friend) => String(friend.username ?? "").toLowerCase() === term
-      );
-    } else if (hasSearch) {
-      filtered = true;
-      filterType = "search";
-      filteredList = filterFriendsByQuery(friends, rawSearch);
+      if (hasExactUsername) {
+        filtered = true;
+        filterType = "username";
+        friends = await ensureFriendsCache({
+          ownerId,
+          username: rawUsername,
+        });
+      } else if (hasSearch) {
+        filtered = true;
+        filterType = "search";
+        friends = await filterFriendsByQuery(rawSearch, { ownerId });
+      } else {
+        friends = await ensureFriendsCache({ ownerId });
+      }
+
+      const data = limit ? friends.slice(0, limit) : friends;
+      const cacheMeta = getFriendsCacheMeta();
+      res.json({
+        data,
+        meta: {
+          total: friends.length,
+          count: data.length,
+          filtered,
+          filterType,
+          cacheSource: cacheMeta.cacheSource,
+          cachedAt: cacheMeta.cachedAt,
+          ttlMs: cacheMeta.ttlMs,
+        },
+      });
+    } catch (error) {
+      console.error("Unable to load friends from Mongo.", error);
+      res.status(500).json({ error: "Unable to load friends list." });
     }
-
-    const data = limit ? filteredList.slice(0, limit) : filteredList;
-
-    const cacheMeta = getFriendsCacheMeta();
-    res.json({
-      data,
-      meta: {
-        total: friends.length,
-        count: data.length,
-        filtered,
-        filterType,
-        cacheSource: cacheMeta.cacheSource,
-        cachedAt: cacheMeta.cachedAt,
-        ttlMs: cacheMeta.ttlMs,
-      },
-    });
   });
 
-  app.get("/api/friend-requests", (req, res) => {
-    res.json({
-      data: getFriendRequests(),
-      meta: { count: getFriendRequestsCount() },
-    });
-  });
-
-  app.post("/api/friend-requests/:id/accept", (req, res) => {
-    const { id } = req.params;
-    const match = findFriendRequest(id);
-    if (!match) {
-      return res.status(404).json({ error: "Friend request not found." });
+  app.get("/api/friend-requests", requireJwt, async (req, res) => {
+    try {
+      const ownerId = req.user?._id;
+      const data = await getFriendRequests(ownerId);
+      const count = await getFriendRequestsCount(ownerId);
+      res.json({
+        data,
+        meta: { count },
+      });
+    } catch (error) {
+      console.error("Unable to load friend requests.", error);
+      res.status(500).json({ error: "Unable to load friend requests." });
     }
-
-    removeFriendRequest(id);
-    res.json({
-      status: "accepted",
-      friend: addFriendFromRequest(match),
-      remainingRequests: getFriendRequestsCount(),
-    });
   });
 
-  app.post("/api/friend-requests/:id/decline", (req, res) => {
-    const { id } = req.params;
-    const match = findFriendRequest(id);
-    if (!match) {
-      return res.status(404).json({ error: "Friend request not found." });
+  const idValidator = [
+    param("id")
+      .isMongoId()
+      .withMessage("Invalid friend request id."),
+  ];
+  const handleValidation = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+    return next();
+  };
 
-    removeFriendRequest(id);
-    res.json({
-      status: "declined",
-      declinedRequest: { id: match.id, username: match.username },
-      remainingRequests: getFriendRequestsCount(),
-    });
-  });
+  app.post(
+    "/api/friend-requests/:id/accept",
+    requireJwt,
+    idValidator,
+    handleValidation,
+    async (req, res) => {
+      const { id } = req.params;
+      const ownerId = req.user?._id;
+      try {
+        const friend = await acceptFriendRequest(id, ownerId);
+        if (!friend) {
+          return res.status(404).json({ error: "Friend request not found." });
+        }
+        const remainingRequests = await getFriendRequestsCount(ownerId);
+        res.json({
+          status: "accepted",
+          friend,
+          remainingRequests,
+        });
+      } catch (error) {
+        console.error("Unable to accept friend request.", error);
+        res.status(500).json({ error: "Unable to accept friend request." });
+      }
+    }
+  );
+
+  app.post(
+    "/api/friend-requests/:id/decline",
+    requireJwt,
+    idValidator,
+    handleValidation,
+    async (req, res) => {
+      const { id } = req.params;
+      const ownerId = req.user?._id;
+      try {
+        const match = await findFriendRequest(id, ownerId);
+        if (!match) {
+          return res.status(404).json({ error: "Friend request not found." });
+        }
+
+        /*
+         * Decline behavior:
+         * - Delete the pending request only
+         * - Service clears cache for this owner
+         * - No friend document is created
+         */
+        await removeFriendRequest(id, ownerId);
+        const remainingRequests = await getFriendRequestsCount(ownerId);
+        res.json({
+          status: "declined",
+          declinedRequest: { id: match.id, username: match.username },
+          remainingRequests,
+        });
+      } catch (error) {
+        console.error("Unable to decline friend request.", error);
+        res.status(500).json({ error: "Unable to decline friend request." });
+      }
+    }
+  );
 
 
 // POST 
 
 
+//boardfeed routes
+app.use("/api/boards", boardFeedRouter);
+
+//BROWSE boards
+app.use("/api/browse", browseBoardsRouter);
 
 //serve static files from uploads folder
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -203,8 +268,7 @@ app.use("/api/boards", viewBoardsRouter);
 //invites
 app.use("/api/boardinvites", boardInvitesRouter);
 
-//board routes
-app.use("/api/boards", boardFeedRouter);
+
 
 //createBoard router
 app.use("/api/boards/create", createBoardRouter);
@@ -214,6 +278,9 @@ app.use("/api/boards", editBoardRouter);
 
 //leave board
 app.use("/api/boards", leaveBoardRouter);
+
+// join board
+app.use("/api/boards", joinBoardRouter);
 
 // JWT authentication routes
 app.use('/auth', authenticationRoutes())

@@ -19,40 +19,49 @@ describe("friendsService shared utilities", () => {
     expect(data[0]).to.have.property("username");
   });
 
-  it("filterFriendsByQuery finds matches in username or name", () => {
+  it("filterFriendsByQuery finds matches in username or name", async () => {
     const list = [
       { username: "test.user", first_name: "Test", last_name: "User" },
       { username: "alex", first_name: "Alex", last_name: "Smith" },
     ];
 
-    const usernameMatch = friendsService.filterFriendsByQuery(list, "alex");
+    const usernameMatch = await friendsService.filterFriendsByQuery(
+      list,
+      "alex"
+    );
     expect(usernameMatch).to.have.length(1);
 
-    const nameMatch = friendsService.filterFriendsByQuery(list, "test user");
+    const nameMatch = await friendsService.filterFriendsByQuery(
+      list,
+      "test user"
+    );
     expect(nameMatch).to.have.length(1);
   });
 
-  it("friend request helpers remove and count items", () => {
-    const requests = friendsService.getFriendRequests();
-    const originalCount = friendsService.getFriendRequestsCount();
+  it("friend request helpers remove and count items", async () => {
+    const requests = await friendsService.getFriendRequests();
+    const originalCount = await friendsService.getFriendRequestsCount();
     expect(requests).to.have.length(originalCount);
 
     const target = requests[0];
-    friendsService.removeFriendRequest(target.id);
-    expect(friendsService.getFriendRequestsCount()).to.equal(originalCount - 1);
-    const record = friendsService.findFriendRequest(target.id);
-    expect(record).to.be.undefined;
+    await friendsService.removeFriendRequest(target.id);
+    expect(await friendsService.getFriendRequestsCount()).to.equal(
+      originalCount - 1
+    );
+    const record = await friendsService.findFriendRequest(target.id);
+    expect(record).to.be.null;
   });
 
-  it("addFriendFromRequest normalizes payload", () => {
+  it("addFriendFromRequest normalizes payload", async () => {
     const request = {
       id: "req-1",
       first_name: "Sam",
       last_name: "Lee",
       username: "samlee",
       avatar: "https://picsum.photos/seed/sam/200/200",
+      requester: "507f1f77bcf86cd799439011",
     };
-    const friend = friendsService.addFriendFromRequest(request);
+    const friend = await friendsService.addFriendFromRequest(request);
     expect(friend).to.include({
       id: "req-1",
       first_name: "Sam",

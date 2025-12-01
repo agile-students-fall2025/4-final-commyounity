@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./FindFriendsPage.css";
 import Header from "./Header";
 import Footer from "./Footer";
+import { fetchWithAuth, getStoredToken } from "./utils/authFetch";
 
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
@@ -91,7 +92,13 @@ const FindFriendsPage = () => {
         const url = new URL(FRIENDS_ENDPOINT);
         url.searchParams.set("username", trimmedTerm);
         url.searchParams.set("limit", "1");
-        const response = await fetch(url.toString(), {
+        const token = getStoredToken();
+        if (!token) {
+          throw Object.assign(new Error("Authentication required"), {
+            code: "AUTH_REQUIRED",
+          });
+        }
+        const response = await fetchWithAuth(url.toString(), {
           signal: controller.signal,
         });
 
