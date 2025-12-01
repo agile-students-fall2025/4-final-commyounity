@@ -26,9 +26,12 @@ export default function EditProfilePage() {
 
   const fetchProfile = async () => {
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile", {
         method: "GET",
-        credentials: "include",
+        headers: {
+          "Authorization": `JWT ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -72,9 +75,12 @@ export default function EditProfilePage() {
       const formData = new FormData();
       formData.append('profilePhoto', file);
 
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile/photo", {
         method: "POST",
-        credentials: "include",
+        headers: {
+          "Authorization": `JWT ${token}`,
+        },
         body: formData
       });
 
@@ -104,12 +110,13 @@ export default function EditProfilePage() {
     setSaving(true);
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile", {
         method: "PUT",
         headers: {
+          "Authorization": `JWT ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(formData)
       });
 

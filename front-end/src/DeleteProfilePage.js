@@ -4,7 +4,7 @@ import "./DeleteProfilePage.css";
 
 export default function DeleteProfilePage() {
   const [deleted, setDeleted] = useState(false);
-  // const navigate = useNavigate(); // TODO: once auth/login exists
+  // const navigate = useNavigate();
 
   function handleDelete() {
     // This is where we'd call the backend to permanently delete the account.

@@ -2,17 +2,19 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const { body, validationResult } = require('express-validator');
+const passport = require('passport');
 
-// Temporary in-memory storage for user profiles (until database is connected)
-// In production, this should be replaced with actual database operations
-const userProfiles = new Map();
+// Import models
+const Profile = require('../models/Profile');
+const User = require('../models/User');
 
-console.log('[PROFILE ROUTES] Module loaded, userProfiles Map created');
+console.log('[PROFILE ROUTES] Module loaded with MongoDB integration');
 
 // Configure multer for file upload handling
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Make sure this folder exists
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -36,84 +38,69 @@ const upload = multer({
   }
 });
 
-// Middleware: Check if user is authenticated
-const requireAuth = (req, res, next) => {
-  // Support both Google OAuth and local login
-  const isGoogleAuth = req.isAuthenticated && req.isAuthenticated();
-  const isLocalAuth = req.session && req.session.user;
-  
-  if (!isGoogleAuth && !isLocalAuth) {
-    console.log('[AUTH CHECK] Not authenticated');
-    return res.status(401).json({ error: 'Please login first' });
-  }
-  
-  const userId = req.user?.id || req.session?.user?.id;
-  console.log('[AUTH CHECK] Authenticated, userId:', userId);
-  next();
+// Middleware: Use JWT authentication (same as other protected routes)
+const requireAuth = passport.authenticate('jwt', { session: false });
+
+// Helper: Get user ID from request (JWT sets req.user)
+const getUserId = (req) => {
+  return req.user?.id || req.user?._id;
 };
 
 // ==================== Get User Profile ====================
 // GET /api/profile
 router.get('/', requireAuth, async (req, res) => {
   try {
-    // Get user ID (supports both login methods)
-    const userId = req.user?.id || req.session?.user?.id;
-    const username = req.user?.username || req.session?.user?.username || 'username';
-    
+    const userId = getUserId(req);
     console.log('[GET PROFILE] Fetching profile for userId:', userId);
-    
-    // Handle name - could be string or object (from Google OAuth)
-    let name = req.user?.displayName || req.session?.user?.name || 'User';
-    if (typeof name === 'object' && name.givenName) {
-      name = `${name.givenName} ${name.familyName || ''}`.trim();
+
+    // Get user info from User model
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
+
+    // Get or create profile from Profile model
+    let profile = await Profile.findOne({ userId: userId });
     
-    // Default profile data
-    const defaultProfile = {
-      id: userId,
-      username: username,
-      name: name,
-      email: req.user?.emails?.[0]?.value || req.session?.user?.email || 'user@example.com',
-      profilePhoto: null,
-      aboutMe: "Hi! I'm Bill from Hong Kong. I love connecting with people who enjoy exploring different cuisines and cultures!",
-      background: 'Grew up in USA, born in Hong Kong',
-      interests: 'Hiking, Skiing, Reading',
-      privacy: {
-        visibility: 'Private',
-        canMessage: 'Everyone',
-        onlineStatus: true
-      },
-      notifications: {
-        boardUpdates: true,
-        newMessages: true,
-        newFollower: true
-      }
+    if (!profile) {
+      // Create default profile if doesn't exist
+      profile = new Profile({
+        userId: userId,
+        aboutMe: '',
+        background: '',
+        interests: '',
+        profilePhoto: '',
+        privacy: {
+          visibility: 'Private',
+          canMessage: 'Everyone',
+          onlineStatus: true
+        },
+        notifications: {
+          boardUpdates: true,
+          newMessages: true,
+          newFollower: true
+        }
+      });
+      await profile.save();
+      console.log('[GET PROFILE] Created new profile for userId:', userId);
+    }
+
+    // Combine user and profile data
+    const responseData = {
+      id: user._id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      profilePhoto: profile.profilePhoto || user.avatar || null,
+      aboutMe: profile.aboutMe,
+      background: profile.background,
+      interests: profile.interests,
+      privacy: profile.privacy,
+      notifications: profile.notifications
     };
-    
-    // Check if user has saved profile data
-    const savedProfile = userProfiles.get(userId);
-    console.log('[GET PROFILE] Saved profile found:', !!savedProfile);
-    
-    // Merge saved profile with defaults to ensure all fields exist
-    const userProfile = savedProfile ? {
-      ...defaultProfile,
-      ...savedProfile,
-      privacy: {
-        ...defaultProfile.privacy,
-        ...(savedProfile.privacy || {})
-      },
-      notifications: {
-        ...defaultProfile.notifications,
-        ...(savedProfile.notifications || {})
-      }
-    } : defaultProfile;
-    
-    if (savedProfile) {
-      console.log('[GET PROFILE] Merged profile data:', JSON.stringify(userProfile, null, 2));
-    }
-    
-    console.log('[GET PROFILE] Returning profile with notifications:', userProfile.notifications);
-    res.json(userProfile);
+
+    console.log('[GET PROFILE] Returning profile for userId:', userId);
+    res.json(responseData);
   } catch (error) {
     console.error('[GET PROFILE] Error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -122,68 +109,103 @@ router.get('/', requireAuth, async (req, res) => {
 
 // ==================== Update User Profile ====================
 // PUT /api/profile
-router.put('/', requireAuth, async (req, res) => {
-  try {
-    const userId = req.user?.id || req.session?.user?.id;
-    const { username, name, aboutMe, background, interests } = req.body;
-    
-    console.log('[UPDATE PROFILE] userId:', userId, 'data:', { username, name, aboutMe, background, interests });
-    
-    // Validate input
-    if (aboutMe && aboutMe.length > 500) {
-      return res.status(400).json({ error: 'About Me cannot exceed 500 characters' });
+router.put('/', 
+  requireAuth,
+  // express-validator validation rules
+  [
+    body('username')
+      .optional()
+      .trim()
+      .isLength({ min: 3, max: 24 })
+      .withMessage('Username must be 3-24 characters')
+      .matches(/^[A-Za-z0-9._-]+$/)
+      .withMessage('Username can only contain letters, numbers, dots, underscores, and hyphens'),
+    body('name')
+      .optional()
+      .trim()
+      .isLength({ min: 1, max: 100 })
+      .withMessage('Name must be 1-100 characters'),
+    body('aboutMe')
+      .optional()
+      .trim()
+      .isLength({ max: 500 })
+      .withMessage('About Me cannot exceed 500 characters'),
+    body('background')
+      .optional()
+      .trim()
+      .isLength({ max: 200 })
+      .withMessage('Background cannot exceed 200 characters'),
+    body('interests')
+      .optional()
+      .trim()
+      .isLength({ max: 200 })
+      .withMessage('Interests cannot exceed 200 characters'),
+  ],
+  async (req, res) => {
+    try {
+      // Check validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          error: errors.array()[0].msg,
+          errors: errors.array() 
+        });
+      }
+
+      const userId = getUserId(req);
+      const { username, name, aboutMe, background, interests } = req.body;
+      
+      console.log('[UPDATE PROFILE] userId:', userId, 'data:', { username, name, aboutMe, background, interests });
+
+      // Update User model (username, name)
+      if (username || name) {
+        const userUpdate = {};
+        if (username) userUpdate.username = username.toLowerCase();
+        if (name) userUpdate.name = name;
+        
+        await User.findByIdAndUpdate(userId, userUpdate);
+      }
+
+      // Update or create Profile
+      const profileUpdate = {};
+      if (aboutMe !== undefined) profileUpdate.aboutMe = aboutMe;
+      if (background !== undefined) profileUpdate.background = background;
+      if (interests !== undefined) profileUpdate.interests = interests;
+
+      const profile = await Profile.findOneAndUpdate(
+        { userId: userId },
+        { $set: profileUpdate },
+        { new: true, upsert: true }
+      );
+
+      // Get updated user for response
+      const user = await User.findById(userId).select('-password');
+
+      console.log('[UPDATE PROFILE] Profile saved for userId:', userId);
+      
+      res.json({
+        success: true,
+        message: 'Profile updated successfully',
+        profile: {
+          username: user.username,
+          name: user.name,
+          aboutMe: profile.aboutMe,
+          background: profile.background,
+          interests: profile.interests
+        }
+      });
+    } catch (error) {
+      console.error('[UPDATE PROFILE] Error:', error);
+      
+      // Handle duplicate username error
+      if (error.code === 11000) {
+        return res.status(400).json({ error: 'Username already taken' });
+      }
+      
+      res.status(500).json({ error: 'Server error' });
     }
-    
-    // Get current profile or create new one
-    const currentProfile = userProfiles.get(userId) || {
-      id: userId,
-      username: req.user?.username || req.session?.user?.username || 'username',
-      email: req.user?.emails?.[0]?.value || req.session?.user?.email || 'user@example.com',
-      profilePhoto: null,
-      privacy: {
-        visibility: 'Private',
-        canMessage: 'Everyone',
-        onlineStatus: true
-      },
-      notifications: {
-        boardUpdates: true,
-        newMessages: true,
-        newFollower: true
-      }
-    };
-    
-    // Update profile with new data
-    const updatedProfile = {
-      ...currentProfile,
-      username: username || currentProfile.username,
-      name: name || currentProfile.name,
-      aboutMe: aboutMe !== undefined ? aboutMe : currentProfile.aboutMe,
-      background: background !== undefined ? background : currentProfile.background,
-      interests: interests !== undefined ? interests : currentProfile.interests
-    };
-    
-    // Save to memory storage
-    userProfiles.set(userId, updatedProfile);
-    
-    console.log('[UPDATE PROFILE] Profile saved for userId:', userId);
-    console.log('[UPDATE PROFILE] Current Map size:', userProfiles.size);
-    
-    res.json({
-      success: true,
-      message: 'Profile updated successfully',
-      profile: {
-        username: updatedProfile.username,
-        name: updatedProfile.name,
-        aboutMe: updatedProfile.aboutMe,
-        background: updatedProfile.background,
-        interests: updatedProfile.interests
-      }
-    });
-  } catch (error) {
-    console.error('[UPDATE PROFILE] Error:', error);
-    res.status(500).json({ error: 'Server error' });
   }
-});
+);
 
 // ==================== Upload Profile Photo ====================
 // POST /api/profile/photo
@@ -193,13 +215,15 @@ router.post('/photo', requireAuth, upload.single('profilePhoto'), async (req, re
       return res.status(400).json({ error: 'No file uploaded' });
     }
     
-    const userId = req.user?.id || req.session?.user?.id;
+    const userId = getUserId(req);
     const photoUrl = `/uploads/${req.file.filename}`;
     
-    // Get current profile and update photo
-    const currentProfile = userProfiles.get(userId) || {};
-    currentProfile.profilePhoto = photoUrl;
-    userProfiles.set(userId, currentProfile);
+    // Update profile with new photo
+    await Profile.findOneAndUpdate(
+      { userId: userId },
+      { $set: { profilePhoto: photoUrl } },
+      { upsert: true }
+    );
     
     console.log('[PHOTO UPLOAD] Photo saved for userId:', userId, 'url:', photoUrl);
     
@@ -214,23 +238,146 @@ router.post('/photo', requireAuth, upload.single('profilePhoto'), async (req, re
   }
 });
 
+// ==================== Update Privacy Settings ====================
+// PUT /api/profile/privacy
+router.put('/privacy',
+  requireAuth,
+  [
+    body('visibility')
+      .optional()
+      .isIn(['Public', 'Private', 'Friends Only'])
+      .withMessage('Invalid visibility setting'),
+    body('canMessage')
+      .optional()
+      .isIn(['Everyone', 'Friends Only', 'No One'])
+      .withMessage('Invalid message permission setting'),
+    body('onlineStatus')
+      .optional()
+      .isBoolean()
+      .withMessage('Online status must be true or false'),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          error: errors.array()[0].msg,
+          errors: errors.array() 
+        });
+      }
+
+      const userId = getUserId(req);
+      const { visibility, canMessage, onlineStatus } = req.body;
+      
+      console.log('[UPDATE PRIVACY] userId:', userId, 'data:', { visibility, canMessage, onlineStatus });
+
+      // Build update object
+      const updateFields = {};
+      if (visibility !== undefined) updateFields['privacy.visibility'] = visibility;
+      if (canMessage !== undefined) updateFields['privacy.canMessage'] = canMessage;
+      if (onlineStatus !== undefined) updateFields['privacy.onlineStatus'] = onlineStatus;
+
+      const profile = await Profile.findOneAndUpdate(
+        { userId: userId },
+        { $set: updateFields },
+        { new: true, upsert: true }
+      );
+
+      console.log('[UPDATE PRIVACY] Privacy settings saved for userId:', userId);
+      
+      res.json({
+        success: true,
+        message: 'Privacy settings updated',
+        privacy: profile.privacy
+      });
+    } catch (error) {
+      console.error('[UPDATE PRIVACY] Error:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
+);
+
+// ==================== Update Notification Settings ====================
+// PUT /api/profile/notifications
+router.put('/notifications',
+  requireAuth,
+  [
+    body('boardUpdates')
+      .optional()
+      .isBoolean()
+      .withMessage('boardUpdates must be true or false'),
+    body('newMessages')
+      .optional()
+      .isBoolean()
+      .withMessage('newMessages must be true or false'),
+    body('newFollower')
+      .optional()
+      .isBoolean()
+      .withMessage('newFollower must be true or false'),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          error: errors.array()[0].msg,
+          errors: errors.array() 
+        });
+      }
+
+      const userId = getUserId(req);
+      const { boardUpdates, newMessages, newFollower } = req.body;
+      
+      console.log('[UPDATE NOTIFICATIONS] userId:', userId, 'data:', { boardUpdates, newMessages, newFollower });
+
+      // Build update object
+      const updateFields = {};
+      if (boardUpdates !== undefined) updateFields['notifications.boardUpdates'] = boardUpdates;
+      if (newMessages !== undefined) updateFields['notifications.newMessages'] = newMessages;
+      if (newFollower !== undefined) updateFields['notifications.newFollower'] = newFollower;
+
+      const profile = await Profile.findOneAndUpdate(
+        { userId: userId },
+        { $set: updateFields },
+        { new: true, upsert: true }
+      );
+
+      console.log('[UPDATE NOTIFICATIONS] Notification settings saved for userId:', userId);
+      
+      res.json({
+        success: true,
+        message: 'Notification settings updated',
+        notifications: profile.notifications
+      });
+    } catch (error) {
+      console.error('[UPDATE NOTIFICATIONS] Error:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
+);
+
 // ==================== Delete User Account ====================
 // DELETE /api/profile
 router.delete('/', requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id || req.session?.user?.id;
+    const userId = getUserId(req);
     
     console.log('[DELETE PROFILE] Deleting profile for userId:', userId);
     
-    // Delete from memory storage
-    userProfiles.delete(userId);
+    // Delete profile from database
+    await Profile.findOneAndDelete({ userId: userId });
+    
+    // Optionally delete user account too
+    // await User.findByIdAndDelete(userId);
     
     // Clear session
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('[DELETE PROFILE] Failed to clear session:', err);
-      }
-    });
+    if (req.session) {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('[DELETE PROFILE] Failed to clear session:', err);
+        }
+      });
+    }
     
     res.json({
       success: true,
@@ -238,183 +385,6 @@ router.delete('/', requireAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('[DELETE PROFILE] Error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// ==================== Update Privacy Settings ====================
-// PUT /api/profile/privacy
-router.put('/privacy', requireAuth, async (req, res) => {
-  try {
-    const userId = req.user?.id || req.session?.user?.id;
-    const { visibility, canMessage, onlineStatus } = req.body;
-    
-    console.log('[UPDATE PRIVACY] userId:', userId, 'data:', { visibility, canMessage, onlineStatus });
-    
-    // Validate input
-    const validVisibility = ['Private', 'Public'];
-    const validCanMessage = ['Everyone', 'Friends Only'];
-    
-    if (visibility && !validVisibility.includes(visibility)) {
-      return res.status(400).json({ error: 'Invalid visibility setting' });
-    }
-    
-    if (canMessage && !validCanMessage.includes(canMessage)) {
-      return res.status(400).json({ error: 'Invalid message permission setting' });
-    }
-    
-    // Get current profile or create a complete one
-    const currentProfile = userProfiles.get(userId) || {
-      id: userId,
-      username: req.user?.username || req.session?.user?.username || 'username',
-      name: req.user?.displayName || req.session?.user?.name || 'User',
-      email: req.user?.emails?.[0]?.value || req.session?.user?.email || 'user@example.com',
-      profilePhoto: null,
-      aboutMe: "Hi! I'm Bill from Hong Kong. I love connecting with people who enjoy exploring different cuisines and cultures!",
-      background: 'Grew up in USA, born in Hong Kong',
-      interests: 'Hiking, Skiing, Reading',
-      privacy: {
-        visibility: 'Private',
-        canMessage: 'Everyone',
-        onlineStatus: true
-      },
-      notifications: {
-        boardUpdates: true,
-        newMessages: true,
-        newFollower: true
-      }
-    };
-    
-    if (!currentProfile.privacy) {
-      currentProfile.privacy = {};
-    }
-    
-    if (visibility !== undefined) currentProfile.privacy.visibility = visibility;
-    if (canMessage !== undefined) currentProfile.privacy.canMessage = canMessage;
-    if (onlineStatus !== undefined) currentProfile.privacy.onlineStatus = onlineStatus;
-    
-    userProfiles.set(userId, currentProfile);
-    
-    console.log('[UPDATE PRIVACY] Privacy settings saved for userId:', userId);
-    console.log('[UPDATE PRIVACY] New privacy settings:', currentProfile.privacy);
-    console.log('[UPDATE PRIVACY] Current Map size:', userProfiles.size);
-    
-    res.json({
-      success: true,
-      message: 'Privacy settings updated',
-      privacy: currentProfile.privacy
-    });
-  } catch (error) {
-    console.error('[UPDATE PRIVACY] Error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// ==================== Update Notification Settings ====================
-// PUT /api/profile/notifications
-router.put('/notifications', requireAuth, async (req, res) => {
-  try {
-    const userId = req.user?.id || req.session?.user?.id;
-    const { boardUpdates, newMessages, newFollower } = req.body;
-    
-    console.log('[UPDATE NOTIFICATIONS] ===== START =====');
-    console.log('[UPDATE NOTIFICATIONS] userId:', userId);
-    console.log('[UPDATE NOTIFICATIONS] Received data:', { boardUpdates, newMessages, newFollower });
-    
-    // Get current profile or create a complete one
-    const currentProfile = userProfiles.get(userId) || {
-      id: userId,
-      username: req.user?.username || req.session?.user?.username || 'username',
-      name: req.user?.displayName || req.session?.user?.name || 'User',
-      email: req.user?.emails?.[0]?.value || req.session?.user?.email || 'user@example.com',
-      profilePhoto: null,
-      aboutMe: "Hi! I'm Bill from Hong Kong. I love connecting with people who enjoy exploring different cuisines and cultures!",
-      background: 'Grew up in USA, born in Hong Kong',
-      interests: 'Hiking, Skiing, Reading',
-      privacy: {
-        visibility: 'Private',
-        canMessage: 'Everyone',
-        onlineStatus: true
-      },
-      notifications: {
-        boardUpdates: true,
-        newMessages: true,
-        newFollower: true
-      }
-    };
-    
-    console.log('[UPDATE NOTIFICATIONS] Current profile before update:', JSON.stringify(currentProfile, null, 2));
-    
-    if (!currentProfile.notifications) {
-      currentProfile.notifications = {};
-      console.log('[UPDATE NOTIFICATIONS] Created new notifications object');
-    }
-    
-    if (boardUpdates !== undefined) {
-      currentProfile.notifications.boardUpdates = boardUpdates;
-      console.log('[UPDATE NOTIFICATIONS] Set boardUpdates to:', boardUpdates);
-    }
-    if (newMessages !== undefined) {
-      currentProfile.notifications.newMessages = newMessages;
-      console.log('[UPDATE NOTIFICATIONS] Set newMessages to:', newMessages);
-    }
-    if (newFollower !== undefined) {
-      currentProfile.notifications.newFollower = newFollower;
-      console.log('[UPDATE NOTIFICATIONS] Set newFollower to:', newFollower);
-    }
-    
-    userProfiles.set(userId, currentProfile);
-    
-    console.log('[UPDATE NOTIFICATIONS] Profile saved to Map');
-    console.log('[UPDATE NOTIFICATIONS] Current Map size:', userProfiles.size);
-    console.log('[UPDATE NOTIFICATIONS] Updated profile:', JSON.stringify(currentProfile, null, 2));
-    
-    // Verify it was saved
-    const verifyProfile = userProfiles.get(userId);
-    console.log('[UPDATE NOTIFICATIONS] Verification - re-fetched profile:', JSON.stringify(verifyProfile, null, 2));
-    console.log('[UPDATE NOTIFICATIONS] ===== END =====');
-    
-    res.json({
-      success: true,
-      message: 'Notification settings updated',
-      notifications: currentProfile.notifications
-    });
-  } catch (error) {
-    console.error('[UPDATE NOTIFICATIONS] Error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// ==================== Change Password ====================
-// PUT /api/profile/password
-router.put('/password', requireAuth, async (req, res) => {
-  try {
-    const userId = req.user?.id || req.session?.user?.id;
-    const { newPassword, confirmPassword } = req.body;
-    
-    console.log('[CHANGE PASSWORD] userId:', userId);
-    
-    // Validate input
-    if (!newPassword || !confirmPassword) {
-      return res.status(400).json({ error: 'Please fill in all fields' });
-    }
-    
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
-    }
-    
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
-    }
-    
-    console.log('[CHANGE PASSWORD] Password changed successfully for userId:', userId);
-    
-    res.json({
-      success: true,
-      message: 'Password changed successfully'
-    });
-  } catch (error) {
-    console.error('[CHANGE PASSWORD] Error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
