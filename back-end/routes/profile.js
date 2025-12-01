@@ -13,7 +13,7 @@ console.log('[PROFILE ROUTES] Module loaded with MongoDB integration');
 // Configure multer for file upload handling
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, path.join(process.cwd(), 'uploads'));
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -59,13 +59,23 @@ router.get('/', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Build full URL for avatar if it's a relative path
+    let profilePhoto = user.avatar || null;
+    if (profilePhoto && !profilePhoto.startsWith('http')) {
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      profilePhoto = `${baseUrl}${profilePhoto}`;
+    }
+
+    console.log('[GET PROFILE] User avatar from DB:', user.avatar);
+    console.log('[GET PROFILE] Returning profilePhoto:', profilePhoto);
+
     // Return user data with profile fields
     const responseData = {
       id: user._id,
       username: user.username,
       name: user.name,
       email: user.email,
-      profilePhoto: user.avatar || null,
+      profilePhoto: profilePhoto,
       aboutMe: user.aboutMe || '',
       background: user.background || '',
       interests: user.interests || '',
@@ -193,7 +203,9 @@ router.post('/photo', requireAuth, upload.single('profilePhoto'), async (req, re
     }
     
     const userId = getUserId(req);
-    const photoUrl = `/uploads/${req.file.filename}`;
+    // Build full URL for the photo
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const photoUrl = `${baseUrl}/uploads/${req.file.filename}`;
     
     // Update user avatar field
     await User.findByIdAndUpdate(userId, { $set: { avatar: photoUrl } });
