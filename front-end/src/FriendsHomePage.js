@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./FriendsHomePage.css";
 import Header from "./Header";
 import Footer from "./Footer";
+import { fetchWithAuth, getStoredToken } from "./utils/authFetch";
 
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
@@ -16,6 +17,7 @@ const FriendsHomePage = () => {
   const [friendsCount, setFriendsCount] = useState(0);
   const [requestsCount, setRequestsCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,9 +25,16 @@ const FriendsHomePage = () => {
 
     const loadStats = async () => {
       try {
+        const token = getStoredToken();
+        if (!token) {
+          throw Object.assign(new Error("Authentication required"), {
+            code: "AUTH_REQUIRED",
+          });
+        }
+
         const [friendsRes, requestsRes] = await Promise.all([
-          fetch(FRIENDS_ENDPOINT),
-          fetch(FRIEND_REQUESTS_ENDPOINT),
+          fetchWithAuth(FRIENDS_ENDPOINT),
+          fetchWithAuth(FRIEND_REQUESTS_ENDPOINT),
         ]);
 
         if (isMounted) {
@@ -41,6 +50,13 @@ const FriendsHomePage = () => {
         }
       } catch (error) {
         console.warn("Unable to load friends stats:", error);
+        if (isMounted) {
+          setAuthError(
+            error?.code === "AUTH_REQUIRED" || error?.code === "AUTH_FORBIDDEN"
+              ? "Please sign in to view your friends and requests."
+              : "Unable to load friends data right now."
+          );
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -58,6 +74,10 @@ const FriendsHomePage = () => {
   const renderContent = () => {
     if (loading) {
       return <p>Loading your friends information...</p>;
+    }
+
+    if (authError) {
+      return <p className="error">{authError}</p>;
     }
 
     switch (activeTab) {

@@ -5,6 +5,7 @@ import FriendThumb from "./FriendThumb";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
+import { fetchWithAuth, getStoredToken } from "./utils/authFetch";
 
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
@@ -104,7 +105,14 @@ const FriendsList = () => {
 
     const loadFriends = async () => {
       try {
-        const response = await fetch(FRIENDS_ENDPOINT);
+        const token = getStoredToken();
+        if (!token) {
+          throw Object.assign(new Error("Authentication required"), {
+            code: "AUTH_REQUIRED",
+          });
+        }
+
+        const response = await fetchWithAuth(FRIENDS_ENDPOINT);
 
         if (!response.ok) {
           throw new Error(`Server responded with status ${response.status}`);
@@ -131,10 +139,15 @@ const FriendsList = () => {
         }
 
         console.warn("Unable to load friends from the Express API.", fetchError);
+        const isAuth =
+          fetchError?.code === "AUTH_REQUIRED" ||
+          fetchError?.code === "AUTH_FORBIDDEN";
         setFriends(FALLBACK_FRIENDS);
         setHydrated(false);
         setError(
-          "Showing a few sample friends while the friends service is unavailable."
+          isAuth
+            ? "Please sign in to view your friends."
+            : "Showing a few sample friends while the friends service is unavailable."
         );
       } finally {
         if (isMounted) {

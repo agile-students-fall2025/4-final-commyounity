@@ -4,6 +4,7 @@ import "./FriendRequestsPage.css";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
+import { fetchWithAuth, getStoredToken } from "./utils/authFetch";
 
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
@@ -89,6 +90,7 @@ const FriendRequestsPage = () => {
 
   const [feedback, setFeedback] = useState(null);
   const hadCachedRequestsRef = useRef(requests.length > 0);
+  const [authError, setAuthError] = useState(null);
 
   const setRequestsAndPersist = (updater) => {
     setRequests((prev) => {
@@ -107,7 +109,14 @@ const FriendRequestsPage = () => {
       }
 
       try {
-        const response = await fetch(FRIEND_REQUESTS_ENDPOINT);
+        const token = getStoredToken();
+        if (!token) {
+          throw Object.assign(new Error("Authentication required"), {
+            code: "AUTH_REQUIRED",
+          });
+        }
+
+        const response = await fetchWithAuth(FRIEND_REQUESTS_ENDPOINT);
 
         if (!response.ok) {
           throw new Error(`Server responded with status ${response.status}`);
@@ -131,9 +140,17 @@ const FriendRequestsPage = () => {
         }
 
         console.warn("Unable to load friend requests from the API.", fetchError);
+        const isAuth =
+          fetchError?.code === "AUTH_REQUIRED" ||
+          fetchError?.code === "AUTH_FORBIDDEN";
         setError(
-          "We couldn't load your friend requests right now. Showing your most recent saved list."
+          isAuth
+            ? "Please sign in to load your friend requests."
+            : "We couldn't load your friend requests right now. Showing your most recent saved list."
         );
+        if (isAuth) {
+          setAuthError("Authentication required to view friend requests.");
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -222,7 +239,14 @@ const FriendRequestsPage = () => {
     const fullName = `${request.first_name} ${request.last_name}`;
 
     try {
-      const response = await fetch(
+      const token = getStoredToken();
+      if (!token) {
+        throw Object.assign(new Error("Authentication required"), {
+          code: "AUTH_REQUIRED",
+        });
+      }
+
+      const response = await fetchWithAuth(
         `${FRIEND_REQUESTS_ENDPOINT}/${encodeURIComponent(request.id)}/accept`,
         { method: "POST" }
       );
@@ -254,7 +278,11 @@ const FriendRequestsPage = () => {
       console.warn("Unable to accept friend request.", actionError);
       setFeedback({
         type: "error",
-        message: "We couldn’t accept the request. Please try again shortly.",
+        message:
+          actionError?.code === "AUTH_REQUIRED" ||
+          actionError?.code === "AUTH_FORBIDDEN"
+            ? "Please sign in to accept friend requests."
+            : "We couldn’t accept the request. Please try again shortly.",
       });
     }
   };
@@ -263,7 +291,14 @@ const FriendRequestsPage = () => {
     const fullName = `${request.first_name} ${request.last_name}`;
 
     try {
-      const response = await fetch(
+      const token = getStoredToken();
+      if (!token) {
+        throw Object.assign(new Error("Authentication required"), {
+          code: "AUTH_REQUIRED",
+        });
+      }
+
+      const response = await fetchWithAuth(
         `${FRIEND_REQUESTS_ENDPOINT}/${encodeURIComponent(request.id)}/decline`,
         { method: "POST" }
       );
@@ -286,7 +321,11 @@ const FriendRequestsPage = () => {
       console.warn("Unable to decline friend request.", actionError);
       setFeedback({
         type: "error",
-        message: "We couldn’t decline the request. Please try again shortly.",
+        message:
+          actionError?.code === "AUTH_REQUIRED" ||
+          actionError?.code === "AUTH_FORBIDDEN"
+            ? "Please sign in to decline friend requests."
+            : "We couldn’t decline the request. Please try again shortly.",
       });
     }
   };
