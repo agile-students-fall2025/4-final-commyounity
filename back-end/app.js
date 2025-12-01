@@ -226,6 +226,12 @@ passport.use(jwtStrategy);
           return res.status(404).json({ error: "Friend request not found." });
         }
 
+        /*
+         * Decline behavior:
+         * - Delete the pending request only
+         * - Service clears cache for this owner
+         * - No friend document is created
+         */
         await removeFriendRequest(id, ownerId);
         const remainingRequests = await getFriendRequestsCount(ownerId);
         res.json({
