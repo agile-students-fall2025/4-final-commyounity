@@ -24,6 +24,7 @@ npm run coverage      # run mocha via c8 to verify code coverage
 
 > For CI/review environments that cannot start mongodb-memory-server, set a reachable test URI:  
 > `MONGODB_URI_TEST="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority" npm test`
+> Scripts set `NODE_ENV=test` automatically.
 
 ## Environment Variables
 

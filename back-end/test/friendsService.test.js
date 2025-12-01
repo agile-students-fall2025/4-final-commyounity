@@ -49,7 +49,7 @@ describe("friendsService shared utilities", () => {
       originalCount - 1
     );
     const record = await friendsService.findFriendRequest(target.id);
-    expect(record).to.be.undefined;
+    expect(record).to.be.null;
   });
 
   it("addFriendFromRequest normalizes payload", async () => {
@@ -59,6 +59,7 @@ describe("friendsService shared utilities", () => {
       last_name: "Lee",
       username: "samlee",
       avatar: "https://picsum.photos/seed/sam/200/200",
+      requester: "507f1f77bcf86cd799439011",
     };
     const friend = await friendsService.addFriendFromRequest(request);
     expect(friend).to.include({
