@@ -525,6 +525,27 @@ const addFriendFromRequest = async (request, ownerId = null) => {
   return friendDoc ? normalizeFriendDoc(friendDoc) : null;
 };
 
+const acceptFriendRequest = async (id, ownerId = null) => {
+  if (!Types.ObjectId.isValid(id)) {
+    return null;
+  }
+
+  const query = { _id: id };
+  if (ownerId) {
+    query.owner = ownerId;
+  }
+
+  const match = await FriendRequest.findOne(query).lean();
+  if (!match) {
+    return null;
+  }
+
+  const friend = await addFriendFromRequest(match, ownerId || match.owner);
+  await FriendRequest.deleteOne({ _id: id });
+  invalidateFriendRequestsCache(ownerId || match.owner);
+  return friend;
+};
+
 const resetFriendsCacheForTests = () => {
   friendsQueryCache.clear();
   lastFriendsCacheKey = null;
@@ -547,6 +568,7 @@ module.exports = {
   getFriendRequestsCount,
   findFriendRequest,
   removeFriendRequest,
+  acceptFriendRequest,
   addFriendFromRequest,
   getFriendsCacheMeta,
   resetFriendsCacheForTests,

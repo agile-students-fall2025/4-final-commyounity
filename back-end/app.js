@@ -29,6 +29,7 @@ const {
   getFriendsCacheMeta,
   getFriendRequests,
   getFriendRequestsCount,
+  acceptFriendRequest,
   findFriendRequest,
   removeFriendRequest,
   addFriendFromRequest,
@@ -194,13 +195,10 @@ passport.use(jwtStrategy);
       const { id } = req.params;
       const ownerId = req.user?._id;
       try {
-        const match = await findFriendRequest(id, ownerId);
-        if (!match) {
+        const friend = await acceptFriendRequest(id, ownerId);
+        if (!friend) {
           return res.status(404).json({ error: "Friend request not found." });
         }
-
-        const friend = await addFriendFromRequest(match, ownerId);
-        await removeFriendRequest(id, ownerId);
         const remainingRequests = await getFriendRequestsCount(ownerId);
         res.json({
           status: "accepted",
