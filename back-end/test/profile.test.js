@@ -4,6 +4,7 @@ const request = require("supertest");
 const mongoose = require("mongoose");
 const path = require("path");
 const fs = require("fs");
+const sinon = require("sinon");
 const app = require("../app");
 const User = require("../models/User");
 
@@ -28,6 +29,7 @@ const authDelete = (path) =>
 
 describe("Profile routes", () => {
   beforeEach(async () => {
+    sinon.restore();
     await User.deleteMany({});
 
     // Create a test user (username max 24 chars)
@@ -56,6 +58,11 @@ describe("Profile routes", () => {
     userId = testUser._id;
   });
 
+  afterEach(async () => {
+    sinon.restore();
+    await User.deleteMany({});
+  });
+
   // ==================== GET /api/profile ====================
   describe("GET /api/profile", () => {
     it("returns user profile with all fields", async () => {
@@ -71,11 +78,6 @@ describe("Profile routes", () => {
       expect(res.body).to.have.property("interests", "Test interests");
       expect(res.body).to.have.property("privacy");
       expect(res.body).to.have.property("notifications");
-    });
-
-    it("returns 401 without JWT token", async () => {
-      const res = await request(app).get("/api/profile");
-      expect(res.status).to.equal(401);
     });
 
     it("returns default values for empty profile fields", async () => {
@@ -99,18 +101,53 @@ describe("Profile routes", () => {
       expect(res.body.background).to.equal("");
       expect(res.body.interests).to.equal("");
     });
+
+    it("prepends base URL when avatar is a relative path", async () => {
+      testUser.avatar = "/uploads/test-avatar.jpg";
+      await testUser.save();
+
+      const res = await authGet("/api/profile");
+
+      expect(res.status).to.equal(200);
+      expect(res.body.profilePhoto).to.include("/uploads/test-avatar.jpg");
+      // supertest 默认 host 会是 127.0.0.1:port
+      expect(res.body.profilePhoto).to.match(/^http:\/\/.+\/uploads\//);
+    });
+
+    it("returns 404 when user does not exist", async () => {
+      await User.deleteMany({});
+      const res = await authGet("/api/profile");
+      expect(res.status).to.equal(404);
+      expect(res.body).to.have.property("error", "User not found");
+    });
+
+    it("returns 500 when DB error occurs", async () => {
+      const stub = sinon
+        .stub(User, "findById")
+        .throws(new Error("DB error in GET"));
+
+      const res = await authGet("/api/profile");
+
+      expect(res.status).to.equal(500);
+      expect(res.body).to.have.property("error", "Server error");
+      stub.restore();
+    });
+
+    it("returns 401 without JWT token", async () => {
+      const res = await request(app).get("/api/profile");
+      expect(res.status).to.equal(401);
+    });
   });
 
   // ==================== PUT /api/profile ====================
   describe("PUT /api/profile", () => {
     it("updates profile fields successfully", async () => {
-      const res = await authPut("/api/profile")
-        .send({
-          name: "Updated Name",
-          aboutMe: "Updated about me",
-          background: "Updated background",
-          interests: "Updated interests",
-        });
+      const res = await authPut("/api/profile").send({
+        name: "Updated Name",
+        aboutMe: "Updated about me",
+        background: "Updated background",
+        interests: "Updated interests",
+      });
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
@@ -121,24 +158,21 @@ describe("Profile routes", () => {
     it("updates username successfully", async () => {
       const ts = Date.now().toString().slice(-6);
       const newUsername = `newuser_${ts}`;
-      const res = await authPut("/api/profile")
-        .send({ username: newUsername });
+      const res = await authPut("/api/profile").send({ username: newUsername });
 
       expect(res.status).to.equal(200);
       expect(res.body.profile.username).to.equal(newUsername.toLowerCase());
     });
 
     it("rejects username that is too short", async () => {
-      const res = await authPut("/api/profile")
-        .send({ username: "ab" });
+      const res = await authPut("/api/profile").send({ username: "ab" });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error");
     });
 
     it("rejects username with invalid characters", async () => {
-      const res = await authPut("/api/profile")
-        .send({ username: "invalid user!" });
+      const res = await authPut("/api/profile").send({ username: "invalid user!" });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error");
@@ -146,11 +180,46 @@ describe("Profile routes", () => {
 
     it("rejects aboutMe exceeding 500 characters", async () => {
       const longText = "a".repeat(501);
-      const res = await authPut("/api/profile")
-        .send({ aboutMe: longText });
+      const res = await authPut("/api/profile").send({ aboutMe: longText });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error");
+    });
+
+    it("returns 404 when user not found during profile update", async () => {
+      await User.deleteMany({});
+      const res = await authPut("/api/profile").send({ name: "No User" });
+
+      expect(res.status).to.equal(404);
+      expect(res.body).to.have.property("error", "User not found");
+    });
+
+    it("rejects duplicate username", async () => {
+      const dupUser = await new User({
+        username: "duplicateuser",
+        email: "dup@example.com",
+        password: "password123",
+        name: "Dup",
+      }).save();
+
+      const res = await authPut("/api/profile").send({
+        username: dupUser.username,
+      });
+
+      expect(res.status).to.equal(400);
+      expect(res.body).to.have.property("error", "Username already taken");
+    });
+
+    it("returns 500 when DB error occurs in profile update", async () => {
+      const stub = sinon
+        .stub(User, "findByIdAndUpdate")
+        .throws(new Error("DB error in PUT /profile"));
+
+      const res = await authPut("/api/profile").send({ name: "Broken" });
+
+      expect(res.status).to.equal(500);
+      expect(res.body).to.have.property("error", "Server error");
+      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -165,65 +234,118 @@ describe("Profile routes", () => {
   // ==================== PUT /api/profile/password ====================
   describe("PUT /api/profile/password", () => {
     it("changes password successfully with correct current password", async () => {
-      const res = await authPut("/api/profile/password")
-        .send({
-          currentPassword: "password123",
-          newPassword: "newpassword456",
-        });
+      const res = await authPut("/api/profile/password").send({
+        currentPassword: "password123",
+        newPassword: "newpassword456",
+      });
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
-      expect(res.body).to.have.property("message", "Password changed successfully");
+      expect(res.body).to.have.property(
+        "message",
+        "Password changed successfully"
+      );
     });
 
     it("rejects incorrect current password", async () => {
-      const res = await authPut("/api/profile/password")
-        .send({
-          currentPassword: "wrongpassword",
-          newPassword: "newpassword456",
-        });
+      const res = await authPut("/api/profile/password").send({
+        currentPassword: "wrongpassword",
+        newPassword: "newpassword456",
+      });
 
       expect(res.status).to.equal(400);
-      expect(res.body).to.have.property("error", "Current password is incorrect");
+      expect(res.body).to.have.property(
+        "error",
+        "Current password is incorrect"
+      );
     });
 
     it("rejects new password that is too short", async () => {
-      const res = await authPut("/api/profile/password")
-        .send({
-          currentPassword: "password123",
-          newPassword: "12345",
-        });
+      const res = await authPut("/api/profile/password").send({
+        currentPassword: "password123",
+        newPassword: "12345",
+      });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error");
     });
 
     it("rejects missing current password", async () => {
-      const res = await authPut("/api/profile/password")
-        .send({
-          newPassword: "newpassword456",
-        });
+      const res = await authPut("/api/profile/password").send({
+        newPassword: "newpassword456",
+      });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error");
     });
 
     it("rejects missing new password", async () => {
-      const res = await authPut("/api/profile/password")
-        .send({
-          currentPassword: "password123",
-        });
+      const res = await authPut("/api/profile/password").send({
+        currentPassword: "password123",
+      });
 
       expect(res.status).to.equal(400);
     });
 
-    it("returns 401 without JWT token", async () => {
+    it("rejects password change for Google OAuth accounts", async () => {
+      const ts = Date.now().toString().slice(-6);
+      const googleUser = await new User({
+        username: `guser_${ts}`,
+        email: `google_${ts}@example.com`,
+        // password 为空，让 !user.password 为 true
+        password: "",
+        name: "Google User",
+        authProvider: "google",
+      }).save();
+
+      const googleToken = googleUser.generateJWT();
+
       const res = await request(app)
         .put("/api/profile/password")
+        .set("Authorization", `JWT ${googleToken}`)
         .send({
-          currentPassword: "password123",
+          currentPassword: "anything",
           newPassword: "newpassword456",
         });
+
+      expect(res.status).to.equal(400);
+      expect(res.body).to.have.property(
+        "error",
+        "Cannot change password for Google OAuth accounts"
+      );
+    });
+
+    it("returns 404 when user not found during password change", async () => {
+      await User.deleteMany({});
+      const res = await authPut("/api/profile/password").send({
+        currentPassword: "password123",
+        newPassword: "newpassword456",
+      });
+
+      expect(res.status).to.equal(404);
+      expect(res.body).to.have.property("error", "User not found");
+    });
+
+    it("returns 500 when DB error occurs in password change", async () => {
+      const stub = sinon
+        .stub(User, "findById")
+        .throws(new Error("DB error in password"));
+
+      const res = await authPut("/api/profile/password").send({
+        currentPassword: "password123",
+        newPassword: "newpassword456",
+      });
+
+      expect(res.status).to.equal(500);
+      expect(res.body).to.have.property("error", "Server error");
+      stub.restore();
+    });
+
+    it("returns 401 without JWT token", async () => {
+      const res = await request(app).put("/api/profile/password").send({
+        currentPassword: "password123",
+        newPassword: "newpassword456",
+      });
 
       expect(res.status).to.equal(401);
     });
@@ -232,8 +354,9 @@ describe("Profile routes", () => {
   // ==================== PUT /api/profile/privacy ====================
   describe("PUT /api/profile/privacy", () => {
     it("updates visibility setting", async () => {
-      const res = await authPut("/api/profile/privacy")
-        .send({ visibility: "Public" });
+      const res = await authPut("/api/profile/privacy").send({
+        visibility: "Public",
+      });
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
@@ -241,28 +364,32 @@ describe("Profile routes", () => {
     });
 
     it("updates canMessage setting", async () => {
-      const res = await authPut("/api/profile/privacy")
-        .send({ canMessage: "Friends Only" });
+      const res = await authPut("/api/profile/privacy").send({
+        canMessage: "Friends Only",
+      });
 
       expect(res.status).to.equal(200);
-      expect(res.body.privacy).to.have.property("canMessage", "Friends Only");
+      expect(res.body.privacy).to.have.property(
+        "canMessage",
+        "Friends Only"
+      );
     });
 
     it("updates onlineStatus setting", async () => {
-      const res = await authPut("/api/profile/privacy")
-        .send({ onlineStatus: false });
+      const res = await authPut("/api/profile/privacy").send({
+        onlineStatus: false,
+      });
 
       expect(res.status).to.equal(200);
       expect(res.body.privacy).to.have.property("onlineStatus", false);
     });
 
     it("updates multiple privacy settings at once", async () => {
-      const res = await authPut("/api/profile/privacy")
-        .send({
-          visibility: "Friends Only",
-          canMessage: "No One",
-          onlineStatus: false,
-        });
+      const res = await authPut("/api/profile/privacy").send({
+        visibility: "Friends Only",
+        canMessage: "No One",
+        onlineStatus: false,
+      });
 
       expect(res.status).to.equal(200);
       expect(res.body.privacy.visibility).to.equal("Friends Only");
@@ -271,18 +398,52 @@ describe("Profile routes", () => {
     });
 
     it("rejects invalid visibility option", async () => {
-      const res = await authPut("/api/profile/privacy")
-        .send({ visibility: "InvalidOption" });
+      const res = await authPut("/api/profile/privacy").send({
+        visibility: "InvalidOption",
+      });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error");
     });
 
     it("rejects invalid canMessage option", async () => {
-      const res = await authPut("/api/profile/privacy")
-        .send({ canMessage: "InvalidOption" });
+      const res = await authPut("/api/profile/privacy").send({
+        canMessage: "InvalidOption",
+      });
 
       expect(res.status).to.equal(400);
+    });
+
+    it("rejects non-boolean onlineStatus", async () => {
+      const res = await authPut("/api/profile/privacy").send({
+        onlineStatus: "yes",
+      });
+
+      expect(res.status).to.equal(400);
+    });
+
+    it("returns 404 when user not found during privacy update", async () => {
+      await User.deleteMany({});
+      const res = await authPut("/api/profile/privacy").send({
+        visibility: "Public",
+      });
+
+      expect(res.status).to.equal(404);
+      expect(res.body).to.have.property("error", "User not found");
+    });
+
+    it("returns 500 when DB error occurs in privacy update", async () => {
+      const stub = sinon
+        .stub(User, "findByIdAndUpdate")
+        .throws(new Error("DB error in privacy"));
+
+      const res = await authPut("/api/profile/privacy").send({
+        visibility: "Public",
+      });
+
+      expect(res.status).to.equal(500);
+      expect(res.body).to.have.property("error", "Server error");
+      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -297,8 +458,9 @@ describe("Profile routes", () => {
   // ==================== PUT /api/profile/notifications ====================
   describe("PUT /api/profile/notifications", () => {
     it("updates boardUpdates setting", async () => {
-      const res = await authPut("/api/profile/notifications")
-        .send({ boardUpdates: false });
+      const res = await authPut("/api/profile/notifications").send({
+        boardUpdates: false,
+      });
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
@@ -306,28 +468,35 @@ describe("Profile routes", () => {
     });
 
     it("updates newMessages setting", async () => {
-      const res = await authPut("/api/profile/notifications")
-        .send({ newMessages: false });
+      const res = await authPut("/api/profile/notifications").send({
+        newMessages: false,
+      });
 
       expect(res.status).to.equal(200);
-      expect(res.body.notifications).to.have.property("newMessages", false);
+      expect(res.body.notifications).to.have.property(
+        "newMessages",
+        false
+      );
     });
 
     it("updates newFollower setting", async () => {
-      const res = await authPut("/api/profile/notifications")
-        .send({ newFollower: false });
+      const res = await authPut("/api/profile/notifications").send({
+        newFollower: false,
+      });
 
       expect(res.status).to.equal(200);
-      expect(res.body.notifications).to.have.property("newFollower", false);
+      expect(res.body.notifications).to.have.property(
+        "newFollower",
+        false
+      );
     });
 
     it("updates multiple notification settings at once", async () => {
-      const res = await authPut("/api/profile/notifications")
-        .send({
-          boardUpdates: false,
-          newMessages: false,
-          newFollower: false,
-        });
+      const res = await authPut("/api/profile/notifications").send({
+        boardUpdates: false,
+        newMessages: false,
+        newFollower: false,
+      });
 
       expect(res.status).to.equal(200);
       expect(res.body.notifications.boardUpdates).to.equal(false);
@@ -336,10 +505,43 @@ describe("Profile routes", () => {
     });
 
     it("rejects non-boolean boardUpdates", async () => {
-      const res = await authPut("/api/profile/notifications")
-        .send({ boardUpdates: "yes" });
+      const res = await authPut("/api/profile/notifications").send({
+        boardUpdates: "yes",
+      });
 
       expect(res.status).to.equal(400);
+    });
+
+    it("rejects non-boolean newMessages", async () => {
+      const res = await authPut("/api/profile/notifications").send({
+        newMessages: "abc",
+      });
+
+      expect(res.status).to.equal(400);
+    });
+
+    it("returns 404 when user not found during notifications update", async () => {
+      await User.deleteMany({});
+      const res = await authPut("/api/profile/notifications").send({
+        boardUpdates: false,
+      });
+
+      expect(res.status).to.equal(404);
+      expect(res.body).to.have.property("error", "User not found");
+    });
+
+    it("returns 500 when DB error occurs in notifications update", async () => {
+      const stub = sinon
+        .stub(User, "findByIdAndUpdate")
+        .throws(new Error("DB error in notifications"));
+
+      const res = await authPut("/api/profile/notifications").send({
+        boardUpdates: false,
+      });
+
+      expect(res.status).to.equal(500);
+      expect(res.body).to.have.property("error", "Server error");
+      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -355,9 +557,10 @@ describe("Profile routes", () => {
   describe("POST /api/profile/photo", () => {
     // Create a test image file
     const testImagePath = path.join(__dirname, "test-image.jpg");
+    const badFilePath = path.join(__dirname, "not-image.txt");
 
     before(() => {
-      // Create a minimal valid JPEG file for testing
+      // Minimal valid JPEG file for testing
       const minimalJpeg = Buffer.from([
         0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01,
         0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43,
@@ -390,22 +593,25 @@ describe("Profile routes", () => {
         0xd9,
       ]);
       fs.writeFileSync(testImagePath, minimalJpeg);
+      fs.writeFileSync(badFilePath, "not an image");
     });
 
     after(() => {
-      // Clean up test image
-      if (fs.existsSync(testImagePath)) {
-        fs.unlinkSync(testImagePath);
-      }
+      if (fs.existsSync(testImagePath)) fs.unlinkSync(testImagePath);
+      if (fs.existsSync(badFilePath)) fs.unlinkSync(badFilePath);
     });
 
     it("uploads profile photo successfully", async () => {
-      const res = await authPost("/api/profile/photo")
-        .attach("profilePhoto", testImagePath);
+      const res = await authPost("/api/profile/photo").attach(
+        "profilePhoto",
+        testImagePath
+      );
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
-      expect(res.body).to.have.property("photoUrl").that.includes("/uploads/");
+      expect(res.body)
+        .to.have.property("photoUrl")
+        .that.includes("/uploads/");
     });
 
     it("rejects upload without file", async () => {
@@ -413,6 +619,31 @@ describe("Profile routes", () => {
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error", "No file uploaded");
+    });
+
+    it("rejects non-image file", async () => {
+      const res = await authPost("/api/profile/photo").attach(
+        "profilePhoto",
+        badFilePath
+      );
+
+      // Multer 会抛错，由全局 error handler 处理，一般是 500
+      expect(res.status).to.be.oneOf([400, 500]);
+    });
+
+    it("returns 500 when DB error occurs in photo upload", async () => {
+      const stub = sinon
+        .stub(User, "findByIdAndUpdate")
+        .throws(new Error("DB error in photo"));
+
+      const res = await authPost("/api/profile/photo").attach(
+        "profilePhoto",
+        testImagePath
+      );
+
+      expect(res.status).to.equal(500);
+      expect(res.body).to.have.property("error", "Server error");
+      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -436,6 +667,18 @@ describe("Profile routes", () => {
       // Verify user is deleted
       const deletedUser = await User.findById(userId);
       expect(deletedUser).to.be.null;
+    });
+
+    it("returns 500 when DB error occurs during delete", async () => {
+      const stub = sinon
+        .stub(User, "findByIdAndDelete")
+        .throws(new Error("DB error in delete"));
+
+      const res = await authDelete("/api/profile");
+
+      expect(res.status).to.equal(500);
+      expect(res.body).to.have.property("error", "Server error");
+      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
