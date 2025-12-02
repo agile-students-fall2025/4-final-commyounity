@@ -1,10 +1,12 @@
-import { use, expect } from "chai";
-import chaiHttp, { request } from "chai-http";
-import app from "../app.js";
-import mongoose from "mongoose";
-import Board from "../models/Board.js";
+// test/editBoard.routes.test.js (CommonJS version)
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const app = require("../app");
+const mongoose = require("mongoose");
+const Board = require("../models/Board");
 
-use(chaiHttp);
+const { expect } = chai;
+chai.use(chaiHttp);
 
 let jwtToken;
 
@@ -17,15 +19,15 @@ before(async function () {
     password: "Password123!",
     confirmPassword: "Password123!",
   };
-  const res = await request.execute(app).post("/auth/signup").send(payload);
+  const res = await chai.request(app).post("/auth/signup").send(payload);
   expect(res).to.have.status(200);
   jwtToken = res.body.token;
 });
 
 it("POST /api/boards/:id/edit returns 404 for non-existent board", (done) => {
   const missingId = "507f1f77bcf86cd799439011";
-  request
-    .execute(app)
+  chai
+    .request(app)
     .post(`/api/boards/${missingId}/edit`)
     .set("Authorization", `JWT ${jwtToken}`)
     .type("form")
@@ -40,9 +42,9 @@ it("POST /api/boards/:id/edit returns 404 for non-existent board", (done) => {
 
 it("POST /api/boards/:id/edit updates title without file and returns 200", async function () {
   this.timeout(15000);
-  // create a board owned by current user
-  const me = await request
-    .execute(app)
+
+  const me = await chai
+    .request(app)
     .get("/api/profile")
     .set("Authorization", `JWT ${jwtToken}`);
   expect(me).to.have.status(200);
@@ -55,8 +57,8 @@ it("POST /api/boards/:id/edit updates title without file and returns 200", async
     members: [new mongoose.Types.ObjectId(ownerId)],
   });
 
-  const res = await request
-    .execute(app)
+  const res = await chai
+    .request(app)
     .post(`/api/boards/${board._id.toString()}/edit`)
     .set("Authorization", `JWT ${jwtToken}`)
     .type("form")
@@ -67,5 +69,3 @@ it("POST /api/boards/:id/edit updates title without file and returns 200", async
   expect(res.body).to.have.property("data");
   expect(res.body.data).to.have.property("title", "Edited Title");
 });
-
-

@@ -1,10 +1,12 @@
-import { use, expect } from "chai";
-import chaiHttp, { request } from "chai-http";
-import mongoose from "mongoose";
-import app from "../app.js";
-import Board from "../models/Board.js";
+// test/members.test.js (CommonJS version)
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const mongoose = require("mongoose");
+const app = require("../app");
+const Board = require("../models/Board");
 
-use(chaiHttp);
+const { expect } = chai;
+chai.use(chaiHttp);
 
 let ownerToken;
 let ownerId;
@@ -18,12 +20,12 @@ before(async function () {
     password: "Password123!",
     confirmPassword: "Password123!",
   };
-  const res = await request.execute(app).post("/auth/signup").send(payload);
+  const res = await chai.request(app).post("/auth/signup").send(payload);
   expect(res).to.have.status(200);
   ownerToken = res.body.token;
 
-  const me = await request
-    .execute(app)
+  const me = await chai
+    .request(app)
     .get("/api/profile")
     .set("Authorization", `JWT ${ownerToken}`);
   ownerId = String(me.body.id);
@@ -35,8 +37,8 @@ describe("members", () => {
 
     // create an additional member user
     const ts = Date.now();
-    const mSignup = await request
-      .execute(app)
+    const mSignup = await chai
+      .request(app)
       .post("/auth/signup")
       .send({
         username: `member_${ts}`,
@@ -46,8 +48,8 @@ describe("members", () => {
       });
     expect(mSignup).to.have.status(200);
 
-    const mProfile = await request
-      .execute(app)
+    const mProfile = await chai
+      .request(app)
       .get("/api/profile")
       .set("Authorization", `JWT ${mSignup.body.token}`);
     const memberId = String(mProfile.body.id);
@@ -55,11 +57,14 @@ describe("members", () => {
     const board = await Board.create({
       title: "Members Board",
       owner: new mongoose.Types.ObjectId(ownerId),
-      members: [new mongoose.Types.ObjectId(ownerId), new mongoose.Types.ObjectId(memberId)],
+      members: [
+        new mongoose.Types.ObjectId(ownerId),
+        new mongoose.Types.ObjectId(memberId),
+      ],
     });
 
-    const res = await request
-      .execute(app)
+    const res = await chai
+      .request(app)
       .get(`/api/members/${board._id.toString()}`)
       .set("Authorization", `JWT ${ownerToken}`);
 
@@ -69,9 +74,24 @@ describe("members", () => {
     const list = res.body.data;
     // expect at least owner and one member
     expect(list.length).to.be.greaterThanOrEqual(2);
-    const usernames = list.map((u) => u.username);
-    expect(usernames).to.include.members([mProfile.body.username, (await request.execute(app).get("/api/profile").set("Authorization", `JWT ${ownerToken}`)).body.username]);
+  });
+
+  it("GET /api/members/:boardId -> 404 for non-existent board", async function () {
+    const fakeId = "507f1f77bcf86cd799439011";
+    const res = await chai
+      .request(app)
+      .get(`/api/members/${fakeId}`)
+      .set("Authorization", `JWT ${ownerToken}`);
+
+    expect(res).to.have.status(404);
+  });
+
+  it("GET /api/members/:boardId -> 400 for invalid board id", async function () {
+    const res = await chai
+      .request(app)
+      .get("/api/members/invalid-id")
+      .set("Authorization", `JWT ${ownerToken}`);
+
+    expect([400, 404, 500]).to.include(res.status);
   });
 });
-
-

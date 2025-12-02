@@ -1,3 +1,4 @@
+// test/setup.js (CommonJS version)
 const mongoose = require("mongoose");
 
 let connectionReady = false;
