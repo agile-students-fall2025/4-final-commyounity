@@ -99,7 +99,10 @@ const authenticationRouter = () => {
     }
 
     try {
-      const user = await User.findOne({ username: username.toLowerCase() }).exec();
+      // try username first, then fallback to email for convenience
+      let user =
+        (await User.findOne({ username: String(username).toLowerCase() }).exec()) ||
+        (await User.findOne({ email: String(username).toLowerCase() }).exec());
       if (!user) {
         console.error("[LOCAL LOGIN] User not found.");
         return res
@@ -237,3 +240,4 @@ const authenticationRouter = () => {
 };
 
 module.exports = authenticationRouter;
+

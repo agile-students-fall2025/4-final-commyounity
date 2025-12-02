@@ -39,6 +39,7 @@ router.post("/", async (req, res) => {
 
     return res.json({
       ok: true,
+      message: `Backend received search for username "${username}".`,
       count: users.length,
       results: users.map((u) => ({
         id: u._id.toString(),
