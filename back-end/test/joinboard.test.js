@@ -1,10 +1,12 @@
-import { use, expect } from "chai";
-import chaiHttp, { request } from "chai-http";
-import mongoose from "mongoose";
-import app from "../app.js";
-import Board from "../models/Board.js";
+// test/joinboard.test.js (CommonJS version)
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const mongoose = require("mongoose");
+const app = require("../app");
+const Board = require("../models/Board");
 
-use(chaiHttp);
+const { expect } = chai;
+chai.use(chaiHttp);
 
 let joinerToken;
 
@@ -17,15 +19,15 @@ before(async function () {
     password: "Password123!",
     confirmPassword: "Password123!",
   };
-  const res = await request.execute(app).post("/auth/signup").send(payload);
+  const res = await chai.request(app).post("/auth/signup").send(payload);
   expect(res).to.have.status(200);
   joinerToken = res.body.token;
 });
 
 describe("joinBoard", () => {
   it("POST /api/boards/:id/join -> 400 (invalid id)", (done) => {
-    request
-      .execute(app)
+    chai
+      .request(app)
       .post("/api/boards/not-a-valid-id/join")
       .set("Authorization", `JWT ${joinerToken}`)
       .end((err, res) => {
@@ -39,10 +41,9 @@ describe("joinBoard", () => {
   it("POST /api/boards/:id/join -> 200 (success)", async function () {
     this.timeout(15000);
 
-    // Create owner and a board
     const ts = Date.now();
-    const ownerSignup = await request
-      .execute(app)
+    const ownerSignup = await chai
+      .request(app)
       .post("/auth/signup")
       .send({
         username: `owner_${ts}`,
@@ -53,8 +54,8 @@ describe("joinBoard", () => {
     expect(ownerSignup).to.have.status(200);
     const ownerToken = ownerSignup.body.token;
 
-    const me = await request
-      .execute(app)
+    const me = await chai
+      .request(app)
       .get("/api/profile")
       .set("Authorization", `JWT ${ownerToken}`);
     const ownerId = String(me.body.id);
@@ -65,8 +66,8 @@ describe("joinBoard", () => {
       members: [new mongoose.Types.ObjectId(ownerId)],
     });
 
-    const res = await request
-      .execute(app)
+    const res = await chai
+      .request(app)
       .post(`/api/boards/${board._id.toString()}/join`)
       .set("Authorization", `JWT ${joinerToken}`);
 
@@ -76,5 +77,3 @@ describe("joinBoard", () => {
     expect(res.body.data).to.have.property("memberCount").that.is.a("number");
   });
 });
-
-

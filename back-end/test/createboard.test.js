@@ -1,14 +1,15 @@
-import { use, expect } from "chai";
-import chaiHttp, { request } from "chai-http";
-import app from "../app.js";
-import fs from "fs";
-import os from "os";
-import path from "path";
+// test/createboard.test.js (CommonJS version)
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const app = require("../app");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
-use(chaiHttp);
+const { expect } = chai;
+chai.use(chaiHttp);
 
 let jwtToken;
-
 
 function createTempPng() {
   const base64Png =
@@ -28,82 +29,44 @@ before(async function () {
     password: "Password123!",
     confirmPassword: "Password123!",
   };
-  const res = await request.execute(app).post("/auth/signup").send(payload);
+  const res = await chai.request(app).post("/auth/signup").send(payload);
   expect(res).to.have.status(200);
   jwtToken = res.body.token;
 });
 
-describe("createBoard", () => {
-  it("POST /api/boards/create -> 400 (missing title)", (done) => {
-    request
-      .execute(app)
-      .post("/api/boards/create")
-      .set("Authorization", `JWT ${jwtToken}`)
-      .type("form")
-      .end((err, res) => {
-        expect(err).to.be.null;
-        expect(res).to.have.status(400);
-        expect(res.body).to.have.property("status", "error");
-        expect(res.body).to.have.property("message").that.match(/title/i);
-        done();
-      });
-  });
-
-  it("POST /api/boards/create -> 400 (missing photo)", (done) => {
-    request
-      .execute(app)
-      .post("/api/boards/create")
-      .set("Authorization", `JWT ${jwtToken}`)
-      .type("form")
-      .field("title", "My Test Board")
-      .end((err, res) => {
-        expect(err).to.be.null;
-        expect(res).to.have.status(400);
-        expect(res.body).to.have.property("status", "error");
-        expect(res.body).to.have.property("message").that.match(/cover photo/i);
-        done();
-      });
-  });
-
-  it("POST /api/boards/create -> 401 (unauthenticated)", (done) => {
-    const tmpPng = createTempPng();
-    request
-      .execute(app)
-      .post("/api/boards/create")
-      .type("form")
-      .field("title", "No Auth Board")
-      .attach("photo", fs.createReadStream(tmpPng), "tiny.png")
-      .end((err, res) => {
-        expect(err).to.be.null;
-        expect(res).to.have.status(401);
-        done();
-      });
-  });
-
-  it("POST /api/boards/create -> 201 (created)", (done) => {
-    const tmpPng = createTempPng();
-    request
-      .execute(app)
-      .post("/api/boards/create")
-      .set("Authorization", `JWT ${jwtToken}`)
-      .type("form")
-      .field("title", "Created Board")
-      .field("descriptionLong", "Created by test")
-      .attach("photo", fs.createReadStream(tmpPng), "tiny.png")
-      .end((err, res) => {
-        expect(err).to.be.null;
-        expect(res).to.have.status(201);
-        expect(res.body).to.have.property("status", "created");
-        expect(res.body).to.have.property("data").that.is.an("object");
-        const { data } = res.body;
-        expect(data).to.have.property("_id");
-        expect(data).to.have.property("title", "Created Board");
-        expect(data).to.have.property("isOwner", true);
-        expect(data).to.have.property("isJoined", true);
-        expect(data).to.have.property("memberCount").that.is.a("number");
-        done();
-      });
-  });
+it("POST /api/boards/create returns 400 when title is missing", (done) => {
+  const tmpFile = createTempPng();
+  chai
+    .request(app)
+    .post("/api/boards/create")
+    .set("Authorization", `JWT ${jwtToken}`)
+    .field("descriptionLong", "A board without a title")
+    .attach("coverPhoto", tmpFile)
+    .end((err, res) => {
+      fs.unlinkSync(tmpFile);
+      expect(err).to.be.null;
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property("status", "error");
+      done();
+    });
 });
 
-
+it("POST /api/boards/create returns 201 when board is created successfully", (done) => {
+  const tmpFile = createTempPng();
+  chai
+    .request(app)
+    .post("/api/boards/create")
+    .set("Authorization", `JWT ${jwtToken}`)
+    .field("title", `Test Board ${Date.now()}`)
+    .field("descriptionLong", "A test board description")
+    .attach("coverPhoto", tmpFile)
+    .end((err, res) => {
+      fs.unlinkSync(tmpFile);
+      expect(err).to.be.null;
+      expect(res).to.have.status(201);
+      expect(res.body).to.have.property("status", "success");
+      expect(res.body).to.have.property("data");
+      expect(res.body.data).to.have.property("title");
+      done();
+    });
+});

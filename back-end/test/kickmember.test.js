@@ -1,10 +1,12 @@
-import { use, expect } from "chai";
-import chaiHttp, { request } from "chai-http";
-import mongoose from "mongoose";
-import app from "../app.js";
-import Board from "../models/Board.js";
+// test/kickmember.test.js (CommonJS version)
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const mongoose = require("mongoose");
+const app = require("../app");
+const Board = require("../models/Board");
 
-use(chaiHttp);
+const { expect } = chai;
+chai.use(chaiHttp);
 
 let ownerToken;
 let ownerId;
@@ -16,7 +18,7 @@ before(async function () {
   const ts = Date.now();
 
   // owner
-  const ownerRes = await request.execute(app).post("/auth/signup").send({
+  const ownerRes = await chai.request(app).post("/auth/signup").send({
     username: `kmA_${ts}`,
     email: `kmA_${ts}@example.com`,
     password: "Password123!",
@@ -24,14 +26,14 @@ before(async function () {
   });
   expect(ownerRes).to.have.status(200);
   ownerToken = ownerRes.body.token;
-  const ownerProfile = await request
-    .execute(app)
+  const ownerProfile = await chai
+    .request(app)
     .get("/api/profile")
     .set("Authorization", `JWT ${ownerToken}`);
   ownerId = String(ownerProfile.body.id);
 
   // member
-  const memberRes = await request.execute(app).post("/auth/signup").send({
+  const memberRes = await chai.request(app).post("/auth/signup").send({
     username: `kmB_${ts}`,
     email: `kmB_${ts}@example.com`,
     password: "Password123!",
@@ -39,8 +41,8 @@ before(async function () {
   });
   expect(memberRes).to.have.status(200);
   memberToken = memberRes.body.token;
-  const memberProfile = await request
-    .execute(app)
+  const memberProfile = await chai
+    .request(app)
     .get("/api/profile")
     .set("Authorization", `JWT ${memberToken}`);
   memberId = String(memberProfile.body.id);
@@ -59,8 +61,8 @@ describe("kickMember", () => {
       ],
     });
 
-    const res = await request
-      .execute(app)
+    const res = await chai
+      .request(app)
       .post(`/api/boards/${board._id.toString()}/kick-member`)
       .set("Authorization", `JWT ${ownerToken}`)
       .send({ memberId });
@@ -82,8 +84,8 @@ describe("kickMember", () => {
       ],
     });
 
-    const res = await request
-      .execute(app)
+    const res = await chai
+      .request(app)
       .post(`/api/boards/${board._id.toString()}/kick-member`)
       .set("Authorization", `JWT ${memberToken}`)
       .send({ memberId: ownerId });
@@ -100,8 +102,8 @@ describe("kickMember", () => {
       members: [new mongoose.Types.ObjectId(ownerId)],
     });
 
-    const res = await request
-      .execute(app)
+    const res = await chai
+      .request(app)
       .post(`/api/boards/${board._id.toString()}/kick-member`)
       .set("Authorization", `JWT ${ownerToken}`)
       .send({ memberId: ownerId });
@@ -110,5 +112,4 @@ describe("kickMember", () => {
     expect(res.body).to.have.property("status", "error");
   });
 });
-
 
