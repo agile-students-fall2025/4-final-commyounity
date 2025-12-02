@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --timeout 8000 --require ./test/setup.js --exit",
-    "coverage": "NODE_ENV=test c8 mocha --timeout 8000 --require ./test/setup.js --exit",
+    "test": "cross-env NODE_ENV=test mocha --timeout 8000 --require ./test/setup.js --exit",
+    "coverage": "cross-env NODE_ENV=test c8 mocha --timeout 8000 --require ./test/setup.js --exit",
     "dev": "nodemon server.js"
   },
   "author": "",
@@ -18,7 +18,6 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
-    "express-validator": "^7.3.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.20.1",
     "morgan": "^1.10.1",
@@ -32,10 +31,9 @@
     "c8": "^10.1.3",
     "chai": "^6.2.0",
     "chai-http": "^5.1.2",
+    "cross-env": "^10.1.0",
     "mocha": "^11.7.5",
-    "mongodb-memory-server": "^10.1.4",
     "node-html-parser": "^7.0.1",
-    "nodemon": "^3.1.10",
-    "supertest": "^7.1.4"
+    "nodemon": "^3.1.10"
   }
 }
