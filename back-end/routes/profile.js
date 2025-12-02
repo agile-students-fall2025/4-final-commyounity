@@ -38,7 +38,18 @@ const upload = multer({
 });
 
 // Middleware: Use JWT authentication (same as other protected routes)
-const requireAuth = passport.authenticate('jwt', { session: false });
+const requireAuth = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err) {
+      return res.status(500).json({ error: 'Authentication error' });
+    }
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized - Please login first' });
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+};
 
 // Helper: Get user ID from request (JWT sets req.user)
 const getUserId = (req) => {
@@ -56,7 +67,7 @@ router.get('/', requireAuth, async (req, res) => {
     const user = await User.findById(userId).select('-password');
     
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(401).json({ error: 'User no longer exists - Please login again' });
     }
 
     // Build full URL for avatar if it's a relative path
