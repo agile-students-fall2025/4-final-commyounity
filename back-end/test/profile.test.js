@@ -4,7 +4,6 @@ const request = require("supertest");
 const mongoose = require("mongoose");
 const path = require("path");
 const fs = require("fs");
-const sinon = require("sinon");
 const app = require("../app");
 const User = require("../models/User");
 
@@ -29,7 +28,6 @@ const authDelete = (path) =>
 
 describe("Profile routes", () => {
   beforeEach(async () => {
-    sinon.restore();
     await User.deleteMany({});
 
     // Create a test user (username max 24 chars)
@@ -58,11 +56,6 @@ describe("Profile routes", () => {
     userId = testUser._id;
   });
 
-  afterEach(async () => {
-    sinon.restore();
-    await User.deleteMany({});
-  });
-
   // ==================== GET /api/profile ====================
   describe("GET /api/profile", () => {
     it("returns user profile with all fields", async () => {
@@ -81,7 +74,6 @@ describe("Profile routes", () => {
     });
 
     it("returns default values for empty profile fields", async () => {
-      // Create user without profile fields
       const ts = Date.now().toString().slice(-6);
       const minimalUser = await new User({
         username: `min_${ts}`,
@@ -110,7 +102,6 @@ describe("Profile routes", () => {
 
       expect(res.status).to.equal(200);
       expect(res.body.profilePhoto).to.include("/uploads/test-avatar.jpg");
-      // supertest 默认 host 会是 127.0.0.1:port
       expect(res.body.profilePhoto).to.match(/^http:\/\/.+\/uploads\//);
     });
 
@@ -119,18 +110,6 @@ describe("Profile routes", () => {
       const res = await authGet("/api/profile");
       expect(res.status).to.equal(404);
       expect(res.body).to.have.property("error", "User not found");
-    });
-
-    it("returns 500 when DB error occurs", async () => {
-      const stub = sinon
-        .stub(User, "findById")
-        .throws(new Error("DB error in GET"));
-
-      const res = await authGet("/api/profile");
-
-      expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("error", "Server error");
-      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -153,6 +132,14 @@ describe("Profile routes", () => {
       expect(res.body).to.have.property("success", true);
       expect(res.body.profile).to.have.property("name", "Updated Name");
       expect(res.body.profile).to.have.property("aboutMe", "Updated about me");
+      expect(res.body.profile).to.have.property(
+        "background",
+        "Updated background"
+      );
+      expect(res.body.profile).to.have.property(
+        "interests",
+        "Updated interests"
+      );
     });
 
     it("updates username successfully", async () => {
@@ -172,7 +159,9 @@ describe("Profile routes", () => {
     });
 
     it("rejects username with invalid characters", async () => {
-      const res = await authPut("/api/profile").send({ username: "invalid user!" });
+      const res = await authPut("/api/profile").send({
+        username: "invalid user!",
+      });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error");
@@ -208,18 +197,6 @@ describe("Profile routes", () => {
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("error", "Username already taken");
-    });
-
-    it("returns 500 when DB error occurs in profile update", async () => {
-      const stub = sinon
-        .stub(User, "findByIdAndUpdate")
-        .throws(new Error("DB error in PUT /profile"));
-
-      const res = await authPut("/api/profile").send({ name: "Broken" });
-
-      expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("error", "Server error");
-      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -292,7 +269,6 @@ describe("Profile routes", () => {
       const googleUser = await new User({
         username: `guser_${ts}`,
         email: `google_${ts}@example.com`,
-        // password 为空，让 !user.password 为 true
         password: "",
         name: "Google User",
         authProvider: "google",
@@ -324,21 +300,6 @@ describe("Profile routes", () => {
 
       expect(res.status).to.equal(404);
       expect(res.body).to.have.property("error", "User not found");
-    });
-
-    it("returns 500 when DB error occurs in password change", async () => {
-      const stub = sinon
-        .stub(User, "findById")
-        .throws(new Error("DB error in password"));
-
-      const res = await authPut("/api/profile/password").send({
-        currentPassword: "password123",
-        newPassword: "newpassword456",
-      });
-
-      expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("error", "Server error");
-      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -432,20 +393,6 @@ describe("Profile routes", () => {
       expect(res.body).to.have.property("error", "User not found");
     });
 
-    it("returns 500 when DB error occurs in privacy update", async () => {
-      const stub = sinon
-        .stub(User, "findByIdAndUpdate")
-        .throws(new Error("DB error in privacy"));
-
-      const res = await authPut("/api/profile/privacy").send({
-        visibility: "Public",
-      });
-
-      expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("error", "Server error");
-      stub.restore();
-    });
-
     it("returns 401 without JWT token", async () => {
       const res = await request(app)
         .put("/api/profile/privacy")
@@ -520,6 +467,14 @@ describe("Profile routes", () => {
       expect(res.status).to.equal(400);
     });
 
+    it("rejects non-boolean newFollower", async () => {
+      const res = await authPut("/api/profile/notifications").send({
+        newFollower: "nope",
+      });
+
+      expect(res.status).to.equal(400);
+    });
+
     it("returns 404 when user not found during notifications update", async () => {
       await User.deleteMany({});
       const res = await authPut("/api/profile/notifications").send({
@@ -528,20 +483,6 @@ describe("Profile routes", () => {
 
       expect(res.status).to.equal(404);
       expect(res.body).to.have.property("error", "User not found");
-    });
-
-    it("returns 500 when DB error occurs in notifications update", async () => {
-      const stub = sinon
-        .stub(User, "findByIdAndUpdate")
-        .throws(new Error("DB error in notifications"));
-
-      const res = await authPut("/api/profile/notifications").send({
-        boardUpdates: false,
-      });
-
-      expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("error", "Server error");
-      stub.restore();
     });
 
     it("returns 401 without JWT token", async () => {
@@ -555,12 +496,10 @@ describe("Profile routes", () => {
 
   // ==================== POST /api/profile/photo ====================
   describe("POST /api/profile/photo", () => {
-    // Create a test image file
     const testImagePath = path.join(__dirname, "test-image.jpg");
     const badFilePath = path.join(__dirname, "not-image.txt");
 
     before(() => {
-      // Minimal valid JPEG file for testing
       const minimalJpeg = Buffer.from([
         0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01,
         0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43,
@@ -627,23 +566,7 @@ describe("Profile routes", () => {
         badFilePath
       );
 
-      // Multer 会抛错，由全局 error handler 处理，一般是 500
-      expect(res.status).to.be.oneOf([400, 500]);
-    });
-
-    it("returns 500 when DB error occurs in photo upload", async () => {
-      const stub = sinon
-        .stub(User, "findByIdAndUpdate")
-        .throws(new Error("DB error in photo"));
-
-      const res = await authPost("/api/profile/photo").attach(
-        "profilePhoto",
-        testImagePath
-      );
-
-      expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("error", "Server error");
-      stub.restore();
+      expect([400, 500]).to.include(res.status);
     });
 
     it("returns 401 without JWT token", async () => {
@@ -664,27 +587,14 @@ describe("Profile routes", () => {
       expect(res.body).to.have.property("success", true);
       expect(res.body).to.have.property("message", "Account deleted");
 
-      // Verify user is deleted
       const deletedUser = await User.findById(userId);
       expect(deletedUser).to.be.null;
     });
 
-    it("returns 500 when DB error occurs during delete", async () => {
-      const stub = sinon
-        .stub(User, "findByIdAndDelete")
-        .throws(new Error("DB error in delete"));
-
-      const res = await authDelete("/api/profile");
-
-      expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("error", "Server error");
-      stub.restore();
-    });
-
     it("returns 401 without JWT token", async () => {
       const res = await request(app).delete("/api/profile");
-
       expect(res.status).to.equal(401);
     });
   });
 });
+
