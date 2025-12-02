@@ -47,22 +47,13 @@ before(function (done) {
 });
 
 // ----------------------------
-// AFTER: disconnect Mongo
-// ----------------------------
-after(async () => {
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.disconnect();
-  }
-});
-
-// ----------------------------
 // TEST 1: GET /api/boards
 // ----------------------------
 it("/api/boards returns success + array", (done) => {
   request
     .execute(app)
     .get("/api/boards")
-    .set("Authorization", `jwt ${authToken}`)
+    .set("Authorization", `JWT ${authToken}`)
     .end((err, res) => {
       expect(err).to.be.null;
       expect(res).to.have.status(200);
@@ -91,7 +82,7 @@ it("/api/boards/:id returns board when valid", (done) => {
   request
     .execute(app)
     .get("/api/boards")
-    .set("Authorization", `jwt ${authToken}`)
+    .set("Authorization", `JWT ${authToken}`)
     .end((err, res) => {
       expect(err).to.be.null;
 
@@ -103,7 +94,7 @@ it("/api/boards/:id returns board when valid", (done) => {
       request
         .execute(app)
         .get(`/api/boards/${id}`)
-        .set("Authorization", `jwt ${authToken}`)
+        .set("Authorization", `JWT ${authToken}`)
         .end((err2, res2) => {
           expect(err2).to.be.null;
           expect(res2).to.have.status(200);
@@ -126,7 +117,7 @@ it("/api/boards/:id returns 404 for non-existent id", (done) => {
   request
     .execute(app)
     .get(`/api/boards/${impossible}`)
-    .set("Authorization", `jwt ${authToken}`)
+    .set("Authorization", `JWT ${authToken}`)
     .end((err, res) => {
       expect(err).to.be.null;
       expect(res).to.have.status(404);

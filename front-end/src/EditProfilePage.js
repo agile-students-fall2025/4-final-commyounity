@@ -1,15 +1,60 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./EditProfilePage.css";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import Cropper from "react-easy-crop";
+
+// Helper function to create cropped image
+const createImage = (url) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", (error) => reject(error));
+    image.crossOrigin = "anonymous";
+    image.src = url;
+  });
+
+async function getCroppedImg(imageSrc, pixelCrop) {
+  const image = await createImage(imageSrc);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      resolve(blob);
+    }, "image/jpeg", 0.9);
+  });
+}
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
   const [photoUrl, setPhotoUrl] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
+  // Cropper states
+  const [showCropper, setShowCropper] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
   // Form fields
   const [formData, setFormData] = useState({
     username: "",
@@ -62,18 +107,39 @@ export default function EditProfilePage() {
     }));
   };
 
-  const handlePhotoUpload = async (e) => {
+  // When user selects a file, show the cropper
+  const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Show preview immediately
-    const previewUrl = URL.createObjectURL(file);
-    setPhotoUrl(previewUrl);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageToCrop(reader.result);
+      setShowCropper(true);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+    };
+    reader.readAsDataURL(file);
+  };
 
-    // Upload to backend
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  // When user confirms the crop
+  const handleCropConfirm = async () => {
     try {
-      const formData = new FormData();
-      formData.append('profilePhoto', file);
+      const croppedBlob = await getCroppedImg(imageToCrop, croppedAreaPixels);
+      
+      // Show preview
+      const previewUrl = URL.createObjectURL(croppedBlob);
+      setPhotoUrl(previewUrl);
+      setShowCropper(false);
+      setImageToCrop(null);
+
+      // Upload to backend
+      const formDataUpload = new FormData();
+      formDataUpload.append('profilePhoto', croppedBlob, 'profile.jpg');
 
       const token = localStorage.getItem('token');
       const response = await fetch("http://localhost:4000/api/profile/photo", {
@@ -81,7 +147,7 @@ export default function EditProfilePage() {
         headers: {
           "Authorization": `JWT ${token}`,
         },
-        body: formData
+        body: formDataUpload
       });
 
       const data = await response.json();
@@ -91,17 +157,19 @@ export default function EditProfilePage() {
         alert("Profile photo uploaded successfully!");
       } else {
         alert(data.error || "Failed to upload photo");
-        setPhotoUrl(""); // Reset on error
       }
     } catch (err) {
-      console.error("Error uploading photo:", err);
+      console.error("Error cropping/uploading photo:", err);
       alert("Failed to upload photo. Please try again.");
-      setPhotoUrl(""); // Reset on error
     }
   };
 
+  const handleCropCancel = () => {
+    setShowCropper(false);
+    setImageToCrop(null);
+  };
+
   const handleSave = async () => {
-    // Validate About Me length
     if (formData.aboutMe.length > 500) {
       alert("About Me cannot exceed 500 characters");
       return;
@@ -160,6 +228,51 @@ export default function EditProfilePage() {
       </button>
       <div className="EditProfilePage">
 
+        {/* Image Cropper Modal */}
+        {showCropper && (
+          <div className="cropper-modal">
+            <div className="cropper-container">
+              <div className="cropper-header">
+                <h3>Adjust Your Photo</h3>
+                <p>Drag to reposition, scroll to zoom</p>
+              </div>
+              <div className="cropper-area">
+                <Cropper
+                  image={imageToCrop}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  cropShape="round"
+                  showGrid={false}
+                  onCropChange={setCrop}
+                  onCropComplete={onCropComplete}
+                  onZoomChange={setZoom}
+                />
+              </div>
+              <div className="cropper-controls">
+                <label>Zoom</label>
+                <input
+                  type="range"
+                  value={zoom}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className="zoom-slider"
+                />
+              </div>
+              <div className="cropper-buttons">
+                <button onClick={handleCropCancel} className="cancel-btn">
+                  Cancel
+                </button>
+                <button onClick={handleCropConfirm} className="confirm-btn">
+                  Save Photo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Profile Picture block */}
         <div className="edit-photo-section">
           <div className="profile-photo-uploader">
@@ -169,7 +282,6 @@ export default function EditProfilePage() {
               className="profile-photo"
             />
 
-            {/* Visible button that triggers the hidden file input */}
             <label htmlFor="profile-photo-input" className="upload-photo-btn">
               Upload Profile Photo
             </label>
@@ -177,91 +289,84 @@ export default function EditProfilePage() {
               id="profile-photo-input"
               type="file"
               accept="image/*"
-              onChange={handlePhotoUpload}
-              hidden
+              onChange={handleFileSelect}
+              style={{ display: "none" }}
             />
           </div>
         </div>
 
-        <form className="edit-form" onSubmit={(e) => e.preventDefault()}>
-          {/* Username */}
+        {/* Form fields */}
+        <div className="edit-form">
           <div className="edit-field">
             <label className="edit-label">Username</label>
             <input
-              className="edit-input"
+              type="text"
               name="username"
-              placeholder="Enter username"
               value={formData.username}
               onChange={handleInputChange}
+              className="edit-input"
+              placeholder="Enter username"
             />
           </div>
 
-          {/* Name */}
           <div className="edit-field">
-            <label className="edit-label">Name</label>
+            <label className="edit-label">Display Name</label>
             <input
-              className="edit-input"
+              type="text"
               name="name"
-              placeholder="Display name"
               value={formData.name}
               onChange={handleInputChange}
+              className="edit-input"
+              placeholder="Enter your name"
             />
           </div>
 
-          {/* About Me */}
           <div className="edit-field">
-            <label className="edit-label">About Me:</label>
-            <div className="aboutme-wrapper">
-              <textarea
-                className="edit-textarea"
-                name="aboutMe"
-                placeholder="Tell people about yourself (max 500 characters)"
-                value={formData.aboutMe}
-                onChange={handleInputChange}
-                maxLength={500}
-              />
-              <div className="char-hint">
-                • {formData.aboutMe.length}/500 characters
-              </div>
-            </div>
+            <label className="edit-label">About Me</label>
+            <textarea
+              name="aboutMe"
+              value={formData.aboutMe}
+              onChange={handleInputChange}
+              className="edit-textarea"
+              placeholder="Tell us about yourself..."
+              rows={4}
+              maxLength={500}
+            />
+            <span className="char-count">{formData.aboutMe.length}/500</span>
           </div>
 
-          {/* Background */}
           <div className="edit-field">
             <label className="edit-label">Background</label>
             <input
-              className="edit-input"
+              type="text"
               name="background"
-              placeholder="Where you're from / what shaped you"
               value={formData.background}
               onChange={handleInputChange}
+              className="edit-input"
+              placeholder="Your background..."
             />
           </div>
 
-          {/* Interest */}
           <div className="edit-field">
-            <label className="edit-label">Interest</label>
+            <label className="edit-label">Interests</label>
             <input
-              className="edit-input"
+              type="text"
               name="interests"
-              placeholder="Your interests"
               value={formData.interests}
               onChange={handleInputChange}
+              className="edit-input"
+              placeholder="Your interests..."
             />
           </div>
 
-          {/* Save button */}
-          <div className="save-wrapper">
-            <button
-              type="button"
-              className="save-button"
-              onClick={handleSave}
-              disabled={saving}
-            >
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
-        </form>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="save-profile-btn"
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </div>
       <Footer />
     </>

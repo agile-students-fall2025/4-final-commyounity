@@ -1,28 +1,48 @@
-import { use, expect } from 'chai';
-import { default as chaiHttp, request } from 'chai-http';
-import app from '../app.js';
+import { use, expect } from "chai";
+import { default as chaiHttp, request } from "chai-http";
+import app from "../app.js";
 
 use(chaiHttp);
 
 describe("BoardFeed API", () => {
+  let authToken;
   let testBoardId;
   let testPostId;
 
   before((done) => {
+    const ts = Date.now();
+    const userData = {
+      username: `feedtester_${ts}`,
+      email: `feedtest_${ts}@example.com`,
+      password: "Password123!",
+      confirmPassword: "Password123!",
+    };
+
     request
       .execute(app)
-      .get("/api/boards")
+      .post("/auth/signup")
+      .send(userData)
       .end((err, res) => {
-        expect(err).to.be.null;
-        expect(res).to.have.status(200);
-        expect(res.body).to.have.property("data").that.is.an("array");
+        if (err) return done(err);
+        expect(res.body).to.have.property("token");
+        authToken = res.body.token;
 
-        if (res.body.data.length === 0) {
-          return done(new Error("No boards exist for testing"));
-        }
+        request
+          .execute(app)
+          .get("/api/boards")
+          .set("Authorization", `JWT ${authToken}`)
+          .end((err2, res2) => {
+            expect(err2).to.be.null;
+            expect(res2).to.have.status(200);
+            expect(res2.body).to.have.property("data").that.is.an("array");
 
-        testBoardId = res.body.data[0].id;
-        done();
+            if (res2.body.data.length === 0) {
+              return done(new Error("No boards exist for testing"));
+            }
+
+            testBoardId = res2.body.data[0]._id || res2.body.data[0].id;
+            done();
+          });
       });
   });
 
@@ -30,6 +50,7 @@ describe("BoardFeed API", () => {
     request
       .execute(app)
       .get(`/api/boards/${testBoardId}/feed`)
+      .set("Authorization", `JWT ${authToken}`)
       .end((err, res) => {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
@@ -42,6 +63,7 @@ describe("BoardFeed API", () => {
     request
       .execute(app)
       .post(`/api/boards/${testBoardId}/feed`)
+      .set("Authorization", `JWT ${authToken}`)
       .send({ message: "Test post from Chai" })
       .end((err, res) => {
         expect(err).to.be.null;
@@ -57,10 +79,14 @@ describe("BoardFeed API", () => {
     request
       .execute(app)
       .post(`/api/boards/${testBoardId}/feed/${testPostId}/like`)
+      .set("Authorization", `JWT ${authToken}`)
       .end((err, res) => {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
-        expect(res.body).to.have.property("likes").that.is.a("number").above(-1);
+        expect(res.body)
+          .to.have.property("likes")
+          .that.is.a("number")
+          .above(-1);
         done();
       });
   });
@@ -69,6 +95,7 @@ describe("BoardFeed API", () => {
     request
       .execute(app)
       .delete(`/api/boards/${testBoardId}/feed/${testPostId}`)
+      .set("Authorization", `JWT ${authToken}`)
       .end((err, res) => {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
@@ -81,6 +108,7 @@ describe("BoardFeed API", () => {
     request
       .execute(app)
       .post(`/api/boards/${testBoardId}/feed`)
+      .set("Authorization", `JWT ${authToken}`)
       .send({})
       .end((err, res) => {
         expect(err).to.be.null;
@@ -94,11 +122,12 @@ describe("BoardFeed API", () => {
     request
       .execute(app)
       .get("/api/boards/someInvalidId/feed")
+      .set("Authorization", `JWT ${authToken}`)
       .end((err, res) => {
         expect(err).to.be.null;
-        expect(res).to.have.status(200);            
+        expect(res).to.have.status(200);
         expect(res.body).to.be.an("array");
-        expect(res.body).to.have.length(0);          
+        expect(res.body).to.have.length(0);
         done();
       });
   });

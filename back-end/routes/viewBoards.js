@@ -1,26 +1,33 @@
 const express = require("express");
 const router = express.Router();
 const Board = require("../models/Board");
-const passport = require("passport"); // ⬅️ add this
+const passport = require("passport");
+
+// Allow requests to proceed even if JWT is missing/invalid; attach user when valid
+const optionalJwt = (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
+    if (err) return next(err);
+    req.user = user || null;
+    return next();
+  })(req, res, next);
+};
 
 // ----------------------------
 // GET ALL BOARDS (protected)
 // ----------------------------
-router.get(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+router.get("/", optionalJwt, async (req, res) => {
     try {
-      // ✅ real logged-in user from JWT
-      const userId = String(req.user._id || req.user.id);
+      const userId = req.user ? String(req.user._id || req.user.id) : null;
 
       const boards = await Board.find();
 
       const processedBoards = boards.map((b) => {
         const obj = b.toObject();
 
-        obj.isOwner = String(obj.owner) === userId;
-        obj.isJoined = obj.members.some((m) => String(m) === userId);
+        obj.isOwner = userId ? String(obj.owner) === userId : false;
+        obj.isJoined = userId
+          ? obj.members.some((m) => String(m) === userId)
+          : false;
         obj.memberCount = obj.members.length;
 
         return obj;
@@ -39,12 +46,9 @@ router.get(
 // ----------------------------
 // GET SINGLE BOARD (protected)
 // ----------------------------
-router.get(
-  "/:id",
-  passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+router.get("/:id", optionalJwt, async (req, res) => {
     try {
-      const userId = String(req.user._id || req.user.id);
+      const userId = req.user ? String(req.user._id || req.user.id) : null;
 
       const board = await Board.findById(req.params.id);
 
@@ -55,8 +59,10 @@ router.get(
       }
 
       const obj = board.toObject();
-      obj.isOwner = String(obj.owner) === userId;
-      obj.isJoined = obj.members.some((m) => String(m) === userId);
+      obj.isOwner = userId ? String(obj.owner) === userId : false;
+      obj.isJoined = userId
+        ? obj.members.some((m) => String(m) === userId)
+        : false;
       obj.memberCount = obj.members.length;
 
       res.json({ status: "success", data: obj });
