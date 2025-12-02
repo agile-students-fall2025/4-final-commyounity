@@ -10,15 +10,9 @@ const boardFeedSchema = new Schema(
       index: true,
     },
 
-    message: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
     author: {
       type: String,
-      default: "Anonymous",
+      required: true,
     },
 
     avatar: {
@@ -28,11 +22,24 @@ const boardFeedSchema = new Schema(
       },
     },
 
+    message: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     likes: {
       type: Number,
       default: 0,
       min: 0,
     },
+
+    likedBy: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      }
+    ],
 
     ts: {
       type: Date,
@@ -40,7 +47,7 @@ const boardFeedSchema = new Schema(
     },
   },
   {
-    timestamps: true, // adds createdAt, updatedAt
+    timestamps: true
   }
 );
 
