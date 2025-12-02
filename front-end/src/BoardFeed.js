@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./BoardFeed.css";
 
+function getAuthHeader() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `JWT ${token}` } : {};
+}
+
 const BoardFeed = ({ boardId, isOwner }) => {
   const [posts, setPosts] = useState([]);
   const [text, setText] = useState("");
@@ -33,7 +38,11 @@ const BoardFeed = ({ boardId, isOwner }) => {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setPosts(Array.isArray(data) ? data : []);
+      setPosts(
+        Array.isArray(data)
+          ? data.map(p => ({ ...p, id: p._id }))
+          : []
+      );
     } catch (err) {
       console.error("Error loading board feed:", err);
       setError("Failed to load board feed.");
@@ -50,13 +59,16 @@ const BoardFeed = ({ boardId, isOwner }) => {
     try {
       const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+        ...getAuthHeader(),
+       },
         credentials: "include",
         body: JSON.stringify({ message: trimmed }),
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const newPost = await res.json();
+      newPost.id = newPost._id;
 
       // Optimistic update
       setPosts((prev) => [newPost, ...prev]);
@@ -69,23 +81,33 @@ const BoardFeed = ({ boardId, isOwner }) => {
 
   const like = async (id) => {
     try {
-      await fetch(`http://localhost:4000/api/boards/${boardId}/feed/${id}/like`, {
+      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed/${id}/like`, {
         method: "POST",
+        headers: { ...getAuthHeader() },
         credentials: "include",
       });
+  
+      if (!res.ok) return console.error("Like failed");
+  
+      const data = await res.json();
+  
       setPosts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, likes: p.likes + 1 } : p))
+        prev.map((p) =>
+        p.id === data.postId ? { ...p, likes: data.likes } : p
+        )
       );
     } catch (err) {
       console.error("Failed to like post:", err);
     }
   };
+  
 
   const remove = async (id) => {
     if (!window.confirm("Delete this post?")) return;
     try {
       const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed/${id}`, {
         method: "DELETE",
+        headers: {...getAuthHeader()},
         credentials: "include",
       });
       if (res.ok) {

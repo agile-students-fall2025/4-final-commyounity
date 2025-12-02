@@ -1,103 +1,104 @@
 const express = require("express");
 const router = express.Router();
-const fs = require("fs");
-const path = require("path");
 const passport = require("passport");
+const BoardFeed = require("../models/BoardFeed");
 
-const FEED_DATA_DIR = path.join(__dirname, "..", "data", "feeds");
-const requireJwt = passport.authenticate("jwt", { session: false });
-
-// Ensure data folder exists
-if (!fs.existsSync(FEED_DATA_DIR)) {
-  fs.mkdirSync(FEED_DATA_DIR, { recursive: true });
-}
-
-function getFeedFilePath(boardId) {
-  return path.join(FEED_DATA_DIR, `${boardId}.json`);
-}
-
-// Helper to read/write JSON safely
-function readFeed(boardId) {
-  const filePath = getFeedFilePath(boardId);
-
-  // ⬅️ If there is no file yet, treat as "no posts", not an error
-  if (!fs.existsSync(filePath)) return [];
-
+// GET FEED
+router.get("/:id/feed", async (req, res) => {
   try {
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
-  } catch {
-    // Corrupt JSON? Fall back to empty feed rather than crashing
-    return [];
+    const posts = await BoardFeed.find({ boardId: req.params.id })
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load feed." });
   }
-}
-
-function writeFeed(boardId, data) {
-  const filePath = getFeedFilePath(boardId);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-}
-
-// --- Routes ---
-
-// GET /api/boards/:id/feed
-router.get("/:id/feed", (req, res) => {
-  const { id } = req.params;
-  const feed = readFeed(id);
-
-  // ⬅️ Always 200 here; frontend can handle empty []
-  res.json(feed);
 });
 
-// POST /api/boards/:id/feed (new post)
-router.post("/:id/feed", requireJwt, (req, res) => {
-  const { id } = req.params;
-  const { message } = req.body;
+// CREATE POST
+router.post(
+  "/:id/feed",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const { message } = req.body;
 
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({ error: "Message is required" });
+      if (!message || typeof message !== "string")
+        return res.status(400).json({ error: "Message required" });
+
+      const post = await BoardFeed.create({
+        boardId: req.params.id,
+        message: message.trim(),
+        author: req.user.username,
+        avatar: req.user.avatar || null,
+        likes: 0,
+        likedBy: [],
+      });
+
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to post message." });
+    }
   }
+);
 
-  const feed = readFeed(id);
-  const newPost = {
-    id: Date.now(),
-    author: req.user?.username || "Anonymous",
-    avatar: req.user?.avatar || `https://i.pravatar.cc/64?u=${Date.now()}`,
-    message: message.trim(),
-    ts: new Date().toISOString(),
-    likes: 0,
-  };
+// LIKE / UNLIKE
+router.post(
+  "/:id/feed/:postId/like",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const post = await BoardFeed.findById(req.params.postId);
+      if (!post) return res.status(404).json({ error: "Post not found" });
 
-  feed.unshift(newPost);
-  writeFeed(id, feed);
-  res.status(200).json(newPost);
-});
+      const userId = req.user._id.toString();
+      const likedIndex = post.likedBy.indexOf(userId);
 
-// POST /api/boards/:id/feed/:postId/like
-router.post("/:id/feed/:postId/like", requireJwt, (req, res) => {
-  const { id, postId } = req.params;
-  const feed = readFeed(id);
-  const post = feed.find((p) => String(p.id) === String(postId));
+      let liked;
 
-  if (!post) {
-    return res.status(404).json({ error: "Post not found" });
+      if (likedIndex === -1) {
+        // User hasn't liked yet, add like
+        post.likes += 1;
+        post.likedBy.push(userId);
+        liked = true;
+      } else {
+        // User already liked, remove like
+        post.likes = Math.max(0, post.likes - 1);
+        post.likedBy.splice(likedIndex, 1);
+        liked = false;
+      }
+
+      await post.save();
+
+      res.json({
+        postId: post._id,
+        likes: post.likes,
+        liked,
+      });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update like." });
+    }
   }
+);
 
-  post.likes += 1;
-  writeFeed(id, feed);
-  res.json(post); // 200
-});
 
-// DELETE /api/boards/:id/feed/:postId
-router.delete("/:id/feed/:postId", requireJwt, (req, res) => {
-  const { id, postId } = req.params;
-  const feed = readFeed(id);
-  const newFeed = feed.filter((p) => String(p.id) !== String(postId));
+// DELETE POST
+router.delete(
+  "/:id/feed/:postId",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const deleted = await BoardFeed.findByIdAndDelete(req.params.postId);
 
-  if (feed.length === newFeed.length) {
-    return res.status(404).json({ error: "Post not found" });
+      if (!deleted) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete post." });
+    }
   }
-
-  writeFeed(id, newFeed);
-  res.json({ success: true }); // 200
-});
+);
 
 module.exports = router;
