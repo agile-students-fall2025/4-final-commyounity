@@ -13,7 +13,11 @@ let token;
 let ownerId;
 
 beforeEach(async () => {
-  await User.deleteMany({});
+  // DELETE ONLY TEST USERS
+  await User.deleteMany({
+    username: /^fr_test_/i
+  });
+
   await FriendRequest.deleteMany({});
   await Friend.deleteMany({});
 
@@ -23,6 +27,7 @@ beforeEach(async () => {
     password: 'password123',
     name: 'FR Tester',
   }).save();
+
   token = user.generateJWT();
   ownerId = user._id;
 
@@ -55,12 +60,8 @@ it('GET /api/friend-requests returns cached requests', done => {
       expect(err).to.be.null;
       expect(res.status).to.equal(200);
 
-      expect(res.body)
-        .to.have.property('data')
-        .that.is.an('array');
-      expect(res.body)
-        .to.have.property('meta')
-        .that.is.an('object');
+      expect(res.body).to.have.property('data').that.is.an('array');
+      expect(res.body).to.have.property('meta').that.is.an('object');
 
       if (Array.isArray(res.body.data)) {
         expect(res.body.meta)
@@ -80,16 +81,11 @@ it('POST /api/friend-requests/:id/accept removes the request and returns friend 
     .end((err, res) => {
       expect(err).to.be.null;
       expect(res.status).to.equal(200);
-      expect(res.body)
-        .to.have.property('data')
-        .that.is.an('array');
+      expect(res.body).to.have.property('data').that.is.an('array');
 
       const target = res.body.data[0];
 
-      // If there are no requests, nothing to test → consider it vacuously OK
-      if (!target) {
-        return done();
-      }
+      if (!target) return done();
 
       request(app)
         .post(`/api/friend-requests/${encodeURIComponent(target.id)}/accept`)
@@ -98,25 +94,15 @@ it('POST /api/friend-requests/:id/accept removes the request and returns friend 
           expect(err2).to.be.null;
           expect(res2.status).to.equal(200);
 
-          expect(res2.body)
-            .to.have.property('status')
-            .that.equals('accepted');
-
-          expect(res2.body)
-            .to.have.property('friend')
-            .that.is.an('object');
-
+          expect(res2.body).to.have.property('status').that.equals('accepted');
+          expect(res2.body).to.have.property('friend').that.is.an('object');
           expect(res2.body.friend).to.include.keys(
             'id',
             'first_name',
             'last_name',
             'username'
           );
-
-          // remainingRequests should be a number
-          expect(res2.body)
-            .to.have.property('remainingRequests')
-            .that.is.a('number');
+          expect(res2.body).to.have.property('remainingRequests').that.is.a('number');
 
           done();
         });
@@ -131,15 +117,10 @@ it('POST /api/friend-requests/:id/decline removes the request and echoes decline
     .end((err, res) => {
       expect(err).to.be.null;
       expect(res.status).to.equal(200);
-      expect(res.body)
-        .to.have.property('data')
-        .that.is.an('array');
+      expect(res.body).to.have.property('data').that.is.an('array');
 
       const target = res.body.data[0];
-
-      if (!target) {
-        return done();
-      }
+      if (!target) return done();
 
       request(app)
         .post(`/api/friend-requests/${encodeURIComponent(target.id)}/decline`)
@@ -148,21 +129,30 @@ it('POST /api/friend-requests/:id/decline removes the request and echoes decline
           expect(err2).to.be.null;
           expect(res2.status).to.equal(200);
 
-          expect(res2.body)
-            .to.have.property('status')
-            .that.equals('declined');
-
-          expect(res2.body)
-            .to.have.property('declinedRequest')
-            .that.is.an('object');
-
+          expect(res2.body).to.have.property('status').that.equals('declined');
+          expect(res2.body).to.have.property('declinedRequest').that.is.an('object');
           expect(res2.body.declinedRequest).to.include.keys('id', 'username');
-
-          expect(res2.body)
-            .to.have.property('remainingRequests')
-            .that.is.a('number');
+          expect(res2.body).to.have.property('remainingRequests').that.is.a('number');
 
           done();
         });
     });
+});
+
+// ✅ AFTER HOOK → delete all test-generated data
+after(async () => {
+  if (mongoose.connection.readyState !== 1) return;
+
+  await User.deleteMany({
+    email: /fr_test_.*@example\.com$/i,
+  });
+
+  await FriendRequest.deleteMany({
+    username: { $in: ['wil.hoff', 'kara.codes'] },
+  });
+
+  await Friend.deleteMany({
+    // all Friend docs created during these tests are tied to test users
+    // so removing test users already disconnects these—but safe to clean anyway
+  });
 });

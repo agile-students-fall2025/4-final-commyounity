@@ -3,6 +3,7 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const mongoose = require("mongoose");
 const app = require("../app");
+const User = require("../models/User");
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -84,4 +85,19 @@ it("POST /auth/signup returns 409 for duplicate username", async function () {
   expect(res2).to.be.json;
   expect(res2.body).to.have.property("success", false);
   expect(res2.body).to.have.property("message").that.includes("Username already taken");
+});
+
+// 💥 CLEANUP: remove test users created by this suite
+after(async () => {
+  if (mongoose.connection.readyState !== 1) return;
+
+  // Slight delay if needed to ensure user creation was committed
+  await new Promise((r) => setTimeout(r, 150));
+
+  await User.deleteMany({
+    username: /^signupuser_\d+$/i
+  });
+  await User.deleteMany({
+    username: /^dupuser_\d+$/i
+  });
 });

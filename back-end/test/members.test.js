@@ -4,6 +4,7 @@ const chaiHttp = require("chai-http");
 const mongoose = require("mongoose");
 const app = require("../app");
 const Board = require("../models/Board");
+const User = require("../models/User");
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -11,27 +12,40 @@ chai.use(chaiHttp);
 let ownerToken;
 let ownerId;
 
-before(async function () {
-  this.timeout(15000);
-  const ts = Date.now();
-  const payload = {
-    username: `mb_${ts}`,
-    email: `mb_${ts}@example.com`,
-    password: "Password123!",
-    confirmPassword: "Password123!",
-  };
-  const res = await chai.request(app).post("/auth/signup").send(payload);
-  expect(res).to.have.status(200);
-  ownerToken = res.body.token;
+describe("Members API", () => {
 
-  const me = await chai
-    .request(app)
-    .get("/api/profile")
-    .set("Authorization", `JWT ${ownerToken}`);
-  ownerId = String(me.body.id);
-});
+  before(async function () {
+    this.timeout(15000);
 
-describe("members", () => {
+    // Remove leftover test users for safety
+    await User.deleteMany({
+      $or: [
+        { username: /^mb_/i },
+        { username: /^member_/i },
+        { email: /^mb_.*@example\.com$/i },
+        { email: /^member_.*@example\.com$/i },
+      ],
+    });
+
+    const ts = Date.now();
+    const payload = {
+      username: `mb_${ts}`,
+      email: `mb_${ts}@example.com`,
+      password: "Password123!",
+      confirmPassword: "Password123!",
+    };
+    const res = await chai.request(app).post("/auth/signup").send(payload);
+    expect(res).to.have.status(200);
+    ownerToken = res.body.token;
+
+    const me = await chai
+      .request(app)
+      .get("/api/profile")
+      .set("Authorization", `JWT ${ownerToken}`);
+
+    ownerId = String(me.body.id);
+  });
+
   it("GET /api/members/:boardId -> 200 and returns members with owner", async function () {
     this.timeout(15000);
 
@@ -69,11 +83,9 @@ describe("members", () => {
       .set("Authorization", `JWT ${ownerToken}`);
 
     expect(res).to.have.status(200);
-    expect(res.body).to.have.property("status", "success");
-    expect(res.body).to.have.property("data").that.is.an("array");
-    const list = res.body.data;
-    // expect at least owner present; member may be filtered if creation fails
-    expect(list.length).to.be.greaterThanOrEqual(1);
+    expect(res.body.status).to.equal("success");
+    expect(res.body.data).to.be.an("array");
+    expect(res.body.data.length).to.be.greaterThanOrEqual(1);
   });
 
   it("GET /api/members/:boardId -> 404 for non-existent board", async function () {
@@ -94,4 +106,32 @@ describe("members", () => {
 
     expect([400, 404, 500]).to.include(res.status);
   });
+
+  // ----------------------------
+  // CLEANUP
+  // ----------------------------
+  after(async () => {
+    if (mongoose.connection.readyState !== 1) return;
+
+    // give Atlas time to finish writes
+    await new Promise((r) => setTimeout(r, 150));
+
+    // Cleanup test users
+    const deletedUsers = await User.deleteMany({
+      $or: [
+        { username: /^mb_/i },
+        { username: /^member_/i },
+        { email: /^mb_.*@example\.com$/i },
+        { email: /^member_.*@example\.com$/i },
+      ],
+    });
+    console.log(`[MEMBERS CLEANUP] removed ${deletedUsers.deletedCount} test users`);
+
+    // Cleanup test boards
+    const deletedBoards = await Board.deleteMany({
+      title: /Members Board/i,
+    });
+    console.log(`[MEMBERS CLEANUP] removed ${deletedBoards.deletedCount} boards`);
+  });
+
 });

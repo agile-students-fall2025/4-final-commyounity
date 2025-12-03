@@ -1,120 +1,103 @@
-// test/browseboard.test.js (CommonJS)
+// test/browseboard.test.js
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const sinon = require("sinon");
 const mongoose = require("mongoose");
+const sinon = require("sinon");
 const app = require("../app");
 const Board = require("../models/Board");
+const User = require("../models/User");
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
-let userToken;
-let userId;
-
-afterEach(() => {
-  sinon.restore();
-});
-
-before(async function () {
+describe("Browse Boards API", function() {
   this.timeout(20000);
 
-  const ts = Date.now();
+  let userToken;
+  let userId;
+  const createdBoardIds = [];
 
-  // Create user
-  const signup = await chai
-    .request(app)
-    .post("/auth/signup")
-    .send({
+  before(async function() {
+    const ts = Date.now();
+    const signup = await chai.request(app).post("/auth/signup").send({
       username: `br_${ts}`,
       email: `browse_${ts}@example.com`,
       password: "Password123!",
-      confirmPassword: "Password123!",
+      confirmPassword: "Password123!"
     });
+    expect(signup).to.have.status(200);
+    userToken = signup.body.token;
 
-  expect(signup).to.have.status(200);
-  userToken = signup.body.token;
+    const me = await chai
+      .request(app)
+      .get("/api/profile")
+      .set("Authorization", `JWT ${userToken}`);
+    userId = String(me.body.id);
+  });
 
-  // Fetch user profile to get ID
-  const me = await chai
-    .request(app)
-    .get("/api/profile")
-    .set("Authorization", `JWT ${userToken}`);
+  after(async function() {
+    // cleanup test boards
+    if (createdBoardIds.length > 0) {
+      await Board.deleteMany({ _id: { $in: createdBoardIds } });
+    }
+    // cleanup test user
+    await User.deleteMany({ _id: userId });
+  });
 
-  userId = String(me.body.id);
-});
+  afterEach(() => {
+    sinon.restore();
+  });
 
-describe("Browse Boards API", () => {
-  it("GET /api/browse/boards returns list of boards excluding user's", async function () {
-    this.timeout(15000);
-
+  it("GET /api/browse/boards returns list of boards", async function() {
     const res = await chai
       .request(app)
       .get("/api/browse/boards")
       .set("Authorization", `JWT ${userToken}`);
-
     expect(res).to.have.status(200);
     expect(res.body).to.have.property("data").that.is.an("array");
   });
 
-  it("GET /api/browse/boards does not return boards owned by user", async function () {
-    this.timeout(15000);
-
-    // Create board owned by user
-    const createdBoard = await Board.create({
+  it("does not return boards owned by user", async function() {
+    const board = await Board.create({
       title: "UserOwnedBoard",
       owner: new mongoose.Types.ObjectId(userId),
-      members: [new mongoose.Types.ObjectId(userId)],
+      members: [new mongoose.Types.ObjectId(userId)]
     });
+    createdBoardIds.push(board._id);
 
     const res = await chai
       .request(app)
       .get("/api/browse/boards")
       .set("Authorization", `JWT ${userToken}`);
-
     expect(res).to.have.status(200);
-
-    // Ensure board does NOT appear in suggestions
-    const titles = res.body.data.map(b => b.title);
+    const titles = res.body.data.map((b) => b.title);
     expect(titles.includes("UserOwnedBoard")).to.be.false;
   });
 
-  it("GET /api/browse/boards does not return boards where user is a member", async function () {
-    this.timeout(15000);
-
-    // Create board where user is member but not owner
-    const createdBoard = await Board.create({
+  it("does not return boards where user is a member", async function() {
+    const board = await Board.create({
       title: "UserMemberBoard",
-      owner: new mongoose.Types.ObjectId(),
-      members: [new mongoose.Types.ObjectId(userId)],
+      owner: new mongoose.Types.ObjectId(), // some other owner
+      members: [new mongoose.Types.ObjectId(userId)]
     });
+    createdBoardIds.push(board._id);
 
     const res = await chai
       .request(app)
       .get("/api/browse/boards")
       .set("Authorization", `JWT ${userToken}`);
-
     expect(res).to.have.status(200);
-
-    // Ensure board does NOT appear
-    const titles = res.body.data.map(b => b.title);
+    const titles = res.body.data.map((b) => b.title);
     expect(titles.includes("UserMemberBoard")).to.be.false;
   });
-});
 
-// Clean up the test boards
-after(async () => {
-  if (mongoose.connection.readyState === 1) {
-    await Board.deleteMany({
-      title: { $in: ["UserOwnedBoard", "UserMemberBoard"] }
-    });
-  }
-});
-
-it("returns error JSON when Board.find throws (covers lines 43-49)", async function () {
+  // -------- ERROR CASE: FORCED FAIL --------
+it("returns error JSON when Board.find throws (covers lines 43–49)", async function () {
   this.timeout(10000);
 
-  // Force throw to enter the catch block
+  // 👇 prevent the noisy [BROWSE BOARDS ERROR] log
+  const consoleStub = sinon.stub(console, "error");
+
   const findStub = sinon.stub(Board, "find").throws(new Error("FORCED_FAIL"));
 
   const res = await chai
@@ -127,5 +110,6 @@ it("returns error JSON when Board.find throws (covers lines 43-49)", async funct
   expect(res.body).to.have.property("message", "Failed to load suggested boards");
   expect(res.body).to.have.property("error").that.includes("FORCED_FAIL");
 
-  findStub.restore();
+  // no need to manually restore, afterEach() already calls sinon.restore()
+});
 });
