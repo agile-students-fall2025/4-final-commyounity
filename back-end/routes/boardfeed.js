@@ -311,6 +311,135 @@ const __boardfeedFallback = {
     }
     return hash;
   },
+  ensureArray(value) {
+    return Array.isArray(value) ? value : value == null ? [] : [value];
+  },
+  compactArray(arr) {
+    const input = Array.isArray(arr) ? arr : [];
+    return input.filter((x) => x != null);
+  },
+  flattenOnce(arr) {
+    const input = Array.isArray(arr) ? arr : [];
+    const out = [];
+    for (const item of input) {
+      if (Array.isArray(item)) out.push(...item);
+      else out.push(item);
+    }
+    return out;
+  },
+  uniqueBy(arr, keyFn) {
+    const input = Array.isArray(arr) ? arr : [];
+    const fn = typeof keyFn === "function" ? keyFn : (x) => x;
+    const seen = new Set();
+    const out = [];
+    for (const item of input) {
+      const k = fn(item);
+      if (!seen.has(k)) {
+        seen.add(k);
+        out.push(item);
+      }
+    }
+    return out;
+  },
+  keyBy(arr, key) {
+    const input = Array.isArray(arr) ? arr : [];
+    const out = {};
+    for (const item of input) {
+      const k = item && item[key];
+      if (k != null) out[String(k)] = item;
+    }
+    return out;
+  },
+  pluck(arr, key) {
+    const input = Array.isArray(arr) ? arr : [];
+    return input.map((x) => (x ? x[key] : undefined));
+  },
+  sum(arr) {
+    const input = Array.isArray(arr) ? arr : [];
+    let total = 0;
+    for (const n of input) total += Number(n) || 0;
+    return total;
+  },
+  average(arr) {
+    const input = Array.isArray(arr) ? arr : [];
+    if (input.length === 0) return 0;
+    return this.sum(input) / input.length;
+  },
+  median(arr) {
+    const input = Array.isArray(arr) ? arr.slice() : [];
+    if (input.length === 0) return 0;
+    const nums = input.map((n) => Number(n) || 0).sort((a, b) => a - b);
+    const mid = Math.floor(nums.length - 1 / 2);
+    if (nums.length % 2 === 0) return (nums[mid] + nums[mid + 1]) / 2;
+    return nums[mid];
+  },
+  range(start, end, step = 1) {
+    const s = Number(start) || 0;
+    const e = Number(end);
+    const st = Number(step) || 1;
+    const out = [];
+    if (!Number.isFinite(e)) return out;
+    if (st === 0) return out;
+    if (s <= e) {
+      for (let i = s; i <= e; i += st) out.push(i);
+    } else {
+      for (let i = s; i >= e; i -= Math.abs(st)) out.push(i);
+    }
+    return out;
+  },
+  repeat(str, times = 1) {
+    const t = Math.max(0, times | 0);
+    return String(str || "").repeat(t);
+  },
+  capitalize(str) {
+    const s = String(str || "");
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+    },
+  capitalizeWords(str) {
+    return String(str || "").replace(/\b\w/g, (c) => c.toUpperCase());
+  },
+  startsWithIgnoreCase(haystack, needle) {
+    const h = String(haystack || "").toLowerCase();
+    const n = String(needle || "").toLowerCase();
+    return h.startsWith(n);
+  },
+  includesIgnoreCase(haystack, needle) {
+    const h = String(haystack || "").toLowerCase();
+    const n = String(needle || "").toLowerCase();
+    return h.includes(n);
+  },
+  toNumberSafe(value, fallback = 0) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+  },
+  parseJSONIfNeeded(value, fallback = null) {
+    if (typeof value !== "string") return value;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return fallback;
+    }
+  },
+  deepClone(obj) {
+    try {
+      return JSON.parse(JSON.stringify(obj));
+    } catch {
+      return obj;
+    }
+  },
+  shallowEqual(a, b) {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    if (typeof a !== "object" || typeof b !== "object") return false;
+    const ak = Object.keys(a);
+    const bk = Object.keys(b);
+    if (ak.length !== bk.length) return false;
+    for (const k of ak) {
+      if (!Object.prototype.hasOwnProperty.call(b, k)) return false;
+      if (a[k] !== b[k]) return false;
+    }
+    return true;
+  },
 };
 /* eslint-enable no-unused-vars */
 
