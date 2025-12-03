@@ -105,11 +105,14 @@ describe("Profile routes", () => {
       expect(res.body.profilePhoto).to.match(/^http:\/\/.+\/uploads\//);
     });
 
-    it("returns 404 when user does not exist", async () => {
+    it("returns 401 when user does not exist", async () => {
       await User.deleteMany({});
       const res = await authGet("/api/profile");
-      expect(res.status).to.equal(404);
-      expect(res.body).to.have.property("error", "User not found");
+      expect(res.status).to.equal(401);
+      expect(res.body).to.have.property(
+        "error",
+        "User no longer exists - Please login again"
+      );
     });
 
     it("returns 401 without JWT token", async () => {
@@ -269,7 +272,7 @@ describe("Profile routes", () => {
       const googleUser = await new User({
         username: `guser_${ts}`,
         email: `google_${ts}@example.com`,
-        password: "",
+        password: "Placeholder123!",
         name: "Google User",
         authProvider: "google",
       }).save();
@@ -597,4 +600,3 @@ describe("Profile routes", () => {
     });
   });
 });
-

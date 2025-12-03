@@ -1,6 +1,7 @@
 // routes/browseBoards.js
 const express = require("express");
 const passport = require("passport");
+const mongoose = require("mongoose");
 const Board = require("../models/Board");
 
 const router = express.Router();
@@ -14,14 +15,14 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     try {
-      const userId = req.user._id;
+      const userId = new mongoose.Types.ObjectId(req.user._id);
 
       // Find boards where:
       //  - owner is NOT the current user
       //  - members array does NOT contain the current user
       const boards = await Board.find({
         owner: { $ne: userId },
-        members: { $ne: userId },
+        members: { $nin: [userId] },
       })
         .sort({ createdAt: -1 })
         .limit(20)
