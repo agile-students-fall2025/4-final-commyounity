@@ -4,8 +4,11 @@ const app = require("../app");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const { expect } = chai;
+const mongoose = require("mongoose");
+const Board = require("../models/Board");
+const BoardFeed = require("../models/BoardFeed");
 
+const { expect } = chai;
 chai.use(chaiHttp);
 
 describe("BoardFeed API", () => {
@@ -52,14 +55,12 @@ describe("BoardFeed API", () => {
           .end((err2, res2) => {
             if (err2) return done(err2);
             expect(res2).to.have.status(201);
-            testBoardId =
-              res2.body?.data?._id ||
-              res2.body?.data?.id ||
-              res2.body?.data?._id?.toString();
+            testBoardId = res2.body?.data?._id || res2.body?.data?.id;
             done();
           });
       });
   });
+
 
   it("GET /api/boards/:id/feed returns posts", (done) => {
     chai
@@ -175,13 +176,29 @@ describe("BoardFeed API", () => {
       });
   });
 
-  after(() => {
+
+  after(async () => {
+
     tempFiles.forEach((file) => {
       try {
         fs.unlinkSync(file);
-      } catch (e) {
-        /* ignore */
-      }
+      } catch (_) {}
     });
+
+    if (mongoose.connection.readyState === 1) {
+
+      if (testBoardId) {
+        try {
+          await BoardFeed.deleteMany({ boardId: testBoardId });
+        } catch (_) {}
+      }
+
+
+      if (testBoardId) {
+        try {
+          await Board.findByIdAndDelete(testBoardId);
+        } catch (_) {}
+      }
+    }
   });
 });

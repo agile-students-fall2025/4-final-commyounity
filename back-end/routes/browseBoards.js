@@ -17,12 +17,12 @@ router.get(
     try {
       const userId = new mongoose.Types.ObjectId(req.user._id);
 
-      // Find boards where:
-      //  - owner is NOT the current user
-      //  - members array does NOT contain the current user
+      // stricter filter:
+      //  - owner is not current user
+      //  - members array does not contain current user (if members exist)
       const boards = await Board.find({
         owner: { $ne: userId },
-        members: { $nin: [userId] },
+        members: { $exists: true, $nin: [userId] },
       })
         .sort({ createdAt: -1 })
         .limit(20)

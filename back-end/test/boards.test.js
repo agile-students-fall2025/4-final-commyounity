@@ -2,15 +2,13 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const app = require("../app");
+const User = require("../models/User");   
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
 let authToken;
 
-// ----------------------------
-// BEFORE: create test user (DB connection handled by global setup)
-// ----------------------------
 before(function (done) {
   this.timeout(20000);
 
@@ -34,9 +32,20 @@ before(function (done) {
     });
 });
 
-// ----------------------------
-// TESTS
-// ----------------------------
+after(async () => {
+  try {
+    await User.deleteMany({
+      $or: [
+        { email: /@example\.com$/i },
+        { username: /^testuser_/i },
+      ],
+    });
+  } catch (err) {
+    
+    console.warn("[BOARDS TEST CLEANUP] Failed to delete test users:", err.message);
+  }
+});
+
 describe("Boards API", () => {
   it("GET /api/boards returns a list of boards", (done) => {
     chai
@@ -62,7 +71,7 @@ describe("Boards API", () => {
 
         const boards = res.body.data;
         if (!boards || boards.length === 0) {
-          return done(); // no boards to test
+          return done();
         }
 
         const boardId = boards[0]._id || boards[0].id;

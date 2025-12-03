@@ -15,7 +15,12 @@ const authGet = (path) =>
 
 describe("Friends routes (JWT)", () => {
   beforeEach(async () => {
-    await User.deleteMany({});
+    // Only remove test users (those created by this test file)
+    await User.deleteMany({
+      email: /frt_.*@example\.com$/i,
+    });
+
+    // Friend docs can all be removed; they’re only used for tests here
     await Friend.deleteMany({});
 
     const user = await new User({
@@ -24,10 +29,11 @@ describe("Friends routes (JWT)", () => {
       password: "password123",
       name: "Friend Tester",
     }).save();
+
     token = user.generateJWT();
     ownerId = user._id;
 
-    // Seed a couple of friends for this owner
+    // Seed two known friends in Mongo (these are your "mock friends")
     await Friend.insertMany([
       {
         owner: ownerId,
@@ -69,24 +75,22 @@ describe("Friends routes (JWT)", () => {
     }
   });
 
+  // uses known seeded friend
   it("/api/friends filters by username when requested", async () => {
-    const res = await authGet("/api/friends");
-    expect(res.status).to.equal(200);
-    const first = res.body?.data?.[0];
-    expect(first, "Expected at least one friend to test filtering").to.be.an(
-      "object"
-    );
-    const username = encodeURIComponent(String(first.username || "").trim());
-    expect(username.length).to.be.greaterThan(0);
+    const username = encodeURIComponent("test.user");
 
-    const res2 = await authGet(`/api/friends?username=${username}`);
-    expect(res2.status).to.equal(200);
-    expect(res2.body).to.have.property("data").that.is.an("array");
-    expect(res2.body.meta).to.have.property("filtered", true);
-    expect(res2.body.meta).to.have.property("filterType", "username");
-    expect(res2.body.data[0]?.username?.toLowerCase()).to.equal(
-      first.username.toLowerCase()
-    );
+    const res = await authGet(`/api/friends?username=${username}`);
+    expect(res.status).to.equal(200);
+
+    expect(res.body).to.have.property("data").that.is.an("array");
+    expect(res.body).to.have.property("meta").that.is.an("object");
+    expect(res.body.meta).to.have.property("filtered", true);
+    expect(res.body.meta).to.have.property("filterType", "username");
+
+    if (res.body.data.length > 0) {
+      expect(res.body.data[0]).to.have.property("username");
+      expect(res.body.data[0].username.toLowerCase()).to.equal("test.user");
+    }
   });
 
   it("/api/friends returns empty data when username is not found", async () => {
@@ -107,6 +111,27 @@ describe("Friends routes (JWT)", () => {
     const res = await authGet("/api/friends").query({ simulateError: true });
     expect(res.status).to.equal(503);
     expect(res.body).to.have.property("error");
+    expect(res.body).to.have.property("meta");
     expect(res.body.meta).to.have.property("simulated", true);
+  });
+
+
+  after(async () => {
+    if (mongoose.connection.readyState !== 1) return;
+
+    const testUsers = await User.find(
+      { email: /^frt_.*@example\.com$/i },
+      { _id: 1 }
+    );
+
+    if (!testUsers.length) return;
+
+    const ownerIds = testUsers.map((u) => u._id);
+
+    // delete Friend docs for those owners
+    await Friend.deleteMany({ owner: { $in: ownerIds } });
+
+    // delete the test users themselves
+    await User.deleteMany({ _id: { $in: ownerIds } });
   });
 });

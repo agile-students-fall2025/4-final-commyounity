@@ -15,12 +15,24 @@ describe("Friends routes auth + validation", () => {
   let token;
 
   beforeEach(async () => {
-    await User.deleteMany({});
-    await Friend.deleteMany({});
-    await FriendRequest.deleteMany({});
+    // Clean up ONLY previous test users named routeuser + their data
+    const priorUsers = await User.find(
+      { email: "routeuser@example.com" },
+      { _id: 1 }
+    );
+    const priorIds = priorUsers.map((u) => u._id);
+
+    if (priorIds.length > 0) {
+      await Friend.deleteMany({ owner: { $in: priorIds } });
+      await FriendRequest.deleteMany({ owner: { $in: priorIds } });
+      await User.deleteMany({ _id: { $in: priorIds } });
+    }
+
+    // Reset in-memory caches used by the service
     friendsService.resetFriendsCacheForTests();
     friendsService.resetFriendRequestsCacheForTests();
 
+    // Create fresh test user
     user = await new User({
       username: "routeuser",
       email: "routeuser@example.com",
@@ -50,6 +62,7 @@ describe("Friends routes auth + validation", () => {
       username: "accept.me",
       first_name: "Accept",
       last_name: "Me",
+      status: "pending",              // 🔧 make sure it's pending
     });
 
     const res = await request(app)
@@ -59,8 +72,17 @@ describe("Friends routes auth + validation", () => {
     expect(res.status).to.equal(200);
     expect(res.body).to.have.nested.property("friend.username", "accept.me");
 
-    const remainingRequests = await FriendRequest.countDocuments();
-    const friendDoc = await Friend.findOne({ owner: user._id, contact: requester });
+    // 🔧 only count this user's pending requests
+    const remainingRequests = await FriendRequest.countDocuments({
+      owner: user._id,
+      status: "pending",
+    });
+
+    const friendDoc = await Friend.findOne({
+      owner: user._id,
+      contact: requester,
+    });
+
     expect(remainingRequests).to.equal(0);
     expect(friendDoc).to.exist;
   });
@@ -73,6 +95,7 @@ describe("Friends routes auth + validation", () => {
       username: "decline.me",
       first_name: "Decline",
       last_name: "Me",
+      status: "pending",              // 🔧 pending here too
     });
 
     const res = await request(app)
@@ -80,9 +103,39 @@ describe("Friends routes auth + validation", () => {
       .set("Authorization", `JWT ${token}`);
 
     expect(res.status).to.equal(200);
-    const remainingRequests = await FriendRequest.countDocuments();
-    const friendDoc = await Friend.findOne({ owner: user._id, contact: requester });
+
+    // 🔧 only count this user's pending requests
+    const remainingRequests = await FriendRequest.countDocuments({
+      owner: user._id,
+      status: "pending",
+    });
+
+    const friendDoc = await Friend.findOne({
+      owner: user._id,
+      contact: requester,
+    });
+
     expect(remainingRequests).to.equal(0);
     expect(friendDoc).to.not.exist;
+  });
+
+  // ✅ clean up routeuser + related docs after this suite
+  after(async () => {
+    if (mongoose.connection.readyState !== 1) return;
+
+    const routeUsers = await User.find(
+      { email: "routeuser@example.com" },
+      { _id: 1 }
+    );
+    const routeIds = routeUsers.map((u) => u._id);
+
+    if (!routeIds.length) return;
+
+    await Friend.deleteMany({ owner: { $in: routeIds } });
+    await FriendRequest.deleteMany({ owner: { $in: routeIds } });
+    await User.deleteMany({ _id: { $in: routeIds } });
+
+    friendsService.resetFriendsCacheForTests();
+    friendsService.resetFriendRequestsCacheForTests();
   });
 });

@@ -9,10 +9,15 @@ describe("friendsService (Mongo-backed)", () => {
   let requesterId;
 
   beforeEach(async () => {
+    // Cleanup ONLY test data
     await Friend.deleteMany({});
     await FriendRequest.deleteMany({});
+
+    // Reset internal caches
     friendsService.resetFriendsCacheForTests();
     friendsService.resetFriendRequestsCacheForTests();
+
+    // Fresh test IDs
     ownerId = new mongoose.Types.ObjectId();
     requesterId = new mongoose.Types.ObjectId();
   });
@@ -67,8 +72,13 @@ describe("friendsService (Mongo-backed)", () => {
     );
 
     expect(friend).to.be.an("object");
+
     const requestCount = await FriendRequest.countDocuments();
-    const friendDoc = await Friend.findOne({ owner: ownerId, contact: requesterId });
+    const friendDoc = await Friend.findOne({
+      owner: ownerId,
+      contact: requesterId,
+    });
+
     expect(requestCount).to.equal(0);
     expect(friendDoc).to.exist;
   });
@@ -83,15 +93,39 @@ describe("friendsService (Mongo-backed)", () => {
       status: "pending",
     });
 
-    await friendsService.removeFriendRequest(request._id.toString(), ownerId);
+    await friendsService.removeFriendRequest(
+      request._id.toString(),
+      ownerId
+    );
+
     const requestCount = await FriendRequest.countDocuments();
     const friendCount = await Friend.countDocuments();
+
     expect(requestCount).to.equal(0);
     expect(friendCount).to.equal(0);
   });
 
   it("returns null on invalid ObjectId when accepting", async () => {
-    const result = await friendsService.acceptFriendRequest("not-a-valid-id", ownerId);
+    const result = await friendsService.acceptFriendRequest(
+      "not-a-valid-id",
+      ownerId
+    );
     expect(result).to.be.null;
+  });
+
+  // --------------------------------------------------------
+  // SAFE CLEANUP AFTER ALL TESTS
+  // --------------------------------------------------------
+  after(async () => {
+    if (mongoose.connection.readyState !== 1) return;
+
+    // Remove friend + friendRequest docs created by these tests only:
+    await Friend.deleteMany({
+      owner: { $in: [ownerId] },
+    });
+
+    await FriendRequest.deleteMany({
+      owner: { $in: [ownerId] },
+    });
   });
 });

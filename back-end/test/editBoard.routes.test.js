@@ -4,6 +4,7 @@ const chaiHttp = require("chai-http");
 const app = require("../app");
 const mongoose = require("mongoose");
 const Board = require("../models/Board");
+const fs = require("fs");
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -27,7 +28,7 @@ before(async function () {
   jwtToken = res.body.token;
   userId = res.body.id || res.body._id;
 
-  // fetch profile to ensure we have id
+  // Fetch profile to ensure we have id
   const me = await chai
     .request(app)
     .get("/api/profile")
@@ -48,17 +49,18 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  if (boardId) {
+  // Remove board created during test
+  if (mongoose.connection.readyState === 1 && boardId) {
     await Board.deleteOne({ _id: boardId });
     boardId = null;
   }
-  tempFiles.forEach((file) => {
+
+  // Remove temp files if any
+  for (const file of tempFiles) {
     try {
       fs.unlinkSync(file);
-    } catch (e) {
-      /* ignore */
-    }
-  });
+    } catch (_) {}
+  }
   tempFiles = [];
 });
 
@@ -94,12 +96,15 @@ it("POST /api/boards/:id/edit updates title without file and returns 200", async
   expect(res.body.data).to.have.property("title", "Edited Title");
 });
 
-after(() => {
-  tempFiles.forEach((file) => {
+// Extra final cleanup just in case
+after(async () => {
+  if (mongoose.connection.readyState === 1) {
+    await Board.deleteMany({ title: { $in: ["Original Title", "Edited Title"] } });
+  }
+
+  for (const file of tempFiles) {
     try {
       fs.unlinkSync(file);
-    } catch (e) {
-      /* ignore */
-    }
-  });
+    } catch (_) {}
+  }
 });
