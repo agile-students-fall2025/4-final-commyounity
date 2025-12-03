@@ -17,30 +17,37 @@ const BoardFeed = ({ boardId, isOwner }) => {
     } catch {
       console.warn("Local feed cache corrupted, ignoring.");
     }
+    const fetchFeed = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed`, {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setPosts(
+          Array.isArray(data)
+            ? data.map(p => ({ ...p, id: p._id }))
+            : []
+        );
+      } catch (err) {
+        console.error("Error loading board feed:", err);
+        setError("Failed to load board feed.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
     fetchFeed(); // Then fetch fresh feed
-  }, [boardId]);
+  }, [boardId, storageKey]);
 
   // Persist feed to localStorage on update
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(posts));
   }, [storageKey, posts]);
 
-  const fetchFeed = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed`, {
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setPosts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error loading board feed:", err);
-      setError("Failed to load board feed.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
