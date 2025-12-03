@@ -65,17 +65,17 @@ const normalizeFriend = (friend, index) => {
 };
 
 const FindFriendsPage = () => {
+  const [searchInput, setSearchInput] = useState("");   // what user types
+  const [submittedTerm, setSubmittedTerm] = useState(""); // what we actually search for
   const [matchingFriend, setMatchingFriend] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const trimmedTerm = searchTerm.trim().toLowerCase();
-
+  // Trigger search ONLY when submittedTerm changes
   useEffect(() => {
     let isMounted = true;
 
-    if (!trimmedTerm) {
+    if (!submittedTerm) {
       setMatchingFriend(null);
       setError(null);
       setLoading(false);
@@ -90,7 +90,7 @@ const FindFriendsPage = () => {
       setLoading(true);
       try {
         const url = new URL(FRIENDS_ENDPOINT);
-        url.searchParams.set("username", trimmedTerm);
+        url.searchParams.set("username", submittedTerm);
         url.searchParams.set("limit", "1");
         const token = getStoredToken();
         if (!token) {
@@ -136,12 +136,14 @@ const FindFriendsPage = () => {
         }
 
         console.warn("Unable to search friends via API.", fetchError);
+
+        // fallback logic (optional)
         const fallback = FALLBACK_FRIENDS.find(
           (friend) =>
-            friend.username.toLowerCase() === trimmedTerm ||
+            friend.username.toLowerCase() === submittedTerm ||
             `${friend.first_name} ${friend.last_name}`
               .toLowerCase()
-              .includes(trimmedTerm)
+              .includes(submittedTerm)
         );
         setMatchingFriend(fallback ?? null);
         setError(
@@ -162,7 +164,18 @@ const FindFriendsPage = () => {
       isMounted = false;
       controller.abort();
     };
-  }, [trimmedTerm]);
+  }, [submittedTerm]);
+
+  const handleSearchClick = () => {
+    const trimmed = searchInput.trim().toLowerCase();
+    if (!trimmed) {
+      setSubmittedTerm("");
+      setMatchingFriend(null);
+      setError(null);
+      return;
+    }
+    setSubmittedTerm(trimmed);
+  };
 
   const messageDetails = useMemo(() => {
     if (loading) {
@@ -172,17 +185,18 @@ const FindFriendsPage = () => {
       };
     }
 
+    if (!submittedTerm) {
+      // user hasn’t actually searched yet
+      return {
+        type: "neutral",
+        text: "Search results will appear here once you enter a username and hit Search.",
+      };
+    }
+
     if (error && !matchingFriend) {
       return {
         type: "error",
         text: error,
-      };
-    }
-
-    if (!trimmedTerm) {
-      return {
-        type: "neutral",
-        text: "Search results will appear here once you enter a username.",
       };
     }
 
@@ -196,15 +210,15 @@ const FindFriendsPage = () => {
 
       return {
         type: "success",
-        text: `We found ${matchingFriend.first_name}! Send them an invite below.`,
+        text: `We found ${matchingFriend.first_name}! You can invite them from here once invites are wired up.`,
       };
     }
 
     return {
       type: "error",
-      text: `No profile found for “${searchTerm}”. Try another username.`,
+      text: `No profile found for “${submittedTerm}”. Try another username.`,
     };
-  }, [loading, error, trimmedTerm, matchingFriend, searchTerm]);
+  }, [loading, error, submittedTerm, matchingFriend]);
 
   return (
     <>
@@ -219,22 +233,39 @@ const FindFriendsPage = () => {
           </i>
         </p>
 
-      <div className="findfriends-search">
-        <input
-          type="search"
-          placeholder="Search by username"
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-          disabled={loading}
-        />
-        <button type="button" disabled={loading || !matchingFriend}>
-          {loading
-            ? "Searching…"
-            : matchingFriend
-            ? "Invite via back end"
-            : "Search"}
-        </button>
-      </div>
+        <div className="findfriends-search">
+          <input
+            type="search"
+            placeholder="Search by username"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            disabled={loading}
+          />
+          <button
+            type="button"
+            disabled={loading || !searchInput.trim()}
+            onClick={handleSearchClick}
+          >
+            {loading ? "Searching…" : "Search"}
+          </button>
+        </div>
+
+        {matchingFriend && (
+          <div className="findfriends-result-card">
+            <img
+              src={matchingFriend.avatar}
+              alt={`${matchingFriend.first_name} ${matchingFriend.last_name}`}
+              className="findfriends-avatar"
+            />
+            <div>
+              <h2>
+                {matchingFriend.first_name} {matchingFriend.last_name}
+              </h2>
+              <p>@{matchingFriend.username}</p>
+              {/* invite button can be wired to a POST endpoint later */}
+            </div>
+          </div>
+        )}
 
         <section
           className={`findfriends-demo-card ${messageDetails.type}`}
