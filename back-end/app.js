@@ -21,6 +21,8 @@ const findMembersRouter = require("./routes/searchMembers");
 const browseBoardsRouter = require("./routes/browseBoards");
 const joinBoardRouter = require("./routes/joinBoard");
 const User = require("./models/User");
+const Friend = require("./models/Friend");
+const FriendRequest = require("./models/FriendRequest");
 
 
 const {
@@ -34,7 +36,7 @@ const {
   removeFriendRequest,
   addFriendFromRequest,
 } = require("./services/friendsService");
-const { param, validationResult } = require("express-validator");
+const { param, validationResult, body } = require("express-validator");
 const app = express() // instantiate an Express object
 
 app.use(cors({
@@ -93,13 +95,9 @@ const requireJwt = passport.authenticate("jwt", { session: false });
     }
   
     try {
-      // 🌟 NEW: if a username was provided, treat this as
-      // "search the user database by username", not just existing friends.
       if (hasExactUsername && !hasSearch) {
         const userDoc = await User.findOne({ username: rawUsername }).lean();
-  
         if (!userDoc) {
-          // No such user -> empty result, but NOT an error
           return res.json({
             data: [],
             meta: {
@@ -114,7 +112,6 @@ const requireJwt = passport.authenticate("jwt", { session: false });
           });
         }
   
-        // Shape the user like a "friend" so your frontend's normalizeFriend works
         const normalized = {
           id: userDoc._id.toString(),
           first_name:
@@ -143,8 +140,6 @@ const requireJwt = passport.authenticate("jwt", { session: false });
         });
       }
   
-      // 🔁 Existing behavior for "search" or no query:
-      // works off the friends service / cache.
       let friends;
       let filtered = false;
       let filterType = null;
@@ -177,7 +172,7 @@ const requireJwt = passport.authenticate("jwt", { session: false });
       res.status(500).json({ error: "Unable to load friends list." });
     }
   });
-  
+
   app.get("/api/friend-requests", requireJwt, async (req, res) => {
     try {
       const ownerId = req.user?._id;
@@ -265,9 +260,126 @@ const requireJwt = passport.authenticate("jwt", { session: false });
       }
     }
   );
+//invite route for friends
+// SEND A FRIEND REQUEST (invite)
+app.post(
+  "/api/friend-requests",
+  requireJwt,
+  [
+    body("username")
+      .isString()
+      .trim()
+      .isLength({ min: 3, max: 24 })
+      .matches(/^[A-Za-z0-9._-]+$/)
+      .withMessage(
+        "A valid username is required (letters, digits, dots, underscores, hyphens)."
+      ),
+    body("message")
+      .optional()
+      .isString()
+      .isLength({ max: 300 })
+      .withMessage("Message must be at most 300 characters."),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(400)
+        .json({ error: errors.array()[0].msg, errors: errors.array() });
+    }
 
+    try {
+      const requesterId = req.user._id; // current logged-in user
+      const requesterUsername = (req.user.username || "").toLowerCase();
+      const { username, message = "" } = req.body;
+      const targetUsername = String(username).toLowerCase().trim();
 
-// POST 
+      // can't invite yourself :)
+      if (targetUsername === requesterUsername) {
+        return res
+          .status(400)
+          .json({ error: "You cannot send a friend request to yourself." });
+      }
+
+      // find the target user by username
+      const targetUser = await User.findOne({ username: targetUsername }).lean();
+      if (!targetUser) {
+        return res
+          .status(404)
+          .json({ error: "User not found with that username." });
+      }
+
+      const ownerId = targetUser._id; // recipient
+      const requesterObjectId = requesterId; // sender
+
+      // already friends?
+      const existingFriend = await Friend.findOne({
+        owner: ownerId,
+        contact: requesterObjectId,
+      }).lean();
+
+      if (existingFriend) {
+        return res.status(200).json({
+          status: "already_friends",
+          message: "You are already friends with this user.",
+        });
+      }
+
+      // do we already have a pending request from this requester → this owner?
+      const existingRequest = await FriendRequest.findOne({
+        owner: ownerId,
+        requester: requesterObjectId,
+        status: "pending",
+      }).lean();
+
+      if (existingRequest) {
+        return res.status(200).json({
+          status: "already_pending",
+          message: "A friend request is already pending for this user.",
+        });
+      }
+
+      // build some nice name fields for the request
+      const fullName = req.user.name || requesterUsername;
+      const [first_name, ...rest] = fullName.split(" ");
+      const last_name = rest.join(" ");
+
+      const avatar = req.user.avatar || "";
+
+      const invite = await FriendRequest.create({
+        owner: ownerId,
+        requester: requesterObjectId,
+        username: requesterUsername,
+        first_name: first_name || requesterUsername,
+        last_name: last_name || "",
+        avatar,
+        message,
+        mutualFriends: 0, // you can compute later if you want
+        status: "pending",
+      });
+
+      return res.status(201).json({
+        status: "pending",
+        data: {
+          id: invite._id.toString(),
+          to: {
+            id: ownerId.toString(),
+            username: targetUser.username,
+          },
+          from: {
+            id: requesterObjectId.toString(),
+            username: requesterUsername,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Unable to send friend request.", error);
+      return res
+        .status(500)
+        .json({ error: "Unable to send friend request right now." });
+    }
+  }
+);
 
 
 //boardfeed routes
