@@ -17,6 +17,19 @@ const SignUpPage = () => {
     e.preventDefault();
     setError('');
   
+    // Enforce same rules as Change Password screen
+    const s = String(password || '');
+    const meetsRules =
+      s.length >= 6 &&
+      /[A-Z]/.test(s) &&
+      /[a-z]/.test(s) &&
+      /[0-9]/.test(s) &&
+      /[!@#$%^&*]/.test(s);
+    if (!meetsRules) {
+      setError('Password must have ≥6 chars, 1 uppercase, 1 lowercase, 1 number, and 1 special (!@#$%^&*).');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords don't match!");
       return;
@@ -125,6 +138,18 @@ const SignUpPage = () => {
             placeholder="Create a password"
             required
           />
+        </div>
+
+        {/* Password rules helper (same look as Change Password) */}
+        <div className="password-rules" aria-live="polite">
+          <div className="password-rules-title">1. Password Requirements</div>
+          <ul className="password-rules-list">
+            <li className="password-rule">At least 6 characters</li>
+            <li className="password-rule">One uppercase letter</li>
+            <li className="password-rule">One lowercase letter</li>
+            <li className="password-rule">One number</li>
+            <li className="password-rule">One special character (!@#$%^&*)</li>
+          </ul>
         </div>
 
         <div className="form-group">

@@ -206,3 +206,27 @@
   .signup-form { padding: 22px 18px; }
   .signup-button { font-size: 14px; height: 46px; }
 }
+
+/* ===== Password Rules (title + list) ===== */
+.password-rules {
+  margin-top: 6px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+}
+.password-rules-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 6px;
+}
+.password-rules-list {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+  color: #6b7280;
+}
+.password-rule {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
