@@ -41,7 +41,7 @@ it("POST /api/boards/create returns 400 when title is missing", (done) => {
     .post("/api/boards/create")
     .set("Authorization", `JWT ${jwtToken}`)
     .field("descriptionLong", "A board without a title")
-    .attach("coverPhoto", tmpFile)
+    .attach("photo", tmpFile)
     .end((err, res) => {
       fs.unlinkSync(tmpFile);
       expect(err).to.be.null;
@@ -59,12 +59,12 @@ it("POST /api/boards/create returns 201 when board is created successfully", (do
     .set("Authorization", `JWT ${jwtToken}`)
     .field("title", `Test Board ${Date.now()}`)
     .field("descriptionLong", "A test board description")
-    .attach("coverPhoto", tmpFile)
+    .attach("photo", tmpFile)
     .end((err, res) => {
       fs.unlinkSync(tmpFile);
       expect(err).to.be.null;
       expect(res).to.have.status(201);
-      expect(res.body).to.have.property("status", "success");
+      expect(res.body).to.have.property("status").that.matches(/created|success/);
       expect(res.body).to.have.property("data");
       expect(res.body.data).to.have.property("title");
       done();

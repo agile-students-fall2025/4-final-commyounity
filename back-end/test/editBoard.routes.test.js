@@ -9,6 +9,7 @@ const { expect } = chai;
 chai.use(chaiHttp);
 
 let jwtToken;
+let userId;
 
 before(async function () {
   this.timeout(15000);
@@ -22,6 +23,7 @@ before(async function () {
   const res = await chai.request(app).post("/auth/signup").send(payload);
   expect(res).to.have.status(200);
   jwtToken = res.body.token;
+  userId = res.body.id || res.body._id;
 });
 
 it("POST /api/boards/:id/edit returns 404 for non-existent board", (done) => {
@@ -48,7 +50,7 @@ it("POST /api/boards/:id/edit updates title without file and returns 200", async
     .get("/api/profile")
     .set("Authorization", `JWT ${jwtToken}`);
   expect(me).to.have.status(200);
-  const ownerId = String(me.body.id);
+  const ownerId = String(userId || me.body.id);
 
   const board = await Board.create({
     title: "Original Title",
