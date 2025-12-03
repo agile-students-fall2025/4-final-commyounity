@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./BoardFeed.css";
 
+// Backend base URL (env first, fallback to localhost:4000)
+const BACKEND_BASE =
+  (process.env.REACT_APP_BACKEND_URL &&
+    process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
+  "http://localhost:4000";
+
 function getAuthHeader() {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `JWT ${token}` } : {};
@@ -11,6 +17,7 @@ const BoardFeed = ({ boardId, isOwner }) => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [myAvatar, setMyAvatar] = useState("");
 
   const storageKey = `board:${boardId}:feed`;
 
@@ -25,6 +32,22 @@ const BoardFeed = ({ boardId, isOwner }) => {
     fetchFeed(); // Then fetch fresh feed
   }, [boardId]);
 
+  // Load current user's avatar for composer from profile API
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${BACKEND_BASE}/api/profile`, {
+          headers: { ...getAuthHeader() },
+          credentials: "include",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const url = data?.profilePhoto || data?.avatar || "";
+        if (typeof url === "string") setMyAvatar(url);
+      } catch {}
+    })();
+  }, []);
+
   // Persist feed to localStorage on update
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(posts));
@@ -33,14 +56,18 @@ const BoardFeed = ({ boardId, isOwner }) => {
   const fetchFeed = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed`, {
+      const res = await fetch(`${BACKEND_BASE}/api/boards/${boardId}/feed`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setPosts(
         Array.isArray(data)
-          ? data.map(p => ({ ...p, id: p._id }))
+          ? data.map((p) => ({
+              ...p,
+              id: p.id || p._id,
+              ts: p.ts || p.createdAt || p.updatedAt,
+            }))
           : []
       );
     } catch (err) {
@@ -57,7 +84,7 @@ const BoardFeed = ({ boardId, isOwner }) => {
     if (!trimmed) return;
 
     try {
-      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed`, {
+      const res = await fetch(`${BACKEND_BASE}/api/boards/${boardId}/feed`, {
         method: "POST",
         headers: { "Content-Type": "application/json",
         ...getAuthHeader(),
@@ -68,7 +95,8 @@ const BoardFeed = ({ boardId, isOwner }) => {
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const newPost = await res.json();
-      newPost.id = newPost._id;
+      newPost.id = newPost.id || newPost._id;
+      newPost.ts = newPost.ts || newPost.createdAt || newPost.updatedAt || Date.now();
 
       // Optimistic update
       setPosts((prev) => [newPost, ...prev]);
@@ -81,7 +109,7 @@ const BoardFeed = ({ boardId, isOwner }) => {
 
   const like = async (id) => {
     try {
-      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed/${id}/like`, {
+      const res = await fetch(`${BACKEND_BASE}/api/boards/${boardId}/feed/${id}/like`, {
         method: "POST",
         headers: { ...getAuthHeader() },
         credentials: "include",
@@ -105,7 +133,7 @@ const BoardFeed = ({ boardId, isOwner }) => {
   const remove = async (id) => {
     if (!window.confirm("Delete this post?")) return;
     try {
-      const res = await fetch(`http://localhost:4000/api/boards/${boardId}/feed/${id}`, {
+      const res = await fetch(`${BACKEND_BASE}/api/boards/${boardId}/feed/${id}`, {
         method: "DELETE",
         headers: {...getAuthHeader()},
         credentials: "include",
@@ -136,7 +164,7 @@ const BoardFeed = ({ boardId, isOwner }) => {
       <form className="composer" onSubmit={handleSubmit}>
         <img
           className="avatar"
-          src="https://i.pravatar.cc/64?u=current"
+          src={myAvatar || "https://i.pravatar.cc/64?u=current"}
           alt="you"
         />
         <textarea

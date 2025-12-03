@@ -1,5 +1,10 @@
 # CommYOUnity
 
+> For DB integration demo:
+- Login with username: `carinutzza`
+- Password: `123456`
+- To test the "Find Members" feature in Edit Board, search for username: `foo`
+
 ## Product Vision Statement
 
 CommYOUnity is a social app designed to connect internstional students and people seeking cultural connections in the NYC area. CommYOUnity helps them find and join commYOUnity boards centered on shared heritage and interests. 
