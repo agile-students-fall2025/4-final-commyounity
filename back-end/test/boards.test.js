@@ -1,7 +1,6 @@
 // test/boards.test.js (CommonJS version)
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const mongoose = require("mongoose");
 const app = require("../app");
 
 const { expect } = chai;
@@ -10,39 +9,29 @@ chai.use(chaiHttp);
 let authToken;
 
 // ----------------------------
-// BEFORE: connect to Mongo + create test user
+// BEFORE: create test user (DB connection handled by global setup)
 // ----------------------------
 before(function (done) {
   this.timeout(20000);
 
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    return done(new Error("MONGODB_URI missing"));
-  }
+  const ts = Date.now();
+  const userData = {
+    username: `testuser_${ts}`,
+    email: `test_${ts}@example.com`,
+    password: "Password123!",
+    confirmPassword: "Password123!",
+  };
 
-  mongoose
-    .connect(mongoUri)
-    .then(() => {
-      const ts = Date.now();
-      const userData = {
-        username: `testuser_${ts}`,
-        email: `test_${ts}@example.com`,
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      };
-
-      chai
-        .request(app)
-        .post("/auth/signup")
-        .send(userData)
-        .end((err, res) => {
-          if (err) return done(err);
-          expect(res.body).to.have.property("token");
-          authToken = res.body.token;
-          done();
-        });
-    })
-    .catch(done);
+  chai
+    .request(app)
+    .post("/auth/signup")
+    .send(userData)
+    .end((err, res) => {
+      if (err) return done(err);
+      expect(res.body).to.have.property("token");
+      authToken = res.body.token;
+      done();
+    });
 });
 
 // ----------------------------
