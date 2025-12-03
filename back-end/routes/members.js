@@ -31,18 +31,18 @@ router.get(
 
       const currentUserId = req.user._id.toString();
 
-      // --- Build participants: OWNER + ALL MEMBERS (no duplicates) ---
+     
       const participants = [];
       const seen = new Set();
 
-      // owner (always include)
+   
       if (board.owner) {
         const ownerId = board.owner.toString();
         participants.push({ userId: ownerId, isOwner: true });
         seen.add(ownerId);
       }
 
-      // members (always include)
+
       (board.members || []).forEach((m) => {
         const id = (m._id || m).toString();
         if (seen.has(id)) return;
@@ -52,7 +52,7 @@ router.get(
 
       console.log("[MEMBERS DEBUG] boardId=", boardId, {
         owner: board.owner?.toString(),
-        members: (board.members || []).map(m => (m._id || m).toString()),
+        members: (board.members || []).map((m) => (m._id || m).toString()),
         participants,
       });
 
@@ -64,10 +64,11 @@ router.get(
         });
       }
 
-      // Fetch user docs for all participants
+
       const userIds = participants.map((p) => p.userId);
       const users = await User.find({ _id: { $in: userIds } })
-        .select("username name email avatar")
+       
+        .select("username name email avatar background interests")
         .lean();
 
       const userById = new Map(users.map((u) => [u._id.toString(), u]));
@@ -83,7 +84,9 @@ router.get(
             email: u.email,
             avatar: u.avatar || `https://i.pravatar.cc/100?u=${p.userId}`,
             isOwner: p.isOwner,
-            isSelf: p.userId === currentUserId, // optional for UI badges
+            isSelf: p.userId === currentUserId,
+            background: u.background || "",
+            interests: u.interests || "",
           };
         })
         .filter(Boolean);

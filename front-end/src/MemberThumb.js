@@ -19,6 +19,17 @@ const MemberThumb = (props) => {
   const avatarSrc =
     details.avatar || `https://i.pravatar.cc/100?u=${details.id}`;
 
+  // New fields from User schema
+  const backgroundText =
+    details.background && details.background.trim().length > 0
+      ? details.background
+      : "No background info yet.";
+
+  const interestsText =
+    details.interests && details.interests.trim().length > 0
+      ? details.interests
+      : "No interests added yet.";
+
   const handleKick = async () => {
     setKickMsg("");
     setKickErr("");
@@ -80,15 +91,20 @@ const MemberThumb = (props) => {
 
       <h2>{displayName}</h2>
 
-      {/* 🔥 ROLE LABEL (Owner / Member) */}
+      {/* Role label */}
       <div className="role-label">{roleLabel}</div>
 
-      {/* Username stays below */}
       {details.username && (
         <div className="username">@{details.username}</div>
       )}
-      <div className="country">From: {details.country}</div>
-      <p className="description">Interests: {details.description}</p>
+
+      {/* New profile fields */}
+      <p className="background">
+        <strong>Background:</strong> {backgroundText}
+      </p>
+      <p className="interests">
+        <strong>Interests:</strong> {interestsText}
+      </p>
 
       {canKick && !details.isOwner && (
         <button
