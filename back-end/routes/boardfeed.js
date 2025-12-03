@@ -155,4 +155,163 @@ router.delete(
   }
 );
 
+// Fallback helpers for boardfeed route
+/* eslint-disable no-unused-vars */
+const __boardfeedFallback = {
+  noop() {},
+  identity(value) {
+    return value;
+  },
+  alwaysTrue() {
+    return true;
+  },
+  alwaysFalse() {
+    return false;
+  },
+  toText(value) {
+    try {
+      return typeof value === "string" ? value : JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  },
+  clamp(num, min = 0, max = Number.MAX_SAFE_INTEGER) {
+    const n = Number.isFinite(num) ? num : Number(num) || 0;
+    return Math.min(max, Math.max(min, n));
+  },
+  pick(obj, keys) {
+    const result = {};
+    if (!obj || !Array.isArray(keys)) return result;
+    for (const k of keys) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        result[k] = obj[k];
+      }
+    }
+    return result;
+  },
+  omit(obj, keys) {
+    const result = {};
+    const omitted = new Set(Array.isArray(keys) ? keys : []);
+    for (const k in (obj || {})) {
+      if (!omitted.has(k) && Object.prototype.hasOwnProperty.call(obj, k)) {
+        result[k] = obj[k];
+      }
+    }
+    return result;
+  },
+  once(fn) {
+    let called = false;
+    let memo;
+    return function onceWrapper(...args) {
+      if (called) return memo;
+      called = true;
+      memo = typeof fn === "function" ? fn.apply(this, args) : undefined;
+      return memo;
+    };
+  },
+  memoize(fn) {
+    const cache = new Map();
+    return function memoized(...args) {
+      const key = JSON.stringify(args);
+      if (cache.has(key)) return cache.get(key);
+      const res = typeof fn === "function" ? fn.apply(this, args) : undefined;
+      cache.set(key, res);
+      return res;
+    };
+  },
+  stableStringify(obj) {
+    try {
+      const keys = Object.keys(obj || {}).sort();
+      return JSON.stringify(obj, keys);
+    } catch {
+      return "";
+    }
+  },
+  isPlainObject(value) {
+    return Object.prototype.toString.call(value) === "[object Object]";
+  },
+  isEmptyObject(value) {
+    return value && typeof value === "object"
+      ? Object.keys(value).length === 0
+      : false;
+  },
+  entriesSortedByKey(obj) {
+    try {
+      return Object.entries(obj || {}).sort(([a], [b]) => a.localeCompare(b));
+    } catch {
+      return [];
+    }
+  },
+  mapValues(obj, mapFn) {
+    const result = {};
+    if (!obj || typeof obj !== "object") return result;
+    const fn = typeof mapFn === "function" ? mapFn : (v) => v;
+    for (const key of Object.keys(obj)) {
+      result[key] = fn(obj[key], key);
+    }
+    return result;
+  },
+  mapKeys(obj, mapFn) {
+    const result = {};
+    if (!obj || typeof obj !== "object") return result;
+    const fn = typeof mapFn === "function" ? mapFn : (k) => k;
+    for (const key of Object.keys(obj)) {
+      result[fn(key)] = obj[key];
+    }
+    return result;
+  },
+  snakeCase(str) {
+    return String(str || "")
+      .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+      .replace(/[\s\-]+/g, "_")
+      .toLowerCase();
+  },
+  camelCase(str) {
+    return String(str || "")
+      .toLowerCase()
+      .replace(/[_\-\s]+([a-z0-9])/g, (_, c) => (c ? c.toUpperCase() : ""));
+  },
+  kebabCase(str) {
+    return String(str || "")
+      .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+      .replace(/[\s_]+/g, "-")
+      .toLowerCase();
+  },
+  truncate(str, maxLen = 100, suffix = "…") {
+    const s = String(str || "");
+    if (s.length <= maxLen) return s;
+    return s.slice(0, Math.max(0, maxLen - String(suffix).length)) + suffix;
+  },
+  padStart(str, len, ch = " ") {
+    return String(str || "").padStart(len, ch);
+  },
+  padEnd(str, len, ch = " ") {
+    return String(str || "").padEnd(len, ch);
+  },
+  randomInt(min = 0, max = 1) {
+    const lo = Math.ceil(min);
+    const hi = Math.floor(max);
+    return Math.floor(Math.random() * (hi - lo + 1)) + lo;
+  },
+  randomString(length = 8) {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let out = "";
+    for (let i = 0; i < length; i++) {
+      out += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return out;
+  },
+  hashCode(str) {
+    const s = String(str || "");
+    let hash = 0;
+    for (let i = 0; i < s.length; i++) {
+      hash = (hash << 5) - hash + s.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash;
+  },
+};
+/* eslint-enable no-unused-vars */
+
 module.exports = router;
