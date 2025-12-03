@@ -20,7 +20,7 @@ const kickMemberRouter = require("./routes/kickMember");
 const findMembersRouter = require("./routes/searchMembers");
 const browseBoardsRouter = require("./routes/browseBoards");
 const joinBoardRouter = require("./routes/joinBoard");
-
+const User = require("./models/User");
 
 
 const {
@@ -49,33 +49,6 @@ const requireJwt = passport.authenticate("jwt", { session: false });
 
 // we will put some server logic here later...
 
-//fall-back data
-  const fallbackMembers = [
-    {
-      id: 1,
-      first_name: "Sherwin",
-      last_name: "Peverell",
-      username: "speverell0",
-      country: "Indonesia",
-      description: "non velit nec nisi vulputate",
-      avatar: "https://i.pravatar.cc/100?img=1",
-    },
-    {
-      id: 2,
-      first_name: "Anna",
-      last_name: "Petrova",
-      username: "apetrova",
-      country: "Russia",
-      description: "non velit nec nisi vulputate",
-      avatar: "https://i.pravatar.cc/100?img=2",
-    },
-  ];
-
-  //mockaroo api - for now no env
-  const MOCKAROO_API_KEY = process.env.MOCKAROO_API_KEY;
-  const MOCKAROO_URL = `https://my.api.mockaroo.com/mock_boards_data.json?key=${MOCKAROO_API_KEY}`;
-  const MOCKAROO_URL_MEMBERS = `https://my.api.mockaroo.com/members.json?key=${MOCKAROO_API_KEY}`;
-
 
  //ROUTES
 
@@ -100,14 +73,15 @@ const requireJwt = passport.authenticate("jwt", { session: false });
     const hasExactUsername = rawUsername.length > 0;
     const hasSearch = !hasExactUsername && rawSearch.length > 0;
     const ownerId = req.user?._id;
-
+  
     if (simulateError) {
       return res.status(503).json({
         error: "Simulated friends service failure.",
         meta: { simulated: true },
       });
     }
-
+  
+    // same validation as before
     if (
       hasExactUsername &&
       !/^[A-Za-z0-9._-]+$/.test(rawUsername)
@@ -117,29 +91,75 @@ const requireJwt = passport.authenticate("jwt", { session: false });
           "Username may only include letters, digits, dots (.), underscores (_), or hyphens (-).",
       });
     }
-
+  
     try {
+      // 🌟 NEW: if a username was provided, treat this as
+      // "search the user database by username", not just existing friends.
+      if (hasExactUsername && !hasSearch) {
+        const userDoc = await User.findOne({ username: rawUsername }).lean();
+  
+        if (!userDoc) {
+          // No such user -> empty result, but NOT an error
+          return res.json({
+            data: [],
+            meta: {
+              total: 0,
+              count: 0,
+              filtered: true,
+              filterType: "username",
+              cacheSource: "users-collection",
+              cachedAt: new Date().toISOString(),
+              ttlMs: 0,
+            },
+          });
+        }
+  
+        // Shape the user like a "friend" so your frontend's normalizeFriend works
+        const normalized = {
+          id: userDoc._id.toString(),
+          first_name:
+            userDoc.first_name ||
+            userDoc.name ||
+            userDoc.username,
+          last_name: userDoc.last_name || "",
+          username: userDoc.username,
+          avatar:
+            userDoc.avatar ||
+            `https://picsum.photos/seed/${userDoc.username}/200/200`,
+          online: !!userDoc.online,
+        };
+  
+        return res.json({
+          data: [normalized],
+          meta: {
+            total: 1,
+            count: 1,
+            filtered: true,
+            filterType: "username",
+            cacheSource: "users-collection",
+            cachedAt: new Date().toISOString(),
+            ttlMs: 0,
+          },
+        });
+      }
+  
+      // 🔁 Existing behavior for "search" or no query:
+      // works off the friends service / cache.
       let friends;
       let filtered = false;
       let filterType = null;
-
-      if (hasExactUsername) {
-        filtered = true;
-        filterType = "username";
-        friends = await ensureFriendsCache({
-          ownerId,
-          username: rawUsername,
-        });
-      } else if (hasSearch) {
+  
+      if (hasSearch) {
         filtered = true;
         filterType = "search";
         friends = await filterFriendsByQuery(rawSearch, { ownerId });
       } else {
         friends = await ensureFriendsCache({ ownerId });
       }
-
+  
       const data = limit ? friends.slice(0, limit) : friends;
       const cacheMeta = getFriendsCacheMeta();
+  
       res.json({
         data,
         meta: {
@@ -157,7 +177,7 @@ const requireJwt = passport.authenticate("jwt", { session: false });
       res.status(500).json({ error: "Unable to load friends list." });
     }
   });
-
+  
   app.get("/api/friend-requests", requireJwt, async (req, res) => {
     try {
       const ownerId = req.user?._id;
@@ -267,8 +287,6 @@ app.use("/api/boards", viewBoardsRouter);
 
 //invites
 app.use("/api/boardinvites", boardInvitesRouter);
-
-
 
 //createBoard router
 app.use("/api/boards/create", createBoardRouter);
