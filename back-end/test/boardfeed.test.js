@@ -1,6 +1,9 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const app = require("../app");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 const { expect } = chai;
 
 chai.use(chaiHttp);
@@ -9,6 +12,17 @@ describe("BoardFeed API", () => {
   let authToken;
   let testBoardId;
   let testPostId;
+  let tempFiles = [];
+
+  const createTempPng = () => {
+    const base64Png =
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP4BwQACfsD/Qqk4mQAAAAASUVORK5CYII=";
+    const buf = Buffer.from(base64Png, "base64");
+    const tmpFile = path.join(os.tmpdir(), `feed-${Date.now()}.png`);
+    fs.writeFileSync(tmpFile, buf);
+    tempFiles.push(tmpFile);
+    return tmpFile;
+  };
 
   before((done) => {
     const ts = Date.now();
@@ -27,14 +41,21 @@ describe("BoardFeed API", () => {
         if (err) return done(err);
         authToken = res.body.token;
 
+        const tmpFile = createTempPng();
         chai
           .request(app)
-          .get("/api/boards")
+          .post("/api/boards/create")
           .set("Authorization", `JWT ${authToken}`)
+          .attach("photo", tmpFile)
+          .field("title", `Feed Board ${ts}`)
+          .field("descriptionLong", "Feed board for tests")
           .end((err2, res2) => {
             if (err2) return done(err2);
-
-            testBoardId = res2.body.data[0]._id;
+            expect(res2).to.have.status(201);
+            testBoardId =
+              res2.body?.data?._id ||
+              res2.body?.data?.id ||
+              res2.body?.data?._id?.toString();
             done();
           });
       });
@@ -152,5 +173,15 @@ describe("BoardFeed API", () => {
         expect(res).to.have.status(500);
         done();
       });
+  });
+
+  after(() => {
+    tempFiles.forEach((file) => {
+      try {
+        fs.unlinkSync(file);
+      } catch (e) {
+        /* ignore */
+      }
+    });
   });
 });

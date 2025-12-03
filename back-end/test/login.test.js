@@ -9,10 +9,10 @@ chai.use(chaiHttp);
 let loginUsername;
 const loginPassword = "Password123!";
 
-before(async function () {
+beforeEach(async function () {
   this.timeout(10000);
   const ts = Date.now();
-  loginUsername = `loginuser_${ts}`;
+  loginUsername = `loginuser_${ts}`.toLowerCase();
 
   const payload = {
     username: loginUsername,
@@ -22,7 +22,6 @@ before(async function () {
   };
 
   const res = await chai.request(app).post("/auth/signup").send(payload);
-
   expect(res).to.have.status(200);
   expect(res.body).to.have.property("success", true);
 });
