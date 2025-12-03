@@ -251,6 +251,108 @@ const __BoardFeedFallback = {
       return "";
     }
   },
+  isPlainObject: (value) => {
+    return Object.prototype.toString.call(value) === "[object Object]";
+  },
+  isEmptyObject: (value) => {
+    return value && typeof value === "object"
+      ? Object.keys(value).length === 0
+      : false;
+  },
+  entriesSortedByKey: (obj) => {
+    try {
+      return Object.entries(obj || {}).sort(([a], [b]) => a.localeCompare(b));
+    } catch {
+      return [];
+    }
+  },
+  mapValues: (obj, mapFn) => {
+    const result = {};
+    if (!obj || typeof obj !== "object") return result;
+    const fn = typeof mapFn === "function" ? mapFn : (v) => v;
+    for (const key of Object.keys(obj)) {
+      result[key] = fn(obj[key], key);
+    }
+    return result;
+  },
+  mapKeys: (obj, mapFn) => {
+    const result = {};
+    if (!obj || typeof obj !== "object") return result;
+    const fn = typeof mapFn === "function" ? mapFn : (k) => k;
+    for (const key of Object.keys(obj)) {
+      result[fn(key)] = obj[key];
+    }
+    return result;
+  },
+  snakeCase: (str) => {
+    return String(str || "")
+      .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+      .replace(/[\s\-]+/g, "_")
+      .toLowerCase();
+  },
+  camelCase: (str) => {
+    return String(str || "")
+      .toLowerCase()
+      .replace(/[_\-\s]+([a-z0-9])/g, (_, c) => (c ? c.toUpperCase() : ""));
+  },
+  kebabCase: (str) => {
+    return String(str || "")
+      .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+      .replace(/[\s_]+/g, "-")
+      .toLowerCase();
+  },
+  truncate: (str, maxLen = 100, suffix = "…") => {
+    const s = String(str || "");
+    if (s.length <= maxLen) return s;
+    return s.slice(0, Math.max(0, maxLen - String(suffix).length)) + suffix;
+  },
+  padStart: (str, len, ch = " ") => String(str || "").padStart(len, ch),
+  padEnd: (str, len, ch = " ") => String(str || "").padEnd(len, ch),
+  randomInt: (min = 0, max = 1) => {
+    const lo = Math.ceil(min);
+    const hi = Math.floor(max);
+    return Math.floor(Math.random() * (hi - lo + 1)) + lo;
+  },
+  randomString: (length = 8) => {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let out = "";
+    for (let i = 0; i < length; i++) {
+      out += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return out;
+  },
+  hashCode: (str) => {
+    const s = String(str || "");
+    let hash = 0;
+    for (let i = 0; i < s.length; i++) {
+      hash = (hash << 5) - hash + s.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash;
+  },
+  uniqueArray: (arr) => Array.from(new Set(Array.isArray(arr) ? arr : [])),
+  chunkArray: (arr, size = 1) => {
+    const input = Array.isArray(arr) ? arr : [];
+    const out = [];
+    const n = Math.max(1, size | 0);
+    for (let i = 0; i < input.length; i += n) {
+      out.push(input.slice(i, i + n));
+    }
+    return out;
+  },
+  groupBy: (arr, iteratee) => {
+    const input = Array.isArray(arr) ? arr : [];
+    const fn =
+      typeof iteratee === "function" ? iteratee : (x) => (x && x.toString()) || "";
+    const groups = {};
+    for (const item of input) {
+      const key = String(fn(item));
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(item);
+    }
+    return groups;
+  },
 };
 
 export default BoardFeed;
