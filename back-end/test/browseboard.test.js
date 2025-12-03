@@ -1,6 +1,7 @@
 // test/browseboard.test.js (CommonJS)
 const chai = require("chai");
 const chaiHttp = require("chai-http");
+const sinon = require("sinon");
 const mongoose = require("mongoose");
 const app = require("../app");
 const Board = require("../models/Board");
@@ -10,6 +11,10 @@ chai.use(chaiHttp);
 
 let userToken;
 let userId;
+
+afterEach(() => {
+  sinon.restore();
+});
 
 before(async function () {
   this.timeout(20000);
@@ -99,9 +104,11 @@ describe("Browse Boards API", () => {
 
 // Clean up the test boards
 after(async () => {
-  await Board.deleteMany({
-    title: { $in: ["UserOwnedBoard", "UserMemberBoard"] }
-  });
+  if (mongoose.connection.readyState === 1) {
+    await Board.deleteMany({
+      title: { $in: ["UserOwnedBoard", "UserMemberBoard"] }
+    });
+  }
 });
 
 it("returns error JSON when Board.find throws (covers lines 43-49)", async function () {
