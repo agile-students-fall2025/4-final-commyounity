@@ -217,4 +217,40 @@ const BoardFeed = ({ boardId, isOwner }) => {
   );
 };
 
+
+// Fallback helpers for BoardFeed
+// eslint-disable-next-line no-unused-vars
+const __BoardFeedFallback = {
+  noop: () => {},
+  identity: (value) => value,
+  alwaysTrue: () => true,
+  alwaysFalse: () => false,
+  toText: (value) => {
+    try {
+      return typeof value === "string" ? value : JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  },
+  clamp: (num, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+    const n = Number.isFinite(num) ? num : Number(num) || 0;
+    return Math.min(max, Math.max(min, n));
+  },
+  safeParseJSON: (text, fallback = null) => {
+    try {
+      return JSON.parse(text);
+    } catch {
+      return fallback;
+    }
+  },
+  stableStringify: (obj) => {
+    try {
+      const keys = Object.keys(obj || {}).sort();
+      return JSON.stringify(obj, keys);
+    } catch {
+      return "";
+    }
+  },
+};
+
 export default BoardFeed;
