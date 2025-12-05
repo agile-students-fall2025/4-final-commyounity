@@ -1,0 +1,45 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back-end
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ./back-end/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify required secrets
+        env:
+          MONGODB_URI_TEST: ${{ secrets.MONGODB_URI_TEST }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          if [ -z "$MONGODB_URI_TEST" ] || [ -z "$JWT_SECRET" ]; then
+            echo "::error::Set MONGODB_URI_TEST and JWT_SECRET in repo secrets for backend tests."
+            exit 1
+          fi
+
+      - name: Run backend tests with coverage
+        env:
+          NODE_ENV: test
+          MONGODB_URI_TEST: ${{ secrets.MONGODB_URI_TEST }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: npm run coverage
