@@ -1,9 +1,10 @@
 # CommYOUnity
 
-> For DB integration demo:
-- Login with username: `carinutzza`
-- Password: `123456`
-- To test the "Find Members" feature in Edit Board, search for username: `foo`
+## Extra-credit
+
+This team has completed extra credit assignment `Continuous Integration` for Sprint 3.
+
+---
 
 ## Product Vision Statement
 

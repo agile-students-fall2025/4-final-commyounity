@@ -1,3 +1,16 @@
+# Database Intregration
+
+> For DB integration demo:
+- Login with username: `carinutzza`
+- Password: `123456`
+- To test the "Find Members" feature in Edit Board, search for username: `foo`
+
+This app uses Atlas and mongodb for database integration.
+
+**Important notes:** some implmentations on the friends pages are not yet fully integrated - they are rendering mock data, which is now served from the data base, rather than from mockaroo. Check back in sprint 4 for further instructions.
+
+If this is the first time you are runing the code after Sprint 3, re-run `npm install`.
+
 # Back-End (Express) Reference
 
 This directory hosts the Express.js server that powers CommYOUnity’s friends and boards features.
