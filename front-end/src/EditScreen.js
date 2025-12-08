@@ -104,9 +104,6 @@ const EditScreen = () => {
   return (
     <>
       <Header title="Edit Board" />
-      <Link to={`/boards/${board.id}`} className="back-btn">
-        ← Back
-      </Link>
       <div className="EditScreen">
         <div className="edit-content">
           <div className="board-photo">

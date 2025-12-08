@@ -293,9 +293,6 @@ const FindFriendsPage = () => {
   return (
     <>
       <Header title="Find Friends" />
-      <Link to="/friends" className="back-btn">
-        ← Back
-      </Link>
       <div className="FindFriendsPage">
         <p>
           <i>

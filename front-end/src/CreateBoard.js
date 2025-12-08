@@ -92,7 +92,7 @@ const CreateBoard = () => {
   return (
     <>
       <Header title="Create a CommYOUnity Board" />
-      <Link to="/home" className="back-btn">← Back</Link>
+
 
       <div className="CreateBoard">
         <div className="upload-section">

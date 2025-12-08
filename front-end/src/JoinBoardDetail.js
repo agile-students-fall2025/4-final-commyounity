@@ -157,9 +157,6 @@ const JoinBoardDetail = () => {
     return (
       <>
         <Header title="Board details" />
-        <Link to="/browseboards" className="back-btn">
-          ← Back
-        </Link>
         <div className="JoinBoardDetail">
           <p className="error">{error || 'Board not found.'}</p>
         </div>

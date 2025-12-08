@@ -209,9 +209,6 @@ const FriendsList = () => {
 
   return (
     <><Header title="View Your Friends" />
-    <Link to="/friends" className="back-btn">
-          ← Back 
-    </Link>
     <div className="FriendsList">
       <p>
         <i>Here are your friends.</i>

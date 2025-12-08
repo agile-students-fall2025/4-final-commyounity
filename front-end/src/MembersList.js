@@ -69,10 +69,6 @@ const MembersList = () => {
   return (
     <>
       <Header title="Members" />
-      <button className="back-btn" onClick={handleBack}>
-        ← Back
-      </button>
-
       <div className="MemberList">
         {error ? (
           <p style={{ padding: "20px", textAlign: "center", color: "#888" }}>

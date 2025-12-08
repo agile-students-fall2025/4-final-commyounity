@@ -129,16 +129,6 @@
       transform: translateY(-2px);
     }
     
-    .JoinBoardDetail .buttons .back-button {
-      background-color: var(--neutral);
-      color: #fff;
-    }
-    
-    .JoinBoardDetail .buttons .back-button:hover {
-      background-color: var(--neutral-dark);
-      transform: translateY(-2px);
-    }
-    
     /* ===== Hover consistency ===== */
     .JoinBoardDetail .buttons button:hover {
       opacity: 0.9;
