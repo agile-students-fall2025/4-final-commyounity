@@ -7,11 +7,20 @@ const passport = require("passport");
 const Board = require("../models/Board");
 
 // ----------------------------
+// Ensure uploads directory exists
+// ----------------------------
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("[UPLOADS DIR] Created uploads directory:", uploadsDir);
+}
+
+// ----------------------------
 // Multer Disk Storage
 // ----------------------------
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(process.cwd(), "uploads"));
+    cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
     const uniqueName = Date.now() + "-" + file.originalname;

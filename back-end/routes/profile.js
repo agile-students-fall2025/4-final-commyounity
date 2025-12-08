@@ -7,6 +7,11 @@ const passport = require('passport');
 
 // Import User model only (Profile fields are now in User schema)
 const User = require('../models/User');
+const Friend = require('../models/Friend');
+const FriendRequest = require('../models/FriendRequest');
+const Board = require('../models/Board');
+const BoardInvite = require('../models/BoardInvite');
+const BoardFeed = require('../models/BoardFeed');
 
 console.log('[PROFILE ROUTES] Module loaded with MongoDB integration');
 
@@ -436,10 +441,57 @@ router.delete('/', requireAuth, async (req, res) => {
   try {
     const userId = getUserId(req);
     
-    console.log('[DELETE PROFILE] Deleting user for userId:', userId);
+    console.log('[DELETE PROFILE] Deleting user and all related data for userId:', userId);
     
-    // Delete user from database (this now includes all profile data)
+    // 1. Remove user from other users' friends arrays
+    const friendsUpdateResult = await User.updateMany(
+      { friends: userId },
+      { $pull: { friends: userId } }
+    );
+    console.log('[DELETE PROFILE] Removed user from', friendsUpdateResult.modifiedCount, 'users\' friends arrays');
+    
+    // 2. Delete all Friend records where user is owner or contact
+    const friendDeleteResult = await Friend.deleteMany(
+      { $or: [{ owner: userId }, { contact: userId }] }
+    );
+    console.log('[DELETE PROFILE] Deleted', friendDeleteResult.deletedCount, 'Friend records');
+    
+    // 3. Delete all FriendRequest records where user is owner or requester
+    const friendRequestDeleteResult = await FriendRequest.deleteMany(
+      { $or: [{ owner: userId }, { requester: userId }] }
+    );
+    console.log('[DELETE PROFILE] Deleted', friendRequestDeleteResult.deletedCount, 'FriendRequest records');
+    
+    // 4. Handle Board records
+    // Remove user from all boards' members arrays
+    const boardMembersUpdateResult = await Board.updateMany(
+      { members: userId },
+      { $pull: { members: userId } }
+    );
+    console.log('[DELETE PROFILE] Removed user from', boardMembersUpdateResult.modifiedCount, 'board members lists');
+    
+    // Delete boards where user is the owner
+    const boardDeleteResult = await Board.deleteMany(
+      { owner: userId }
+    );
+    console.log('[DELETE PROFILE] Deleted', boardDeleteResult.deletedCount, 'Board records (owned by user)');
+    
+    // 5. Delete all BoardInvite records where user is invitedUserId or invitedBy
+    const boardInviteDeleteResult = await BoardInvite.deleteMany(
+      { $or: [{ invitedUserId: userId }, { invitedBy: userId }] }
+    );
+    console.log('[DELETE PROFILE] Deleted', boardInviteDeleteResult.deletedCount, 'BoardInvite records');
+    
+    // 6. Remove user from all BoardFeed likedBy arrays
+    const boardFeedUpdateResult = await BoardFeed.updateMany(
+      { likedBy: userId },
+      { $pull: { likedBy: userId } }
+    );
+    console.log('[DELETE PROFILE] Removed user from', boardFeedUpdateResult.modifiedCount, 'BoardFeed likedBy arrays');
+    
+    // 7. Finally, delete the user itself
     await User.findByIdAndDelete(userId);
+    console.log('[DELETE PROFILE] Deleted user record');
     
     // Clear session
     if (req.session) {
@@ -450,9 +502,10 @@ router.delete('/', requireAuth, async (req, res) => {
       });
     }
     
+    console.log('[DELETE PROFILE] Successfully deleted user and all related data for userId:', userId);
     res.json({
       success: true,
-      message: 'Account deleted'
+      message: 'Account and all related data deleted successfully'
     });
   } catch (error) {
     console.error('[DELETE PROFILE] Error:', error);
