@@ -11,7 +11,7 @@ const BrowseBoard = () => {
     <div className="browse-board-content">
         <BrowseBoardList /> 
     </div>
-    <Footer />
+    <Footer backToHome />
     </>
 }
 
