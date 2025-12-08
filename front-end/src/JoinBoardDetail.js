@@ -170,9 +170,6 @@ const JoinBoardDetail = () => {
   return (
     <>
       <Header title={board.title} />
-      <Link to="/browseboards" className="back-btn">
-        ← Back
-      </Link>
       <div className="JoinBoardDetail">
         <section className="main-content">
           <article className="board" key={board.id || board._id}>

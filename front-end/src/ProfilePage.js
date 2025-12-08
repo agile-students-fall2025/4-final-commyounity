@@ -142,7 +142,7 @@ export default function ProfilePage() {
             </p>
           </div>
         </div>
-        <Footer />
+        <Footer backToHome />
       </>
     );
   }
