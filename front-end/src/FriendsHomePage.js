@@ -143,7 +143,7 @@ const FriendsHomePage = () => {
         <div className="friends-content">{renderContent()}</div>
       </div>
     </div>
-    <Footer/>
+    <Footer backToHome />
     </>
   );
 };

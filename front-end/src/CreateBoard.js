@@ -163,7 +163,7 @@ const CreateBoard = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer backToHome />
     </>
   );
 };
