@@ -134,9 +134,6 @@ export default function PrivacySettingsPage() {
   return (
     <>
       <Header title="Privacy Settings" />
-      <Link to="/settings" className="back-btn">
-        ← Back
-      </Link>
       <div className="PrivacyPage">
         {/* Row: Profile Visibility */}
         <div className="privacy-row">

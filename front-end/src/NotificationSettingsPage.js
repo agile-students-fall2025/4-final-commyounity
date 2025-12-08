@@ -134,9 +134,6 @@ export default function NotificationSettingsPage() {
   return (
     <>
       <Header title="Notifications Settings" />
-      <Link to="/settings" className="back-btn">
-        &larr; Back
-      </Link>
       <div className="NotifPage">
         {/* Row: Board Updates */}
         <div className="notif-row">

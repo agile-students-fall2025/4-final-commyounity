@@ -219,13 +219,6 @@ export default function EditProfilePage() {
   return (
     <>
       <Header title="Edit Profile" />
-      <button
-        className="back-home-btn"
-        onClick={() => navigate("/profilepage")}
-        style={{ marginTop: "20px" }}
-      >
-        ← Back
-      </button>
       <div className="EditProfilePage">
 
         {/* Image Cropper Modal */}

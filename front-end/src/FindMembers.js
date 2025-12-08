@@ -95,9 +95,6 @@ const FindMembers = () => {
   return (
     <>
       <Header title="Find Members" />
-      <button className="back-btn" onClick={handleBack}>
-        ← Back
-      </button>
 
       <div className="FindMembers">
         <form className="search-form" onSubmit={handleSearch}>

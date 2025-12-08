@@ -96,9 +96,6 @@ const BoardDetail = () => {
   return (
     <>
       <Header title={board.title} />
-      <Link to="/viewboards" className="back-btn">
-        ← Back
-      </Link>
       <div className="BoardDetail">
         <section className="main-content">
           <article className="board" key={board.id || board._id}>

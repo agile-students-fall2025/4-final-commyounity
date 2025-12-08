@@ -104,9 +104,6 @@ const FriendsHomePage = () => {
     <>
     <Header title="Friends" />
     <div className="back-btn-row">
-    <button className="back-home-btn" onClick={() => navigate("/home")}>
-      ← Back
-    </button>
     </div>
     <div className="FriendsHomePage">
 

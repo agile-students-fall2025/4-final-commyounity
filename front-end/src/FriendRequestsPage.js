@@ -417,9 +417,6 @@ const FriendRequestsPage = () => {
   return (
     <>
       <Header title="Friend Requests" />
-      <Link to="/friends" className="back-btn">
-        ← Back
-      </Link>
       <div className="FriendRequestsPage">
         <p>
           <i>Review and manage people who want to connect with you.</i>

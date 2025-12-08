@@ -9,9 +9,6 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   return (
     <><Header title="Settings" />
-    <Link to="/profilepage" className="back-btn">
-          ← Back
-    </Link>
     <div className="settings-back-container">
 </div>
     <div className="SettingsPage">
