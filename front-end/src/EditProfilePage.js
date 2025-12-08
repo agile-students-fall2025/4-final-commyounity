@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./EditProfilePage.css";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
@@ -219,13 +219,6 @@ export default function EditProfilePage() {
   return (
     <>
       <Header title="Edit Profile" />
-      <button
-        className="back-home-btn"
-        onClick={() => navigate("/profilepage")}
-        style={{ marginTop: "20px" }}
-      >
-        ← Back
-      </button>
       <div className="EditProfilePage">
 
         {/* Image Cropper Modal */}

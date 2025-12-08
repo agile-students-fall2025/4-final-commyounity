@@ -362,64 +362,70 @@ router.put('/notifications',
 
 // ==================== Change Password ====================
 // PUT /api/profile/password
-router.put('/password',
+router.put(
+  "/password",
   requireAuth,
   [
-    body('currentPassword')
+    body("currentPassword")
       .notEmpty()
-      .withMessage('Current password is required'),
-    body('newPassword')
+      .withMessage("Current password is required"),
+    body("newPassword")
       .isLength({ min: 6 })
-      .withMessage('New password must be at least 6 characters'),
+      .withMessage("New password must be at least 6 characters"),
   ],
   async (req, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: errors.array()[0].msg,
-          errors: errors.array() 
+          errors: errors.array(),
         });
       }
 
       const userId = getUserId(req);
       const { currentPassword, newPassword } = req.body;
-      
-      console.log('[CHANGE PASSWORD] Attempting password change for userId:', userId);
 
-      // Get user with password field
+      console.log(
+        "[CHANGE PASSWORD] Attempting password change for userId:",
+        userId
+      );
+
       const user = await User.findById(userId);
-      
+
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: "User not found" });
       }
 
-      // Check if user is from Google OAuth (no password)
-      if (user.authProvider === 'google' && !user.password) {
-        return res.status(400).json({ 
-          error: 'Cannot change password for Google OAuth accounts' 
+     
+      if (user.authProvider === "google") {
+        return res.status(400).json({
+          error: "Cannot change password for Google OAuth accounts",
         });
       }
 
       // Verify current password
       const isValidPassword = user.validPassword(currentPassword);
       if (!isValidPassword) {
-        return res.status(400).json({ error: 'Current password is incorrect' });
+        return res.status(400).json({ error: "Current password is incorrect" });
       }
 
-      // Update password (the pre-save hook will hash it)
+      // Update password (pre-save hook will hash it)
       user.password = newPassword;
       await user.save();
 
-      console.log('[CHANGE PASSWORD] Password changed successfully for userId:', userId);
-      
+      console.log(
+        "[CHANGE PASSWORD] Password changed successfully for userId:",
+        userId
+      );
+
       res.json({
         success: true,
-        message: 'Password changed successfully'
+        message: "Password changed successfully",
       });
     } catch (error) {
-      console.error('[CHANGE PASSWORD] Error:', error);
-      res.status(500).json({ error: 'Server error' });
+      console.error("[CHANGE PASSWORD] Error:", error);
+      res.status(500).json({ error: "Server error" });
     }
   }
 );

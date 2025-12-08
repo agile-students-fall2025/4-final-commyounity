@@ -8,10 +8,6 @@ const BrowseBoard = () => {
     console.log("**")
     return <>
     <Header title="Browse CommYOUnity Boards" />
-    {/* Back to Home button */}
-    <Link to="/home" className="back-btn">
-          ← Back
-    </Link>
     <div className="browse-board-content">
         <BrowseBoardList /> 
     </div>

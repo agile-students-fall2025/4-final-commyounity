@@ -10,6 +10,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [authError, setAuthError] = useState(false); // New: distinguish auth errors from other errors
 
   // Fetch user profile data when component mounts or when navigating back
   useEffect(() => {
@@ -29,6 +30,15 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
+      
+      // If no token exists, set auth error directly
+      if (!token) {
+        setAuthError(true);
+        setError("You need to log in first to view your profile.");
+        setLoading(false);
+        return;
+      }
+      
       const response = await fetch("http://localhost:4000/api/profile", {
         method: "GET",
         headers: {
@@ -39,6 +49,13 @@ export default function ProfilePage() {
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
+        setAuthError(false);
+      } else if (response.status === 401 || response.status === 403) {
+        // 401 Unauthorized or 403 Forbidden - authentication issue
+        setAuthError(true);
+        setError("You need to log in first to view your profile.");
+        // Optional: clear invalid token
+        localStorage.removeItem('token');
       } else {
         setError("Failed to load profile");
       }
@@ -59,6 +76,7 @@ export default function ProfilePage() {
     } catch (err) {
       console.error("Logout failed:", err);
     } finally {
+      localStorage.removeItem('token');
       navigate("/"); 
     }
   };
@@ -85,6 +103,7 @@ export default function ProfilePage() {
 
       if (response.ok) {
         alert("Profile deleted successfully. You will now be logged out.");
+        localStorage.removeItem('token');
         navigate("/");
       } else {
         alert(data.error || "Failed to delete profile. Please try again.");
@@ -106,7 +125,29 @@ export default function ProfilePage() {
     );
   }
 
-  // Show error state
+  // Auth error - show friendly message with login link
+  if (authError) {
+    return (
+      <>
+        <Header title="Your Profile" />
+        <div className="ProfilePage">
+          <div className="auth-error-container">
+            <h2>🔒 Login Required</h2>
+            <p>{error}</p>
+            <Link to="/login" className="login-link-btn">
+              Go to Login
+            </Link>
+            <p className="signup-hint">
+              Don't have an account? <Link to="/signup">Sign up here</Link>
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // Show other error state
   if (error) {
     return (
       <>

@@ -11,9 +11,6 @@ const ViewBoard = () => {
     return <>
      <Header title="View Your CommYOUnity Boards" />
     {/* Back to Home button */}
-    <Link to="/home" className="back-btn">
-          ← Back
-    </Link>
     <div className="view-board-content">
         <BoardList /> 
     </div>

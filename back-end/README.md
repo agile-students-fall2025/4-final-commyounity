@@ -1,3 +1,16 @@
+# Database Intregration
+
+> For DB integration demo:
+- Login with username: `carinutzza`
+- Password: `123456`
+- To test the "Find Members" feature in Edit Board, search for username: `foo`
+
+This app uses Atlas and mongodb for database integration.
+
+**Important notes:** some implmentations on the friends pages are not yet fully integrated - they are rendering mock data, which is now served from the data base, rather than from mockaroo. Check back in sprint 4 for further instructions.
+
+If this is the first time you are runing the code after Sprint 3, re-run `npm install`.
+
 # Back-End (Express) Reference
 
 This directory hosts the Express.js server that powers CommYOUnity’s friends and boards features.
@@ -99,4 +112,9 @@ npm run coverage       # c8 + mocha (target ≥10% coverage)
 
 ```bash
 MONGODB_URI_TEST="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority" npm test
+MONGODB_URI_TEST="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority" npm run coverage
 ```
+
+Test fixtures use generated usernames like `br_<ts>`, `cb_<ts>`, `edit_user_<ts>`, `feedtester_<ts>`, `loginuser_<ts>`, `mb_<ts>`, `member_<ts>`, `routeuser`, `fr_test_<ts>`, `frt_<ts>`, and `guser_<ts>` (seeded Mockaroo friends include usernames like `mparbrook1`, etc.).
+
+CI: GitHub Actions runs `npm run coverage` on push/PR via `.github/workflows/backend-tests.yml`. Set repo secrets `MONGODB_URI_TEST` and `JWT_SECRET` so tests can reach Atlas and pass authentication checks.

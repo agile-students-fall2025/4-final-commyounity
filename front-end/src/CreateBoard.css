@@ -32,25 +32,6 @@
   margin-bottom: 32px;
 }
 
-.header .back-button {
-  width: 48px;
-  height: 48px;
-  display: inline-grid;
-  place-items: center;
-  border: none;
-  background: #000;
-  color: #fff;
-  font-size: 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: all 0.2s ease;
-}
-.header .back-button:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
-
 /* ===== Form card wrapper ===== */
 .form-card {
   background: var(--card);

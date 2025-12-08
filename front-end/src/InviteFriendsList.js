@@ -59,9 +59,6 @@ const InviteFriendsList = () => {
   return (
     <>
       <Header title="Invite Friends" />
-      <button className="back-btn" onClick={handleBack}>
-        ← Back
-      </button>
 
       <div className="InviteFriendsList">
         {error && (

@@ -9,7 +9,9 @@ const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
     process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
   "http://localhost:4000";
+
 const FRIENDS_ENDPOINT = `${BACKEND_BASE}/api/friends`;
+const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
 
 const FALLBACK_FRIENDS = [
   {
@@ -65,11 +67,25 @@ const normalizeFriend = (friend, index) => {
 };
 
 const FindFriendsPage = () => {
-  const [searchInput, setSearchInput] = useState("");   // what user types
-  const [submittedTerm, setSubmittedTerm] = useState(""); // what we actually search for
+  // what user types
+  const [searchInput, setSearchInput] = useState("");
+  // what we actually submit to the backend
+  const [submittedTerm, setSubmittedTerm] = useState("");
+  // found friend
   const [matchingFriend, setMatchingFriend] = useState(null);
+  // search state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // invite state
+  const [inviteStatus, setInviteStatus] = useState("idle"); // idle | sending | sent | error
+  const [inviteError, setInviteError] = useState(null);
+
+  // whenever we change result friend, reset invite state
+  useEffect(() => {
+    setInviteStatus("idle");
+    setInviteError(null);
+  }, [matchingFriend?.id]);
 
   // Trigger search ONLY when submittedTerm changes
   useEffect(() => {
@@ -92,12 +108,14 @@ const FindFriendsPage = () => {
         const url = new URL(FRIENDS_ENDPOINT);
         url.searchParams.set("username", submittedTerm);
         url.searchParams.set("limit", "1");
+
         const token = getStoredToken();
         if (!token) {
           throw Object.assign(new Error("Authentication required"), {
             code: "AUTH_REQUIRED",
           });
         }
+
         const response = await fetchWithAuth(url.toString(), {
           signal: controller.signal,
         });
@@ -124,20 +142,15 @@ const FindFriendsPage = () => {
             ? normalizeFriend(payload.data[0], 0)
             : null;
 
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted) return;
 
         setMatchingFriend(first);
         setError(null);
       } catch (fetchError) {
-        if (!isMounted || fetchError.name === "AbortError") {
-          return;
-        }
+        if (!isMounted || fetchError.name === "AbortError") return;
 
         console.warn("Unable to search friends via API.", fetchError);
 
-        // fallback logic (optional)
         const fallback = FALLBACK_FRIENDS.find(
           (friend) =>
             friend.username.toLowerCase() === submittedTerm ||
@@ -145,6 +158,7 @@ const FindFriendsPage = () => {
               .toLowerCase()
               .includes(submittedTerm)
         );
+
         setMatchingFriend(fallback ?? null);
         setError(
           fallback
@@ -177,6 +191,56 @@ const FindFriendsPage = () => {
     setSubmittedTerm(trimmed);
   };
 
+  const isFallbackFriend =
+    matchingFriend && String(matchingFriend.id || "").startsWith("fallback");
+
+  const handleSendInvite = async () => {
+    if (!matchingFriend) return;
+
+    if (isFallbackFriend) {
+      setInviteStatus("error");
+      setInviteError(
+        "This is a demo profile from fallback data – you can only invite real users."
+      );
+      return;
+    }
+
+    setInviteStatus("sending");
+    setInviteError(null);
+
+    try {
+      const response = await fetchWithAuth(FRIEND_REQUESTS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: matchingFriend.username,
+          // if later you add a custom message field in the UI, pass it here
+          // message: "Hey, let’s connect on Commyounity!"
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setInviteStatus("error");
+        setInviteError(
+          payload?.error ||
+            "We couldn’t send the invite. They might already have a pending request."
+        );
+        return;
+      }
+
+      setInviteStatus("sent");
+      setInviteError(null);
+    } catch (err) {
+      console.error("Error sending friend invite:", err);
+      setInviteStatus("error");
+      setInviteError("Network error while sending invite. Please try again.");
+    }
+  };
+
   const messageDetails = useMemo(() => {
     if (loading) {
       return {
@@ -186,7 +250,6 @@ const FindFriendsPage = () => {
     }
 
     if (!submittedTerm) {
-      // user hasn’t actually searched yet
       return {
         type: "neutral",
         text: "Search results will appear here once you enter a username and hit Search.",
@@ -208,9 +271,16 @@ const FindFriendsPage = () => {
         };
       }
 
+      if (inviteStatus === "sent") {
+        return {
+          type: "success",
+          text: `Invite sent to ${matchingFriend.first_name}!`,
+        };
+      }
+
       return {
         type: "success",
-        text: `We found ${matchingFriend.first_name}! You can invite them from here once invites are wired up.`,
+        text: `We found ${matchingFriend.first_name}! Send them an invite below.`,
       };
     }
 
@@ -218,14 +288,11 @@ const FindFriendsPage = () => {
       type: "error",
       text: `No profile found for “${submittedTerm}”. Try another username.`,
     };
-  }, [loading, error, submittedTerm, matchingFriend]);
+  }, [loading, error, submittedTerm, matchingFriend, inviteStatus]);
 
   return (
     <>
       <Header title="Find Friends" />
-      <Link to="/friends" className="back-btn">
-        ← Back
-      </Link>
       <div className="FindFriendsPage">
         <p>
           <i>
@@ -257,12 +324,36 @@ const FindFriendsPage = () => {
               alt={`${matchingFriend.first_name} ${matchingFriend.last_name}`}
               className="findfriends-avatar"
             />
-            <div>
+            <div className="findfriends-result-main">
               <h2>
                 {matchingFriend.first_name} {matchingFriend.last_name}
               </h2>
-              <p>@{matchingFriend.username}</p>
-              {/* invite button can be wired to a POST endpoint later */}
+              <p className="findfriends-username">@{matchingFriend.username}</p>
+              <div className="findfriends-invite-row">
+                <button
+                  type="button"
+                  onClick={handleSendInvite}
+                  disabled={
+                    inviteStatus === "sending" ||
+                    inviteStatus === "sent" ||
+                    isFallbackFriend
+                  }
+                  className="findfriends-invite-btn"
+                >
+                  {isFallbackFriend
+                    ? "Invite unavailable"
+                    : inviteStatus === "sending"
+                    ? "Sending…"
+                    : inviteStatus === "sent"
+                    ? "Invite sent"
+                    : "Send friend invite"}
+                </button>
+                {inviteError && (
+                  <span className="findfriends-invite-error">
+                    {inviteError}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         )}

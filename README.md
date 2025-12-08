@@ -1,5 +1,11 @@
 # CommYOUnity
 
+## Extra-credit
+
+This team has completed extra credit assignment `Continuous Integration` for Sprint 3.
+
+---
+
 ## Product Vision Statement
 
 CommYOUnity is a social app designed to connect internstional students and people seeking cultural connections in the NYC area. CommYOUnity helps them find and join commYOUnity boards centered on shared heritage and interests. 
