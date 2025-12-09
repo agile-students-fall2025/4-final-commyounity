@@ -147,6 +147,8 @@ If you wish to contibute to this project, please visit the [CONTRIBUTING.md](./C
 - npm (comes with Node.js)
 - A Mockaroo API key (free account available at [mockaroo.com](https://www.mockaroo.com/))
 
+> **Note on mock friends data:** The friends/friend-requests service only seeds mock data in development. To enable seeding locally, set `ALLOW_MOCK_FRIEND_SEED=true` in `back-end/.env`. Leave this unset/false in production so no fake friends are inserted; production should use real Mongo data instead.
+
 ### Quick Start
 
 1. **Clone the repository**
