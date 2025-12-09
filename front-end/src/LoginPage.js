@@ -27,7 +27,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:4000/auth/login', {
+      const res = await fetch('http://178.128.70.142:4000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // credentials: 'include', // not needed if you're using JWT in body, not cookies
@@ -114,7 +114,7 @@ const LoginPage = () => {
           Continue with{' '}
           <a
             className="oauth-link"
-            href="http://localhost:4000/auth/google"
+            href="http://178.128.70.142:4000/auth/google"
           >
             <img
               className="oauth-icon"

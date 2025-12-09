@@ -21,7 +21,7 @@ const BoardList = props => {
     }
 
     axios
-      .get('http://localhost:4000/api/boards', {
+      .get('http://178.128.70.142:4000/api/boards', {
         headers: {
           Authorization: `JWT ${token}`,  
         },

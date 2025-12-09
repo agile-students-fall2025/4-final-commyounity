@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./BoardFeed.css";
 
-// Backend base URL (env first, fallback to localhost:4000)
+// Backend base URL (env first, fallback to 178.128.70.142:4000)
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
     process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
-  "http://localhost:4000";
+  "http://178.128.70.142:4000";
 
 function getAuthHeader() {
   const token = localStorage.getItem("token");

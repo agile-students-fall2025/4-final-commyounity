@@ -7,7 +7,7 @@ const Footer = ({ backToHome = false }) => {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:4000/auth/logout", { method: "GET" });
+      await fetch("http://178.128.70.142:4000/auth/logout", { method: "GET" });
     } catch (err) {
       console.error("Logout request to backend failed (ignoring):", err);
     }

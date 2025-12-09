@@ -9,7 +9,7 @@ import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
     process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
-  "http://localhost:4000";
+  "http://178.128.70.142:4000";
 
 const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
 const BOARD_INVITES_BASE = `${BACKEND_BASE}/api/boardinvites`;

@@ -23,7 +23,7 @@ export default function NotificationSettingsPage() {
     try {
       console.log('[NotificationSettings] Fetching from backend...');
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile", {
+      const response = await fetch("http://178.128.70.142:4000/api/profile", {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -65,7 +65,7 @@ export default function NotificationSettingsPage() {
       
       const token = localStorage.getItem('token');
       
-      const response = await fetch("http://localhost:4000/api/profile/notifications", {
+      const response = await fetch("http://178.128.70.142:4000/api/profile/notifications", {
         method: "PUT",
         headers: {
           "Authorization": `JWT ${token}`,

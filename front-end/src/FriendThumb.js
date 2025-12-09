@@ -42,7 +42,7 @@ const FriendThumb = ({
       console.log(`[FRONTEND] Inviting ${displayName} to board ${boardId}…`);
 
       const response = await axios.post(
-        `http://localhost:4000/api/boardinvites/${boardId}/invite`,
+        `http://178.128.70.142:4000/api/boardinvites/${boardId}/invite`,
         {
           invitedUserId: details.id, 
         },
