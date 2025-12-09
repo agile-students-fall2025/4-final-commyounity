@@ -14,7 +14,7 @@ const ViewBoard = () => {
     <div className="view-board-content">
         <BoardList /> 
     </div>
-    <Footer /> 
+    <Footer backToHome/> 
     </>
 }
 
