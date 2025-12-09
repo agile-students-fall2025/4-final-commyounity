@@ -60,7 +60,7 @@ const BoardList = props => {
         <div className="search-wrapper">
           <SearchBar 
             onSearch={setYourBoardsSearch}
-            placeholder="Search your ..."
+            placeholder="Search your boards ..."
           />
         </div>
   
