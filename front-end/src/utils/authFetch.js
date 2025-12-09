@@ -18,6 +18,44 @@ export const isAuthError = (error) =>
 export const getAuthErrorMessage = () =>
   "Please sign in again so we can reach the friends service securely.";
 
+const decodeJwtPayload = () => {
+  const token = getStoredToken();
+  if (!token) return null;
+  const parts = token.split(".");
+  if (parts.length < 2) return null;
+  try {
+    let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) base64 += "=";
+    const json = atob(base64);
+    return JSON.parse(json);
+  } catch (error) {
+    console.warn("Unable to parse JWT.", error);
+    return null;
+  }
+};
+
+export const getAuthProfileFromToken = () => {
+  const payload = decodeJwtPayload();
+  if (!payload) return null;
+  const username =
+    typeof payload.username === "string"
+      ? payload.username.toLowerCase()
+      : typeof payload.user?.username === "string"
+      ? payload.user.username.toLowerCase()
+      : null;
+  const id =
+    typeof payload.id === "string"
+      ? payload.id
+      : typeof payload._id === "string"
+      ? payload._id
+      : typeof payload.user?.id === "string"
+      ? payload.user.id
+      : null;
+  return { username, id };
+};
+
+export const getUsernameFromToken = () => getAuthProfileFromToken()?.username || null;
+
 export const fetchWithAuth = async (url, options = {}) => {
   const token = getStoredToken();
   if (!token) {

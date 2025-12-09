@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const { body, validationResult } = require('express-validator');
 const passport = require('passport');
 
@@ -14,6 +15,14 @@ const BoardInvite = require('../models/BoardInvite');
 const BoardFeed = require('../models/BoardFeed');
 
 console.log('[PROFILE ROUTES] Module loaded with MongoDB integration');
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('[PROFILE ROUTES] Created uploads directory:', uploadsDir);
+}
+
 
 // Configure multer for file upload handling
 const storage = multer.diskStorage({

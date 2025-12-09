@@ -35,6 +35,7 @@ const {
   findFriendRequest,
   removeFriendRequest,
   addFriendFromRequest,
+  invalidateFriendRequestsCache,
 } = require("./services/friendsService");
 const { param, validationResult, body } = require("express-validator");
 const app = express() // instantiate an Express object
@@ -61,25 +62,26 @@ const requireJwt = passport.authenticate("jwt", { session: false });
   app.get("/api/friends", requireJwt, async (req, res) => {
     const rawUsername =
       typeof req.query.username === "string" ? req.query.username.trim() : "";
-    const rawSearch =
+  const rawSearch =
       typeof req.query.search === "string"
         ? req.query.search.trim()
         : rawUsername
         ? ""
         : "";
-    const limitParam = Number(req.query.limit);
-    const limit =
+  const limitParam = Number(req.query.limit);
+  const limit =
       Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
-    const simulateError =
+  const simulateError =
       String(req.query.simulateError || "").toLowerCase() === "true";
-    const hasExactUsername = rawUsername.length > 0;
-    const hasSearch = !hasExactUsername && rawSearch.length > 0;
-    const ownerId = req.user?._id;
-  
-    if (simulateError) {
-      return res.status(503).json({
-        error: "Simulated friends service failure.",
-        meta: { simulated: true },
+  const hasExactUsername = rawUsername.length > 0;
+  const hasSearch = !hasExactUsername && rawSearch.length > 0;
+  const ownerId = req.user?._id;
+  const currentUsername = String(req.user?.username || "").toLowerCase();
+
+  if (simulateError) {
+    return res.status(503).json({
+      error: "Simulated friends service failure.",
+      meta: { simulated: true },
       });
     }
   
@@ -91,6 +93,12 @@ const requireJwt = passport.authenticate("jwt", { session: false });
       return res.status(400).json({
         error:
           "Username may only include letters, digits, dots (.), underscores (_), or hyphens (-).",
+      });
+    }
+
+    if (hasExactUsername && rawUsername.toLowerCase() === currentUsername) {
+      return res.status(400).json({
+        error: "You cannot add yourself as a friend.",
       });
     }
   
@@ -357,6 +365,9 @@ app.post(
         mutualFriends: 0, // you can compute later if you want
         status: "pending",
       });
+
+      // ensure the recipient sees the new request immediately
+      invalidateFriendRequestsCache(ownerId);
 
       return res.status(201).json({
         status: "pending",

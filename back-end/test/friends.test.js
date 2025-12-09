@@ -9,6 +9,7 @@ const { expect } = chai;
 
 let token;
 let ownerId;
+let currentUsername;
 
 const authGet = (path) =>
   request(app).get(path).set("Authorization", `JWT ${token}`);
@@ -32,6 +33,7 @@ describe("Friends routes (JWT)", () => {
 
     token = user.generateJWT();
     ownerId = user._id;
+    currentUsername = user.username;
 
     // Seed two known friends in Mongo (these are your "mock friends")
     await Friend.insertMany([
@@ -113,6 +115,12 @@ describe("Friends routes (JWT)", () => {
     expect(res.body).to.have.property("error");
     expect(res.body).to.have.property("meta");
     expect(res.body.meta).to.have.property("simulated", true);
+  });
+
+  it("does not return the current user as their own friend", async () => {
+    const res = await authGet(`/api/friends?username=${currentUsername}`);
+    expect(res.status).to.equal(400);
+    expect(res.body).to.have.property("error");
   });
 
 
