@@ -248,7 +248,7 @@ export default function ProfilePage() {
           </button>
         </section>
       </div>
-      <Footer backToHome />
+      <Footer />
     </>
   );
 }
