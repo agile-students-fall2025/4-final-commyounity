@@ -359,6 +359,7 @@ const queryFriendsFromDb = async (options = {}) => {
   const query = {};
   if (ownerId) {
     query.owner = ownerId;
+    query.contact = { $ne: ownerId }; // never surface yourself as your own friend
   }
   if (username) {
     query.username = String(username).trim().toLowerCase();
