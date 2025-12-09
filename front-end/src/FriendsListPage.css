@@ -198,6 +198,7 @@
 }
 
 /* ===== Responsive Layout ===== */
+/* ===== Responsive Layout ===== */
 @media (max-width: 768px) {
   .FriendsList {
     margin: 40px 16px;
@@ -214,14 +215,23 @@
     width: 200px;
   }
 
+  /* Stack search + filter cleanly */
   .friendslist-controls {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
   }
 
+  /* Inputs stay compact and centered */
   .friendslist-search,
   .friendslist-filter {
     width: 100%;
+    max-width: 320px;
+    flex: 0 0 auto;   /* prevents huge height on mobile */
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    border-radius: 10px;
   }
 
   .back-button,
@@ -240,6 +250,14 @@
 
   .friendslist-logo img {
     width: 160px;
+  }
+
+  /* Even more compact controls on tiny screens */
+  .friendslist-search,
+  .friendslist-filter {
+    max-width: 260px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
   }
 
   .find-friends-btn {
