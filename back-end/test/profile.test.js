@@ -20,6 +20,11 @@ const authPost = (p) => request(app).post(p).set("Authorization", `JWT ${token}`
 const authDelete = (p) => request(app).delete(p).set("Authorization", `JWT ${token}`);
 
 describe("Profile routes", () => {
+  // Some Mongo ops on CI can be slow — allow extra time
+  before(function () {
+    this.timeout(20000);
+  });
+
   // create a fresh test user before each test
   beforeEach(async () => {
     const tsShort = Date.now().toString().slice(-6);

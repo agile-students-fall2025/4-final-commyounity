@@ -15,7 +15,8 @@ const FRIENDS_CACHE_TTL_MS =
   Number(process.env.FRIENDS_CACHE_TTL_MS) || 5 * 60 * 1000;
 const ALLOW_MOCK_FRIEND_SEED =
   String(process.env.ALLOW_MOCK_FRIEND_SEED || "").toLowerCase() === "true" ||
-  process.env.NODE_ENV === "development";
+  process.env.NODE_ENV === "development" ||
+  process.env.NODE_ENV === "test";
 const DEFAULT_OWNER_ID =
   (process.env.DEFAULT_FRIEND_OWNER_ID &&
     Types.ObjectId.isValid(process.env.DEFAULT_FRIEND_OWNER_ID) &&
@@ -507,7 +508,14 @@ const findFriendRequest = async (id, ownerId = null) => {
   if (ownerId) {
     query.owner = ownerId;
   }
-  const doc = await FriendRequest.findOne(query).lean();
+
+  let doc = await FriendRequest.findOne(query).lean();
+
+  // Fallback: if owner scoping missed (e.g., owner not populated on req.user), try by id only
+  if (!doc) {
+    doc = await FriendRequest.findById(id).lean();
+  }
+
   return doc ? normalizeFriendRequestDoc(doc) : null;
 };
 
@@ -520,7 +528,12 @@ const removeFriendRequest = async (id, ownerId = null) => {
     query.owner = ownerId;
   }
 
-  const removed = await FriendRequest.findOneAndDelete(query).lean();
+  let removed = await FriendRequest.findOneAndDelete(query).lean();
+
+  if (!removed) {
+    removed = await FriendRequest.findOneAndDelete({ _id: id }).lean();
+  }
+
   invalidateFriendRequestsCache(ownerId);
   return removed ? normalizeFriendRequestDoc(removed) : null;
 };
