@@ -120,6 +120,18 @@ const requireJwt = passport.authenticate("jwt", { session: false });
           });
         }
   
+        // Build full URL for avatar if it's a relative path
+        let avatarUrl = userDoc.avatar || null;
+        if (avatarUrl && !avatarUrl.startsWith('http')) {
+          // If it's a relative path, make it absolute
+          const baseUrl = `${req.protocol}://${req.get('host')}`;
+          // Ensure it starts with / if it doesn't
+          if (!avatarUrl.startsWith('/')) {
+            avatarUrl = '/' + avatarUrl;
+          }
+          avatarUrl = baseUrl + avatarUrl;
+        }
+        
         const normalized = {
           id: userDoc._id.toString(),
           first_name:
@@ -129,7 +141,7 @@ const requireJwt = passport.authenticate("jwt", { session: false });
           last_name: userDoc.last_name || "",
           username: userDoc.username,
           avatar:
-            userDoc.avatar ||
+            avatarUrl ||
             `https://picsum.photos/seed/${userDoc.username}/200/200`,
           online: !!userDoc.online,
         };
@@ -161,13 +173,28 @@ const requireJwt = passport.authenticate("jwt", { session: false });
       }
   
       const data = limit ? friends.slice(0, limit) : friends;
+      
+      // Build full URL for avatars if they're relative paths
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const processedData = data.map(friend => {
+        if (friend.avatar && !friend.avatar.startsWith('http')) {
+          // If it's a relative path, make it absolute
+          let avatarPath = friend.avatar;
+          if (!avatarPath.startsWith('/')) {
+            avatarPath = '/' + avatarPath;
+          }
+          return { ...friend, avatar: baseUrl + avatarPath };
+        }
+        return friend;
+      });
+      
       const cacheMeta = getFriendsCacheMeta();
   
       res.json({
-        data,
+        data: processedData,
         meta: {
           total: friends.length,
-          count: data.length,
+          count: processedData.length,
           filtered,
           filterType,
           cacheSource: cacheMeta.cacheSource,
