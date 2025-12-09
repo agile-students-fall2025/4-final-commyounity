@@ -294,10 +294,7 @@ describe("Profile routes", () => {
     });
 
     it("returns 401 without JWT token", async () => {
-      const res = await request(app)
-        .post("/api/profile/photo")
-        .attach("profilePhoto", testImagePath);
-
+      const res = await request(app).post("/api/profile/photo");
       expect(res.status).to.equal(401);
     });
   });
