@@ -15,6 +15,7 @@ const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
 const BOARD_INVITES_BASE = `${BACKEND_BASE}/api/boardinvites`;
 const BOARD_INVITES_LIST_ENDPOINT = `${BOARD_INVITES_BASE}/invites`;
 
+
 const normalizeRequest = (request, index) => {
   const fallbackId = `request-${Date.now()}-${index}`;
   const id = request.id ?? fallbackId;
@@ -27,12 +28,13 @@ const normalizeRequest = (request, index) => {
 
   return {
     id,
+    requester: request.requester,
     first_name: firstName,
     last_name: lastName,
     username,
     avatar:
-      request.avatar ??
-      request.profilePhotoURL ??
+      request.avatar || 
+      request.profilePhotoURL ||
       `https://picsum.photos/seed/${username}/200/200`,
     message: request.message,
     mutualFriends:
@@ -51,6 +53,28 @@ const FriendRequestsPage = () => {
   const [feedback, setFeedback] = useState(null);
   const hadCachedRequestsRef = useRef(false);
   const [authError, setAuthError] = useState(null);
+
+  const fetchUserProfile = async (userId) => {
+    const token = getStoredToken();
+    if (!token) {
+      throw Object.assign(new Error("Authentication required"), {
+        code: "AUTH_REQUIRED",
+      });
+    }
+
+    const res = await fetch(`${BACKEND_BASE}/api/users/${userId}`, {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch user ${userId}`);
+    }
+
+    const payload = await res.json();
+    return payload.data;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -72,9 +96,32 @@ const FriendRequestsPage = () => {
         }
 
         const payload = await response.json();
-        const normalized = Array.isArray(payload?.data)
+
+        let normalized = Array.isArray(payload?.data)
           ? payload.data.map(normalizeRequest)
           : [];
+
+        normalized = await Promise.all(
+          normalized.map(async (req) => {
+            const requesterId = req.requester;
+            if (!requesterId) return req;
+
+            try {
+              const user = await fetchUserProfile(requesterId);
+
+              return {
+                ...req,
+                avatar: user.avatar || req.avatar,
+                first_name: user.first_name || req.first_name,
+                last_name: user.last_name || req.last_name,
+                username: user.username || req.username,
+              };
+            } catch (err) {
+              console.warn("Failed to fetch user profile for request:", err);
+              return req;
+            }
+          })
+        );
 
         if (!isMounted) return;
 
@@ -264,6 +311,7 @@ const FriendRequestsPage = () => {
       });
     }
   };
+
 
   const handleBoardInviteAccept = async (invite) => {
     try {
