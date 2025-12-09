@@ -1,24 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./FriendRequestsPage.css";
-import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 import Header from "./Header";
 import Footer from "./Footer";
 import { fetchWithAuth, getStoredToken } from "./utils/authFetch";
+import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
     process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
   "http://localhost:4000";
 
-// friend requests stay the same
 const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
-
-// ✅ board invites now use /api/boardinvites
 const BOARD_INVITES_BASE = `${BACKEND_BASE}/api/boardinvites`;
 const BOARD_INVITES_LIST_ENDPOINT = `${BOARD_INVITES_BASE}/invites`;
-
-const REQUESTS_CACHE_KEY = "friend-requests";
 
 const normalizeRequest = (request, index) => {
   const fallbackId = `request-${Date.now()}-${index}`;
@@ -45,69 +40,23 @@ const normalizeRequest = (request, index) => {
   };
 };
 
-const loadCachedRequests = () => {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  try {
-    const cached = window.localStorage.getItem(REQUESTS_CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (Array.isArray(parsed)) {
-        return parsed.map((item, index) => normalizeRequest(item, index));
-      }
-    }
-  } catch (storageError) {
-    console.warn("Unable to read cached friend requests.", storageError);
-  }
-
-  return [];
-};
-
-const persistRequests = (requests) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(
-      REQUESTS_CACHE_KEY,
-      JSON.stringify(requests)
-    );
-  } catch (storageError) {
-    console.warn("Unable to cache friend requests.", storageError);
-  }
-};
-
 const FriendRequestsPage = () => {
-  const [requests, setRequests] = useState(loadCachedRequests);
-  const [loading, setLoading] = useState(requests.length === 0);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [boardInvites, setBoardInvites] = useState([]);
   const [boardInvitesError, setBoardInvitesError] = useState(null);
 
   const [feedback, setFeedback] = useState(null);
-  const hadCachedRequestsRef = useRef(requests.length > 0);
+  const hadCachedRequestsRef = useRef(false);
   const [authError, setAuthError] = useState(null);
-
-  const setRequestsAndPersist = (updater) => {
-    setRequests((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      persistRequests(next);
-      return next;
-    });
-  };
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchRequests = async () => {
-      if (!hadCachedRequestsRef.current) {
-        setLoading(true);
-      }
-
+      setLoading(true);
       try {
         const token = getStoredToken();
         if (!token) {
@@ -127,17 +76,13 @@ const FriendRequestsPage = () => {
           ? payload.data.map(normalizeRequest)
           : [];
 
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted) return;
 
-        setRequestsAndPersist(normalized);
+        setRequests(normalized);
         hadCachedRequestsRef.current = normalized.length > 0;
         setError(null);
       } catch (fetchError) {
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted) return;
 
         console.warn("Unable to load friend requests from the API.", fetchError);
         const isAuth =
@@ -146,7 +91,7 @@ const FriendRequestsPage = () => {
         setError(
           isAuth
             ? "Please sign in to load your friend requests."
-            : "We couldn't load your friend requests right now. Showing your most recent saved list."
+            : "We couldn't load your friend requests right now."
         );
         if (isAuth) {
           setAuthError("Authentication required to view friend requests.");
@@ -162,14 +107,12 @@ const FriendRequestsPage = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          // not logged in, no board invites
           setBoardInvites([]);
           return;
         }
 
         const res = await fetch(BOARD_INVITES_LIST_ENDPOINT, {
           headers: {
-            // ✅ match backend passport JWT strategy
             Authorization: `JWT ${token}`,
           },
         });
@@ -204,32 +147,28 @@ const FriendRequestsPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!feedback) {
-      return undefined;
-    }
+    if (!feedback) return undefined;
 
     const timer = window.setTimeout(() => setFeedback(null), 3500);
     return () => window.clearTimeout(timer);
   }, [feedback]);
 
   const updateStoredFriends = (updater) => {
-    if (typeof window === "undefined") {
-      return;
-    }
+    if (typeof window === "undefined") return;
 
     try {
       const stored = window.localStorage.getItem(FRIENDS_STORAGE_KEY);
-      let parsed = [];
-
-      if (stored) {
-        const existing = JSON.parse(stored);
-        if (Array.isArray(existing)) {
-          parsed = existing;
-        }
-      }
-
-      const next = updater(parsed);
-      window.localStorage.setItem(FRIENDS_STORAGE_KEY, JSON.stringify(next));
+      const existing = stored ? JSON.parse(stored) : null;
+      const existingFriends = Array.isArray(existing?.friends)
+        ? existing.friends
+        : Array.isArray(existing)
+        ? existing
+        : [];
+      const next = updater(existingFriends);
+      window.localStorage.setItem(
+        FRIENDS_STORAGE_KEY,
+        JSON.stringify(next)
+      );
     } catch (storageError) {
       console.warn("Unable to update stored friends.", storageError);
     }
@@ -257,9 +196,7 @@ const FriendRequestsPage = () => {
 
       const payload = await response.json();
 
-      setRequestsAndPersist((prev) =>
-        prev.filter((item) => item.id !== request.id)
-      );
+      setRequests((prev) => prev.filter((item) => item.id !== request.id));
 
       if (payload?.friend) {
         updateStoredFriends((current) => {
@@ -309,9 +246,7 @@ const FriendRequestsPage = () => {
 
       await response.json();
 
-      setRequestsAndPersist((prev) =>
-        prev.filter((item) => item.id !== request.id)
-      );
+      setRequests((prev) => prev.filter((item) => item.id !== request.id));
 
       setFeedback({
         type: "info",
@@ -498,7 +433,6 @@ const FriendRequestsPage = () => {
               </div>
             )}
 
-            {/* BOARD INVITES SECTION */}
             <section className="boardinvites-section">
               <div className="boardinvites-header">
                 <h2>Board Invites</h2>

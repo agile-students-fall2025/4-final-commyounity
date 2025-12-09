@@ -35,6 +35,7 @@ const {
   findFriendRequest,
   removeFriendRequest,
   addFriendFromRequest,
+  invalidateFriendRequestsCache,
 } = require("./services/friendsService");
 const { param, validationResult, body } = require("express-validator");
 const app = express() // instantiate an Express object
@@ -364,6 +365,9 @@ app.post(
         mutualFriends: 0, // you can compute later if you want
         status: "pending",
       });
+
+      // ensure the recipient sees the new request immediately
+      invalidateFriendRequestsCache(ownerId);
 
       return res.status(201).json({
         status: "pending",

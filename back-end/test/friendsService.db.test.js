@@ -7,6 +7,7 @@ const friendsService = require("../services/friendsService");
 describe("friendsService (Mongo-backed)", () => {
   let ownerId;
   let requesterId;
+  let recipientId;
 
   beforeEach(async () => {
     // Cleanup ONLY test data
@@ -20,6 +21,7 @@ describe("friendsService (Mongo-backed)", () => {
     // Fresh test IDs
     ownerId = new mongoose.Types.ObjectId();
     requesterId = new mongoose.Types.ObjectId();
+    recipientId = new mongoose.Types.ObjectId();
   });
 
   it("fetches friends by exact username and partial search", async () => {
@@ -111,6 +113,37 @@ describe("friendsService (Mongo-backed)", () => {
       ownerId
     );
     expect(result).to.be.null;
+  });
+
+  it("creates reciprocal friend records when a request is accepted", async () => {
+    const request = await FriendRequest.create({
+      owner: recipientId,
+      requester: requesterId,
+      username: "reciprocal.user",
+      first_name: "Reciprocal",
+      last_name: "User",
+      status: "pending",
+    });
+
+    const friend = await friendsService.acceptFriendRequest(
+      request._id.toString(),
+      recipientId
+    );
+
+    expect(friend).to.be.an("object");
+
+    const recipientFriend = await Friend.findOne({
+      owner: recipientId,
+      contact: requesterId,
+    }).lean();
+
+    const requesterFriend = await Friend.findOne({
+      owner: requesterId,
+      contact: recipientId,
+    }).lean();
+
+    expect(recipientFriend).to.exist;
+    expect(requesterFriend).to.exist;
   });
 
   // --------------------------------------------------------

@@ -2,6 +2,7 @@ const axios = require("axios");
 const mongoose = require("mongoose");
 const Friend = require("../models/Friend");
 const FriendRequest = require("../models/FriendRequest");
+const User = require("../models/User");
 
 const { Types } = mongoose;
 
@@ -539,6 +540,67 @@ const addFriendFromRequest = async (request, ownerId = null) => {
   };
 };
 
+const resolveUserProfile = async (userId, fallbackUsername = "friend") => {
+  if (!userId || !Types.ObjectId.isValid(userId)) {
+    const username = String(fallbackUsername || "friend").toLowerCase();
+    return {
+      username,
+      first_name: "Friend",
+      last_name: "",
+      avatar: `https://picsum.photos/seed/${encodeURIComponent(username)}/200/200`,
+    };
+  }
+
+  const userDoc = await User.findById(userId).lean();
+  const username =
+    String(userDoc?.username || fallbackUsername || "friend").toLowerCase();
+
+  const fullName =
+    userDoc?.name ||
+    `${userDoc?.first_name || ""} ${userDoc?.last_name || ""}`.trim();
+  const [first, ...rest] = (fullName || username).split(" ").filter(Boolean);
+
+  const first_name = userDoc?.first_name || first || "Friend";
+  const last_name = userDoc?.last_name || rest.join(" ");
+  const avatar =
+    userDoc?.avatar ||
+    `https://picsum.photos/seed/${encodeURIComponent(username)}/200/200`;
+
+  return { username, first_name, last_name, avatar };
+};
+
+const ensureReciprocalFriend = async (request, ownerId = null) => {
+  const plain = toPlainObject(request);
+  const requester = plain.requester || plain.contact;
+  const recipient = ownerId || plain.owner;
+
+  if (!requester || !recipient) return null;
+  if (String(requester) === String(recipient)) return null;
+
+  const profile = await resolveUserProfile(
+    recipient,
+    plain.ownerUsername || plain.ownerHandle
+  );
+
+  const reciprocalDoc = await Friend.findOneAndUpdate(
+    { owner: requester, contact: recipient },
+    {
+      owner: requester,
+      contact: recipient,
+      username: profile.username,
+      first_name: profile.first_name,
+      last_name: profile.last_name || "",
+      avatar: profile.avatar,
+      online: true,
+      status: "accepted",
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  ).lean();
+
+  invalidateFriendsCache(requester);
+  return normalizeFriendDoc(reciprocalDoc);
+};
+
 const acceptFriendRequest = async (id, ownerId = null) => {
   if (!Types.ObjectId.isValid(id)) {
     return null;
@@ -555,6 +617,7 @@ const acceptFriendRequest = async (id, ownerId = null) => {
   }
 
   const friend = await addFriendFromRequest(match, ownerId || match.owner);
+  await ensureReciprocalFriend(match, ownerId || match.owner);
   await FriendRequest.deleteOne({ _id: id });
   invalidateFriendRequestsCache(ownerId || match.owner);
   return friend;
@@ -588,4 +651,5 @@ module.exports = {
   resetFriendsCacheForTests,
   resetFriendRequestsCacheForTests,
   setMockFriendsFetcherForTests,
+  invalidateFriendRequestsCache,
 };
