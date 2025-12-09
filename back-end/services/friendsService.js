@@ -13,6 +13,9 @@ const MOCKAROO_FRIENDS_URL =
 const FRIENDS_FETCH_COUNT = Number(process.env.FRIENDS_FETCH_COUNT) || 20;
 const FRIENDS_CACHE_TTL_MS =
   Number(process.env.FRIENDS_CACHE_TTL_MS) || 5 * 60 * 1000;
+const ALLOW_MOCK_FRIEND_SEED =
+  String(process.env.ALLOW_MOCK_FRIEND_SEED || "").toLowerCase() === "true" ||
+  process.env.NODE_ENV === "development";
 const DEFAULT_OWNER_ID =
   (process.env.DEFAULT_FRIEND_OWNER_ID &&
     Types.ObjectId.isValid(process.env.DEFAULT_FRIEND_OWNER_ID) &&
@@ -270,6 +273,11 @@ const fetchFriendsFromMockaroo = async (ownerId = DEFAULT_OWNER_ID) => {
 };
 
 const seedFriendsIfEmpty = async (ownerId = DEFAULT_OWNER_ID) => {
+  if (!ALLOW_MOCK_FRIEND_SEED) {
+    friendsSeeded = true;
+    return null;
+  }
+
   if (friendsSeeded) {
     return null;
   }
@@ -306,6 +314,11 @@ const seedFriendsIfEmpty = async (ownerId = DEFAULT_OWNER_ID) => {
 };
 
 const seedFriendRequestsIfEmpty = async (ownerId = DEFAULT_OWNER_ID) => {
+  if (!ALLOW_MOCK_FRIEND_SEED) {
+    friendRequestsSeeded = true;
+    return null;
+  }
+
   if (friendRequestsSeeded) {
     return null;
   }
