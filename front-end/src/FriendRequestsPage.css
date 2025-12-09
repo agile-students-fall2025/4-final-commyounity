@@ -70,6 +70,26 @@
   font-weight: 600;
 }
 
+/* ===== Search ===== */
+.request-search {
+  margin: 28px auto 10px;
+  display: flex;
+  justify-content: center;
+  max-width: 640px;
+  width: 100%;
+}
+
+.request-empty-search {
+  margin: 12px auto 0;
+  padding: 16px 20px;
+  max-width: 720px;
+  background: rgba(47, 109, 246, 0.08);
+  border: 1px solid rgba(47, 109, 246, 0.18);
+  border-radius: var(--radius-sm);
+  color: #2b3a67;
+  font-weight: 600;
+}
+
 /* ===== Requests Grid ===== */
 .request-list {
   margin-top: 32px;
@@ -324,6 +344,12 @@
   .friendrequests-logo img {
     width: 180px;
     height: auto;
+  }
+
+  .request-search {
+    margin: 20px 0 6px;
+    padding: 0 8px;
+    max-width: 100%;
   }
 
   .request-list {
