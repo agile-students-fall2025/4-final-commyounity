@@ -23,7 +23,7 @@ const joinBoardRouter = require("./routes/joinBoard");
 const User = require("./models/User");
 const Friend = require("./models/Friend");
 const FriendRequest = require("./models/FriendRequest");
-
+const ViewProfile = require("./routes/users");
 
 const {
   ensureFriendsCache,
@@ -464,6 +464,9 @@ app.use("/api/boards", kickMemberRouter);
 
 //find members
 app.use("/api/searches", findMembersRouter);
+
+//view profile
+app.use("/api/users", ViewProfile);
 
 // export the express app we created to make it available to other modules
 module.exports = app
