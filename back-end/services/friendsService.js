@@ -245,6 +245,23 @@ let friendsSeeded = false;
 let friendRequestsSeeded = false;
 
 const fetchFriendsFromMockaroo = async (ownerId = DEFAULT_OWNER_ID) => {
+  // Never hit external Mockaroo in tests; use local fixtures instead
+  if (process.env.NODE_ENV === "test") {
+    const docs = normalizedFallbackFriends.map((friend) => ({
+      owner: ownerId,
+      contact: new Types.ObjectId(),
+      username: friend.username.toLowerCase(),
+      first_name: friend.first_name,
+      last_name: friend.last_name || "",
+      avatar: friend.avatar,
+      online: Boolean(friend.online),
+      status: "accepted",
+    }));
+    const inserted = await Friend.insertMany(docs);
+    invalidateFriendsCache(ownerId);
+    return inserted.map((doc, index) => normalizeFriendDoc(doc, index));
+  }
+
   const fetcher = mockFriendsFetcher || axios.get;
   const response = await fetcher(MOCKAROO_FRIENDS_URL, {
     params: {
