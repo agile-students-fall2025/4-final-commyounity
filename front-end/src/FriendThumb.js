@@ -2,7 +2,6 @@
 import React from "react";
 import "./FriendThumb.css";
 import axios from "axios";
-import API_BASE from "./utils/apiBase";
 
 const FriendThumb = ({
   details,
@@ -42,7 +41,7 @@ const FriendThumb = ({
       console.log(`[FRONTEND] Inviting ${displayName} to board ${boardId}…`);
 
       const response = await axios.post(
-        `${API_BASE}/api/boardinvites/${boardId}/invite`,
+        `http://localhost:4000/api/boardinvites/${boardId}/invite`,
         {
           invitedUserId: details.id, 
         },

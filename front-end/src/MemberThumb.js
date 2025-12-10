@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./MemberThumb.css";
-import API_BASE from "./utils/apiBase";
 
 const MemberThumb = (props) => {
   const { details, boardId, canKick, onKicked } = props;
@@ -51,7 +50,7 @@ const MemberThumb = (props) => {
       setKicking(true);
 
       const res = await fetch(
-        `${API_BASE}/api/boards/${boardId}/kick-member`,
+        `http://localhost:4000/api/boards/${boardId}/kick-member`,
         {
           method: "POST",
           headers: {

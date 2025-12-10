@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './LoginPage.css';
 import Header from "./Header";
-import API_BASE from "./utils/apiBase";
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');     
@@ -28,7 +27,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch('http://localhost:4000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // credentials: 'include', // not needed if you're using JWT in body, not cookies
@@ -114,8 +113,8 @@ const LoginPage = () => {
         <p className="oauth-inline">
           Continue with{' '}
           <a
-          className="oauth-link"
-          href={`${API_BASE}/auth/google`}
+            className="oauth-link"
+            href="http://localhost:4000/auth/google"
           >
             <img
               className="oauth-icon"

@@ -6,7 +6,6 @@ import "./InviteFriendsList.css";
 import FriendThumb from "./FriendThumb";
 import Header from "./Header";
 import Footer from "./Footer";
-import API_BASE from "./utils/apiBase";
 
 const InviteFriendsList = () => {
   const { id: boardId } = useParams();
@@ -27,7 +26,7 @@ const InviteFriendsList = () => {
         console.log("[InviteFriendsList] fetching invite candidates…");
 
         const res = await axios.get(
-          `${API_BASE}/api/boardinvites/${boardId}/friends`,
+          `http://localhost:4000/api/boardinvites/${boardId}/friends`,
           {
             headers: {
               Authorization: `JWT ${token}`,

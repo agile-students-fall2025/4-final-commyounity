@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PrivacySettingsPage.css";
 import Header from "./Header";
-import API_BASE from "./utils/apiBase";
+import Footer from "./Footer";
 
 export default function PrivacySettingsPage() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function PrivacySettingsPage() {
     try {
       console.log('[PrivacySettings] Fetching from backend...');
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/api/profile`, {
+      const response = await fetch("http://localhost:4000/api/profile", {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -64,7 +64,7 @@ export default function PrivacySettingsPage() {
       console.log('[PrivacySettings] Saving settings:', newSettings);
       
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/api/profile/privacy`, {
+      const response = await fetch("http://localhost:4000/api/profile/privacy", {
         method: "PUT",
         headers: {
           "Authorization": `JWT ${token}`,

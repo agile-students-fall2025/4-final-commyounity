@@ -4,7 +4,6 @@ import axios from 'axios';
 import './JoinBoardDetail.css';
 import Header from "./Header";
 import Footer from "./Footer";
-import API_BASE from "./utils/apiBase";
 
 const JoinBoardDetail = () => {
   const { id } = useParams();
@@ -34,7 +33,7 @@ const JoinBoardDetail = () => {
         }
 
         const res = await axios.get(
-          `${API_BASE}/api/boards/${id}`,
+          `http://localhost:4000/api/boards/${id}`,
           {
             signal: controller.signal,
             headers: {
@@ -69,7 +68,7 @@ const JoinBoardDetail = () => {
       }
   
       const res = await axios.get(
-        `${API_BASE}/api/members/${id}`,   // ✅ note the /:boardId
+        `http://localhost:4000/api/members/${id}`,   // ✅ note the /:boardId
         {
           headers: {
             Authorization: `JWT ${token}`,          // ✅ matches your backend passport JWT
@@ -111,7 +110,7 @@ const JoinBoardDetail = () => {
       }
 
       const res = await axios.post(
-        `${API_BASE}/api/boards/${id}/join`,
+        `http://localhost:4000/api/boards/${id}/join`,
         {}, 
         {
           headers: {

@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
-import API_BASE from "./utils/apiBase";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ export default function ProfilePage() {
         return;
       }
       
-      const response = await fetch(`${API_BASE}/api/profile`, {
+      const response = await fetch("http://localhost:4000/api/profile", {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -71,7 +70,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${API_BASE}/logout`, {
+      await fetch("http://localhost:4000/logout", {
         method: "GET",
         credentials: "include",
       });
@@ -116,7 +115,7 @@ export default function ProfilePage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/api/profile`, {
+      const response = await fetch("http://localhost:4000/api/profile", {
         method: "DELETE",
         headers: {
           "Authorization": `JWT ${token}`,
