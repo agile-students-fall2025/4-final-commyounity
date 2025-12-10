@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './SignUpPage.css';
 import Header from "./Header";
+import API_BASE from "./utils/apiBase";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -25,7 +26,7 @@ const SignUpPage = () => {
     setLoading(true);
   
     try {
-      const res = await fetch('http://localhost:4000/auth/signup', {
+      const res = await fetch(`${API_BASE}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -78,7 +79,7 @@ const SignUpPage = () => {
 //goole auth disabled for now!!!
   // --- Google signup redirect ---
   const handleGoogleSignup = () => {
-    window.location.href = 'http://localhost:4000/auth/google';
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   return (

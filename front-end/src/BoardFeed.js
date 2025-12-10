@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./BoardFeed.css";
 
 // Backend base URL (env first, fallback to localhost:4000)
-const BACKEND_BASE =
-  (process.env.REACT_APP_BACKEND_URL &&
-    process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
-  "http://localhost:4000";
+import API_BASE from "./utils/apiBase";
+
+const BACKEND_BASE = API_BASE;
 
 function getAuthHeader() {
   const token = localStorage.getItem("token");

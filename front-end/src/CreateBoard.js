@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import "./CreateBoard.css";
 import Header from "./Header";
 import Footer from "./Footer";
+import API_BASE from "./utils/apiBase";
 
 const CreateBoard = () => {
   const [boardName, setBoardName] = useState("");
@@ -59,7 +60,7 @@ const CreateBoard = () => {
         }
       }
 
-      const response = await fetch("http://localhost:4000/api/boards/create", {
+      const response = await fetch(`${API_BASE}/api/boards/create`, {
         method: "POST",
         headers: {
           // IMPORTANT: don't set Content-Type with FormData
