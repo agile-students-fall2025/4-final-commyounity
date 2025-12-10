@@ -184,7 +184,7 @@ export default function ProfilePage() {
     );
   }
 
-  const randomImage = profile?.profilePhoto || `https://picsum.photos/160/120?random=${Math.floor(Math.random() * 1000)}`;
+  const randomImage = profile?.profilePhoto || `https://simplyilm.com/wp-content/uploads/2017/08/temporary-profile-placeholder-1.jpg`;
 
   // Helper function to safely display name
   const getDisplayName = (name) => {

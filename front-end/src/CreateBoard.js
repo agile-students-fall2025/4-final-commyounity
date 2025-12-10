@@ -139,20 +139,6 @@ const CreateBoard = () => {
 
         <div className="button-group">
           <button
-            onClick={() => navigate("/boards/:id/findmembers")}
-            className="secondary-button"
-            type="button"
-          >
-            Find Members
-          </button>
-          <button
-            onClick={() => navigate("/boards/:id/invite")}
-            className="secondary-button"
-            type="button"
-          >
-            Invite Friends
-          </button>
-          <button
             onClick={handleCreate}
             className="primary-button"
             disabled={submitting}

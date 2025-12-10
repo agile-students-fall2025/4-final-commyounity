@@ -1,46 +1,51 @@
+// routes/editBoard.js
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const passport = require("passport");          
+const passport = require("passport");
 const Board = require("../models/Board");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(process.cwd(), "uploads"));
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
+
+// ----------------------------
+// Cloudinary Config
+// ----------------------------
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ----------------------------
+// Multer + Cloudinary Storage
+// ----------------------------
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "commyounity_boards",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 1200, crop: "limit" }],
   },
 });
 
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    if (file && !file.mimetype.startsWith("image/")) {
+    if (!file.mimetype.startsWith("image/")) {
       return cb(new Error("Only image uploads are allowed"));
     }
     cb(null, true);
   },
 });
 
-function safeUnlink(filePath) {
-  fs.unlink(filePath, (err) => {
-    if (err && err.code !== "ENOENT") {
-      console.error("[EDIT BOARD] Failed to delete file:", filePath, err);
-    }
-  });
-}
-
 // ----------------------------
-// EDIT BOARD 
+// EDIT BOARD (Cloudinary)
 // ----------------------------
 router.post(
   "/:id/edit",
   passport.authenticate("jwt", { session: false }),
-  upload.single("photo"),
+  upload.single("photo"), // now uploaded to cloudinary instead of /uploads
   async (req, res) => {
     const { id } = req.params;
     const { title, descriptionLong } = req.body;
@@ -50,11 +55,6 @@ router.post(
       const board = await Board.findById(id);
 
       if (!board) {
-        if (newFile) {
-          const newPath = path.join(process.cwd(), "uploads", newFile.filename);
-          safeUnlink(newPath);
-        }
-
         return res.status(404).json({
           status: "error",
           message: "Board not found",
@@ -69,30 +69,17 @@ router.post(
         user: req.user.username,
       });
 
+      // Update text fields
       if (typeof title === "string" && title.trim() !== "") {
         board.title = title.trim();
       }
-
       if (typeof descriptionLong === "string") {
         board.descriptionLong = descriptionLong.trim();
       }
 
-      if (newFile) {
-        const uploadsDir = path.join(process.cwd(), "uploads");
-
-        if (board.coverPhotoURL) {
-          try {
-            const urlPath = new URL(board.coverPhotoURL);
-            const oldFileName = path.basename(urlPath.pathname);
-            const oldFullPath = path.join(uploadsDir, oldFileName);
-            safeUnlink(oldFullPath);
-          } catch (e) {
-            console.warn("[EDIT BOARD] Could not parse old coverPhotoURL:", board.coverPhotoURL);
-          }
-        }
-
-        const newCoverPhotoURL = `${req.protocol}://${req.get("host")}/uploads/${newFile.filename}`;
-        board.coverPhotoURL = newCoverPhotoURL;
+      // If a new image was uploaded → replace Cloudinary URL
+      if (newFile && newFile.path) {
+        board.coverPhotoURL = newFile.path; // Cloudinary returns .path as the full hosted URL
       }
 
       const updated = await board.save();
@@ -105,11 +92,6 @@ router.post(
 
     } catch (err) {
       console.error("[EDIT BOARD ERROR]", err);
-
-      if (newFile) {
-        const newPath = path.join(process.cwd(), "uploads", newFile.filename);
-        safeUnlink(newPath);
-      }
 
       return res.status(500).json({
         status: "error",
