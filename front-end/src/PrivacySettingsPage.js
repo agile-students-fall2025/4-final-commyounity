@@ -135,12 +135,6 @@ export default function PrivacySettingsPage() {
     <>
       <Header title="Privacy Settings" />
       <div className="PrivacyPage">
-        {/* Back Button */}
-        <div className="privacy-header">
-          <button className="privacy-back" onClick={() => navigate("/settings")}>
-            ← Back
-          </button>
-        </div>
 
         {/* Row: Profile Visibility */}
         <div className="privacy-row">
@@ -175,6 +169,7 @@ export default function PrivacySettingsPage() {
           </button>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

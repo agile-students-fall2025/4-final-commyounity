@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ChangePasswordPage.css";
+import Footer from "./Footer";
+import Header from "./Header";
 import API_BASE from "./utils/apiBase";
 
 export default function ChangePasswordPage() {
@@ -90,15 +92,9 @@ export default function ChangePasswordPage() {
   };
 
   return (
+    <>
     <div className="ChangePasswordPage">
-      {/* header with back button + title */}
-      <header className="change-header">
-        <button className="change-back" onClick={() => navigate("/settings")}>
-          ←
-        </button>
-        <h1 className="change-title">Change Password</h1>
-      </header>
-
+    <Header title="Change Password" />
       <div className="change-card">
         {/* Current Password */}
         <div className="change-field">
@@ -217,5 +213,7 @@ export default function ChangePasswordPage() {
         </button>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

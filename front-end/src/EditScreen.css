@@ -114,16 +114,16 @@ textarea {
 
 /* Individual Button Colors */
 .EditScreen .member-actions .invite {
-  background-color: var(--brand);
+  background-color: rgb(190, 188, 188);
 }
 
 .EditScreen .member-actions .manage {
-  background-color: #ffc107;
+  background-color: rgb(190, 188, 188);
   color: #333;
 }
 
 .EditScreen .member-actions .find {
-  background-color: #22c55e;
+  background-color: rgb(190, 188, 188);
 }
 
 /* Hover State */

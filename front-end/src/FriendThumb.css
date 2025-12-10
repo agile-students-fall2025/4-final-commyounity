@@ -131,11 +131,12 @@
 }
 
 .FriendThumb .invite-button {
-  background-color: var(--accent);
+  background-color: black;
   color: #fff;
 }
 .FriendThumb .invite-button:hover {
-  background-color: var(--accent-dark);
+  background-color: black;
+  color: #2f6df6;
   transform: translateY(-2px);
 }
 

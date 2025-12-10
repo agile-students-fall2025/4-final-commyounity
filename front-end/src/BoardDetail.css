@@ -98,12 +98,13 @@
 }
 
 /* variants */
-.BoardDetail .buttons .members-button { background: var(--brand); color: #fff; }
-.BoardDetail .buttons .edit-button    { background: var(--warn);  color: #333; }
-.BoardDetail .buttons .leave-button   { background: #f2f2f2;     color: #111; }
+.BoardDetail .buttons .members-button { background: #6b7280; color: #fff; }
+.BoardDetail .buttons .edit-button    { background: #6b7280; color: #fff; }
+.BoardDetail .buttons .leave-button   { background: black; color: #fff; }
+.BoardDetail .buttons .leave-button  button:hover { transform: translateY(-2px); color: #2f6df6; opacity: .95; }
 
 /* hover/focus */
-.BoardDetail .buttons button:hover { transform: translateY(-2px); opacity: .95; }
+.BoardDetail .buttons .edit-button button:hover { transform: translateY(-2px); opacity: .95; }
 .BoardDetail .buttons button:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0,123,255,.25);

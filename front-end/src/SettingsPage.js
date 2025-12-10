@@ -3,17 +3,12 @@ import { Link } from "react-router-dom";
 import "./SettingsPage.css";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-
+import Footer from "./Footer";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   return (
     <><Header title="Settings" />
-    <div className="settings-back-container">
-      <button className="settings-back" onClick={() => navigate("/profilepage")}>
-        ← Back
-      </button>
-    </div>
     <div className="SettingsPage">
       <div className="settings-buttons">
         <Link to="/settings/notifications" className="settings-block">
@@ -30,6 +25,7 @@ export default function SettingsPage() {
 
       </div>
     </div>
+    <Footer />
     </>
   );
 }
