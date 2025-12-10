@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ChangePasswordPage.css";
+import Footer from "./Footer";
+import Header from "./Header";
+import API_BASE from "./utils/apiBase";
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -60,7 +63,7 @@ export default function ChangePasswordPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile/password", {
+      const response = await fetch(`${API_BASE}/api/profile/password`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -89,15 +92,9 @@ export default function ChangePasswordPage() {
   };
 
   return (
+    <>
     <div className="ChangePasswordPage">
-      {/* header with back button + title */}
-      <header className="change-header">
-        <button className="change-back" onClick={() => navigate("/settings")}>
-          ←
-        </button>
-        <h1 className="change-title">Change Password</h1>
-      </header>
-
+    <Header title="Change Password" />
       <div className="change-card">
         {/* Current Password */}
         <div className="change-field">
@@ -216,5 +213,7 @@ export default function ChangePasswordPage() {
         </button>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }
