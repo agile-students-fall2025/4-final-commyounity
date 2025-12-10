@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./PrivacySettingsPage.css";
 import Header from "./Header";
 import Footer from "./Footer";
+import API_BASE from "./utils/apiBase";
 
 export default function PrivacySettingsPage() {
   const navigate = useNavigate();
