@@ -135,6 +135,13 @@ export default function NotificationSettingsPage() {
     <>
       <Header title="Notifications Settings" />
       <div className="NotifPage">
+        {/* Back Button */}
+        <div className="notif-header">
+        <button className="notif-back" onClick={() => navigate("/settings")}>
+          ← Back
+        </button>
+        </div>
+
         {/* Row: Board Updates */}
         <div className="notif-row">
           <div className="notif-label">Board Updates</div>

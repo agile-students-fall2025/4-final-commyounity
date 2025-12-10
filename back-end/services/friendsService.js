@@ -508,6 +508,47 @@ const removeFriendRequest = async (id, ownerId = null) => {
   return removed ? normalizeFriendRequestDoc(removed) : null;
 };
 
+const removeFriendship = async (ownerId, friendIdentifier) => {
+  if (!Types.ObjectId.isValid(ownerId)) {
+    return false;
+  }
+
+  let contactId = null;
+  let directDoc = null;
+
+  if (Types.ObjectId.isValid(friendIdentifier)) {
+    directDoc = await Friend.findOne({
+      _id: friendIdentifier,
+      owner: ownerId,
+    }).lean();
+  }
+
+  if (directDoc) {
+    contactId = directDoc.contact;
+  } else if (Types.ObjectId.isValid(friendIdentifier)) {
+    contactId = friendIdentifier;
+  }
+
+  if (!contactId || !Types.ObjectId.isValid(contactId)) {
+    return false;
+  }
+
+  const [primary, reciprocal] = await Promise.all([
+    Friend.findOneAndDelete({ owner: ownerId, contact: contactId }).lean(),
+    Friend.findOneAndDelete({ owner: contactId, contact: ownerId }).lean(),
+  ]);
+
+  await Promise.all([
+    User.findByIdAndUpdate(ownerId, { $pull: { friends: contactId } }),
+    User.findByIdAndUpdate(contactId, { $pull: { friends: ownerId } }),
+  ]);
+
+  invalidateFriendsCache(ownerId);
+  invalidateFriendsCache(contactId);
+
+  return Boolean(primary || reciprocal || directDoc);
+};
+
 const addFriendFromRequest = async (request, ownerId = null) => {
   if (!request) return null;
   const plain = toPlainObject(request);
@@ -703,6 +744,7 @@ module.exports = {
   removeFriendRequest,
   acceptFriendRequest,
   addFriendFromRequest,
+  removeFriendship,
   getFriendsCacheMeta,
   resetFriendsCacheForTests,
   resetFriendRequestsCacheForTests,

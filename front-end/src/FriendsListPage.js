@@ -13,30 +13,30 @@ const BACKEND_BASE =
 const FRIENDS_ENDPOINT = `${BACKEND_BASE}/api/friends`;
 
 const FALLBACK_FRIENDS = [
-  {
-    id: "fallback-1",
-    first_name: "Jordan",
-    last_name: "Ramirez",
-    username: "jordan.r",
-    avatar: "https://picsum.photos/seed/jordan/200/200",
-    online: true,
-  },
-  {
-    id: "fallback-2",
-    first_name: "Morgan",
-    last_name: "Lee",
-    username: "morganlee",
-    avatar: "https://picsum.photos/seed/morgan/200/200",
-    online: false,
-  },
-  {
-    id: "fallback-3",
-    first_name: "Skylar",
-    last_name: "Nguyen",
-    username: "skylar.ng",
-    avatar: "https://picsum.photos/seed/skylar/200/200",
-    online: true,
-  },
+  // {
+  //   id: "fallback-1",
+  //   first_name: "Jordan",
+  //   last_name: "Ramirez",
+  //   username: "jordan.r",
+  //   avatar: "https://picsum.photos/seed/jordan/200/200",
+  //   online: true,
+  // },
+  // {
+  //   id: "fallback-2",
+  //   first_name: "Morgan",
+  //   last_name: "Lee",
+  //   username: "morganlee",
+  //   avatar: "https://picsum.photos/seed/morgan/200/200",
+  //   online: false,
+  // },
+  // {
+  //   id: "fallback-3",
+  //   first_name: "Skylar",
+  //   last_name: "Nguyen",
+  //   username: "skylar.ng",
+  //   avatar: "https://picsum.photos/seed/skylar/200/200",
+  //   online: true,
+  // },
 ];
 
 const normalizeFriend = (friend, index) => {
@@ -130,10 +130,34 @@ const FriendsList = () => {
     };
   }, []);
 
-  const handleUnfriend = (friendId) => {
-    setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendId)
-    );
+  const handleUnfriend = async (friendId) => {
+    const isMongoId =
+      typeof friendId === "string" && /^[a-fA-F0-9]{24}$/.test(friendId);
+
+    // If this came from fallback/mock data, just remove locally
+    if (!isMongoId) {
+      setFriends((prevFriends) =>
+        prevFriends.filter((friend) => friend.id !== friendId)
+      );
+      return;
+    }
+
+    try {
+      const res = await fetchWithAuth(`${FRIENDS_ENDPOINT}/${friendId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server responded with status ${res.status}`);
+      }
+
+      setFriends((prevFriends) =>
+        prevFriends.filter((friend) => friend.id !== friendId)
+      );
+    } catch (err) {
+      console.warn("Unable to remove friend.", err);
+      setError("Unable to remove that friend right now. Please try again.");
+    }
   };
 
   const filteredFriends = useMemo(() => {
