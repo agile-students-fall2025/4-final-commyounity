@@ -23,7 +23,7 @@ export default function PrivacySettingsPage() {
     try {
       console.log('[PrivacySettings] Fetching from backend...');
       const token = localStorage.getItem('token');
-      const response = await fetch("http://178.128.70.142/api/api/profile", {
+      const response = await fetch("http://178.128.70.142/api/profile", {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -64,7 +64,7 @@ export default function PrivacySettingsPage() {
       console.log('[PrivacySettings] Saving settings:', newSettings);
       
       const token = localStorage.getItem('token');
-      const response = await fetch("http://178.128.70.142/api/api/profile/privacy", {
+      const response = await fetch("http://178.128.70.142/api/profile/privacy", {
         method: "PUT",
         headers: {
           "Authorization": `JWT ${token}`,

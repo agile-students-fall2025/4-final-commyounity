@@ -72,7 +72,7 @@ export default function EditProfilePage() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch("http://178.128.70.142/api/api/profile", {
+      const response = await fetch("http://178.128.70.142/api/profile", {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -142,7 +142,7 @@ export default function EditProfilePage() {
       formDataUpload.append('profilePhoto', croppedBlob, 'profile.jpg');
 
       const token = localStorage.getItem('token');
-      const response = await fetch("http://178.128.70.142/api/api/profile/photo", {
+      const response = await fetch("http://178.128.70.142/api/profile/photo", {
         method: "POST",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -179,7 +179,7 @@ export default function EditProfilePage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch("http://178.128.70.142/api/api/profile", {
+      const response = await fetch("http://178.128.70.142/api/profile", {
         method: "PUT",
         headers: {
           "Authorization": `JWT ${token}`,

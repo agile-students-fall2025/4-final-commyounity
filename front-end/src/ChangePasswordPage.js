@@ -62,7 +62,7 @@ export default function ChangePasswordPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch("http://178.128.70.142/api/api/profile/password", {
+      const response = await fetch("http://178.128.70.142/api/profile/password", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
