@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ChangePasswordPage.css";
+import API_BASE from "./utils/apiBase";
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();

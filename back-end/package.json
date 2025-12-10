@@ -6,7 +6,8 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --timeout 8000 --require ./test/setup.js --exit",
     "coverage": "cross-env NODE_ENV=test c8 mocha --timeout 8000 --require ./test/setup.js --exit",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js",
   },
   "author": "",
   "license": "ISC",
