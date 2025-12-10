@@ -7,6 +7,7 @@ import Footer from "./Footer";
 const BrowseBoard = () => {
     console.log("**")
     return <>
+    <></>
     <Header title="Browse CommYOUnity Boards" />
     <div className="browse-board-content">
         <BrowseBoardList /> 
