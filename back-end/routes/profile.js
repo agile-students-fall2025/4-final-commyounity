@@ -493,7 +493,7 @@ router.delete('/', requireAuth, async (req, res) => {
     console.log('[DELETE PROFILE] Successfully deleted user and all related data for userId:', userId);
     res.json({
       success: true,
-      message: 'Account and all related data deleted successfully'
+      message: 'Account deleted'
     });
   } catch (error) {
     console.error('[DELETE PROFILE] Error:', error);
