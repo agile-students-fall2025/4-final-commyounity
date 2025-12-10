@@ -59,7 +59,7 @@ const CreateBoard = () => {
         }
       }
 
-      const response = await fetch("http://178.128.70.142/api/boards/create", {
+      const response = await fetch("http://178.128.70.142/api/api/boards/create", {
         method: "POST",
         headers: {
           // IMPORTANT: don't set Content-Type with FormData

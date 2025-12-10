@@ -34,7 +34,7 @@ const FindMembers = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("http://178.128.70.142/api/searches", {
+      const res = await fetch("http://178.128.70.142/api/api/searches", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: trimmed }),
@@ -67,7 +67,7 @@ const FindMembers = () => {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://178.128.70.142/api/boardinvites/${boardId}/invite`,
+        `http://178.128.70.142/api/api/boardinvites/${boardId}/invite`,
         {
           method: "POST",
           headers: {

@@ -30,7 +30,7 @@ const MembersList = () => {
         }
 
         const response = await axios.get(
-          `http://178.128.70.142/api/members/${initialBoardId}`,
+          `http://178.128.70.142/api/api/members/${initialBoardId}`,
           {
             headers: {
               Authorization: `jwt ${token}`, // keep same scheme as other calls

@@ -19,7 +19,7 @@ const BrowseBoardList = () => {
       return
     }
 
-    axios.get('http://178.128.70.142/api/browse/boards', {
+    axios.get('http://178.128.70.142/api/api/browse/boards', {
       headers: {
         Authorization: `JWT ${token}`,
       },
