@@ -10,13 +10,9 @@
   --radius: 16px;
   --radius-sm: 10px;
   
-  /* Privacy-specific colors */
-  --orange: #f97316;
-  --orange-dark: #ea580c;
-  --green: #10b981;
-  --green-dark: #059669;
-  --purple: #8b5cf6;
-  --purple-dark: #7c3aed;
+  /* Toggle colors */
+  --toggle-active: #111;
+  --toggle-inactive: #e5e7eb;
   --gray: #9ca3af;
   --gray-light: #e5e7eb;
   --gray-dark: #6b7280;
@@ -122,134 +118,99 @@
   opacity: 1;
 }
 
-/* Status indicator dot */
-.privacy-toggle::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-  transition: all 0.3s ease;
-  vertical-align: middle;
-}
+/* Status indicator dot - REMOVED */
 
-/* ===== PRIVATE State (Orange) ===== */
+/* ===== PRIVATE State - Grey ===== */
 .privacy-toggle.private {
-  background: var(--orange);
-  box-shadow: 0 6px 18px rgba(249, 115, 22, 0.35);
+  background: var(--gray-light);
+  color: var(--gray-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .privacy-toggle.private:hover {
-  background: var(--orange-dark);
+  background: #d1d5db;
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.45);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .privacy-toggle.private:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.privacy-toggle.private::before {
-  background: #fbbf24;
-  box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
-  animation: pulse 2s infinite;
-}
-
-/* ===== PUBLIC State (Green) ===== */
+/* ===== PUBLIC State - Black ===== */
 .privacy-toggle.public {
-  background: var(--green);
-  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+  background: #111;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .privacy-toggle.public:hover {
-  background: var(--green-dark);
+  background: #000;
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .privacy-toggle.public:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.privacy-toggle.public::before {
-  background: #34d399;
-  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
-  animation: pulse 2s infinite;
-}
-
-/* ===== EVERYONE State (Blue) ===== */
+/* ===== EVERYONE State - Black ===== */
 .privacy-toggle.everyone {
-  background: var(--brand);
-  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.35);
+  background: #111;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .privacy-toggle.everyone:hover {
-  background: var(--brand-dark);
+  background: #000;
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(47, 109, 246, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .privacy-toggle.everyone:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(47, 109, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.privacy-toggle.everyone::before {
-  background: #60a5fa;
-  box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
-  animation: pulse 2s infinite;
-}
-
-/* ===== FRIENDS ONLY State (Purple) ===== */
+/* ===== FRIENDS ONLY State - Grey ===== */
 .privacy-toggle.friends-only {
-  background: var(--purple);
-  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+  background: var(--gray-light);
+  color: var(--gray-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .privacy-toggle.friends-only:hover {
-  background: var(--purple-dark);
+  background: #d1d5db;
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.45);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .privacy-toggle.friends-only:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.privacy-toggle.friends-only::before {
-  background: #a78bfa;
-  box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.7);
-  animation: pulse 2s infinite;
-}
-
-/* ===== ON State (Blue - same as notification) ===== */
+/* ===== ON State - Black ===== */
 .privacy-toggle.on {
-  background: var(--brand);
-  box-shadow: 0 6px 18px rgba(47, 109, 246, 0.35);
+  background: #111;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .privacy-toggle.on:hover {
-  background: var(--brand-dark);
+  background: #000;
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(47, 109, 246, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .privacy-toggle.on:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(47, 109, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.privacy-toggle.on::before {
-  background: #10b981;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  animation: pulse 2s infinite;
-}
-
-/* ===== OFF State (Gray - same as notification) ===== */
+/* ===== OFF State - Grey ===== */
 .privacy-toggle.off {
   background: var(--gray-light);
   color: var(--gray-dark);
@@ -266,25 +227,6 @@
 .privacy-toggle.off:active {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.privacy-toggle.off::before {
-  background: var(--gray);
-  box-shadow: none;
-  animation: none;
-}
-
-/* ===== Pulse Animation ===== */
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-  }
 }
 
 /* ===== Accessibility - Focus states ===== */

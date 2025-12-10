@@ -1,3 +1,4 @@
+/* ===== Theme Variables ===== */
 .ProfilePage {
   --bg: #f7f7f8;
   --text: #1b1b1f;
@@ -9,6 +10,8 @@
   --brand: #0b66ff;
   --accent: #ffc107;
   --danger: #ef4444;
+  --gray: #6b7280;
+  --gray-light: #9ca3af;
 
   max-width: 980px;
   margin: 64px auto;
@@ -106,10 +109,10 @@
   box-shadow: var(--shadow);
 }
 
-/* Edit button under photo */
+/* Edit button under photo - Grey */
 .edit-profile-btn {
-  background: var(--accent);
-  color: #222;
+  background: var(--gray);
+  color: #fff;
   font-weight: 700;
   border: none;
   border-radius: 10px;
@@ -118,7 +121,7 @@
   box-shadow: var(--shadow);
   transition: transform .15s ease, opacity .15s ease;
 }
-.edit-profile-btn:hover { transform: translateY(-2px); opacity: .95; }
+.edit-profile-btn:hover { transform: translateY(-2px); opacity: .9; }
 
 /* ===== Sections - COMPACT VERSION ===== */
 .profile-section {
@@ -140,11 +143,11 @@
 .section-box,
 .section-input {
   width: 100%;
-  border: none;              /* No border */
-  background: transparent;   /* Transparent background */
+  border: none;
+  background: transparent;
   color: #1a1a1a;
   border-radius: var(--radius-sm);
-  padding: 4px 0;            /* Minimal padding */
+  padding: 4px 0;
   line-height: 1.65;
   font-size: 15px;
   font-weight: 400;
@@ -154,7 +157,7 @@
 /* About Me - Auto-fit content height */
 .multiline-box { 
   min-height: auto;
-  max-height: none;          /* No max height - fit content */
+  max-height: none;
   padding: 8px 0;
   white-space: pre-wrap;
   overflow-y: visible;
@@ -168,7 +171,7 @@
 
 /* Background and Interests - Single line inputs */
 .section-input {
-  height: auto;              /* Auto height */
+  height: auto;
   padding: 4px 0;
   border: none;
   background: transparent;
@@ -198,9 +201,13 @@
   transition: transform .15s ease, opacity .15s ease;
 }
 
-.settings-btn { background: var(--brand); color: #fff; }
-.delete-btn   { background: #f3f4f6; color: #111; }
+/* Settings button - Grey */
+.settings-btn { background: var(--gray); color: #fff; }
+
+/* Delete button - Grey */
+.delete-btn { background: #f3f4f6; color: #111; }
 .delete-btn.danger { background: #fee2e2; color: var(--danger); }
+
 .wide-button:hover { transform: translateY(-2px); opacity: .95; }
 
 /* ===== Responsive ===== */
@@ -226,8 +233,9 @@
   .multiline-box {
     padding: 4px 0;
   }
+}
 
-  /* Auth error container styles */
+/* Auth error container styles */
 .auth-error-container {
   display: flex;
   flex-direction: column;
@@ -279,5 +287,4 @@
 
 .signup-hint a:hover {
   text-decoration: underline;
-}
 }

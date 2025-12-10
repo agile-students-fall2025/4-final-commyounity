@@ -137,9 +137,9 @@ export default function NotificationSettingsPage() {
       <div className="NotifPage">
         {/* Back Button */}
         <div className="notif-header">
-        <button className="notif-back" onClick={() => navigate("/settings")}>
-          ← Back
-        </button>
+          <button className="notif-back" onClick={() => navigate("/settings")}>
+            ← Back
+          </button>
         </div>
 
         {/* Row: Board Updates */}
@@ -164,9 +164,9 @@ export default function NotificationSettingsPage() {
           </button>
         </div>
 
-        {/* Row: New Follower */}
+        {/* Row: New Followers */}
         <div className="notif-row">
-          <div className="notif-label">New Follower</div>
+          <div className="notif-label">New Followers</div>
           <button
             className={`notif-toggle ${followersOn ? '' : 'off'}`}
             onClick={toggleFollowers}

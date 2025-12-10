@@ -9,6 +9,8 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   --radius: 16px;
   --radius-sm: 10px;
+  --gray: #6b7280;
+  --gray-dark: #4b5563;
 }
 
 /* ===== Page Container ===== */
@@ -46,10 +48,11 @@
 }
 .findfriends-search input:focus {
   outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.15);
+  border-color: var(--gray);
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.15);
 }
 
+/* ===== Search Button ===== */
 .findfriends-search button {
   width: min(240px, 100%);
   padding: 14px 20px;
@@ -58,13 +61,13 @@
   border: none;
   border-radius: var(--radius-sm);
   color: #fff;
-  background: var(--brand);
+  background: var(--gray);
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
-  box-shadow: 0 6px 20px rgba(47, 109, 246, 0.25);
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.2);
 }
 .findfriends-search button:hover {
-  background: var(--brand-dark);
+  background: var(--gray-dark);
   transform: translateY(-2px);
 }
 .findfriends-search button:active {
@@ -133,32 +136,9 @@
 .findfriends-demo-card.success { color: #1e9c5e; }
 .findfriends-demo-card.info    { color: #2563eb; }
 .findfriends-demo-card.error   { color: #dc2626; }
-.findfriends-demo-card.neutral { color: var(--brand-dark); }
+.findfriends-demo-card.neutral { color: var(--gray); }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .FindFriendsPage {
-    padding: 28px 16px;
-    margin: 40px 0;
-  }
-
-  .findfriends-search { padding: 24px; }
-
-  .findfriends-result-card {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .findfriends-avatar {
-    width: 70px;
-    height: 70px;
-  }
-
-  .findfriends-search input,
-  .findfriends-search button {
-    width: 100%;
-  }
-}
+/* ===== Result Card (updated) ===== */
 .findfriends-result-card {
   margin: 0 auto 24px;
   margin-top: 8px;
@@ -200,21 +180,22 @@
   flex-wrap: wrap;
 }
 
+/* ===== Invite Button ===== */
 .findfriends-invite-btn {
   padding: 8px 14px;
   font-size: 0.9rem;
   border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
-  background: var(--brand);
+  background: var(--gray);
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(47, 109, 246, 0.25);
+  box-shadow: 0 4px 14px rgba(107, 114, 128, 0.2);
   transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
 }
 
 .findfriends-invite-btn:hover:not(:disabled) {
-  background: var(--brand-dark);
+  background: var(--gray-dark);
   transform: translateY(-1px);
 }
 
@@ -226,4 +207,29 @@
 .findfriends-invite-error {
   font-size: 0.85rem;
   color: #dc2626;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .FindFriendsPage {
+    padding: 28px 16px;
+    margin: 40px 0;
+  }
+
+  .findfriends-search { padding: 24px; }
+
+  .findfriends-result-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .findfriends-avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .findfriends-search input,
+  .findfriends-search button {
+    width: 100%;
+  }
 }

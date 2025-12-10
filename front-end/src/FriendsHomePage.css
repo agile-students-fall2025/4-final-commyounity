@@ -39,16 +39,17 @@
   font-size: 1.1rem;
   font-weight: 700;
   color: #fff;
-  background: var(--brand);
+  background: #111;
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: 0 6px 20px rgba(47, 109, 246, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .friends-btn:hover {
-  background: var(--brand-dark);
+  background: #111;
+  color: var(--brand);
   transform: translateY(-2px);
 }
 
@@ -57,12 +58,12 @@
 }
 
 .friends-btn.active {
-  background: #1e40af;
+  background: #000;
 }
 
 /* ===== Accessibility Focus ===== */
 .friends-btn:focus-visible {
-  outline: 3px solid black;
+  outline: 3px solid var(--brand);
 }
 
 /* ===== Responsive Tweaks ===== */
