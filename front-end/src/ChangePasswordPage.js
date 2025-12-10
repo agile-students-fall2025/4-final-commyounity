@@ -92,6 +92,9 @@ export default function ChangePasswordPage() {
     <div className="ChangePasswordPage">
       {/* header with back button + title */}
       <header className="change-header">
+        <button className="change-back" onClick={() => navigate("/settings")}>
+          ←
+        </button>
         <h1 className="change-title">Change Password</h1>
       </header>
 

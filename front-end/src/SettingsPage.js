@@ -10,7 +10,10 @@ export default function SettingsPage() {
   return (
     <><Header title="Settings" />
     <div className="settings-back-container">
-</div>
+      <button className="settings-back" onClick={() => navigate("/profilepage")}>
+        ← Back
+      </button>
+    </div>
     <div className="SettingsPage">
       <div className="settings-buttons">
         <Link to="/settings/notifications" className="settings-block">
