@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import "./NotificationSettingsPage.css";
 import Header from "./Header";
 import API_BASE from "./utils/apiBase";
-import API_BASE from "./utils/apiBase";
+import Footer from "./Footer";
 
 export default function NotificationSettingsPage() {
   const navigate = useNavigate();

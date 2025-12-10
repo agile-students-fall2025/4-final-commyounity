@@ -93,14 +93,6 @@ const FriendThumb = ({
       <div className="FriendThumb-actions">
         {variant === "list" ? (
           <>
-            <button
-              className="view-profile-button"
-              onClick={() =>
-                alert(`Viewing ${displayName}'s profile (pretend)!`)
-              }
-            >
-              View Profile
-            </button>
             <button className="unfriend-button" onClick={handleUnfriendClick}>
               Unfriend
             </button>
