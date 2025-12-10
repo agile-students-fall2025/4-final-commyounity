@@ -1,50 +1,41 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const passport = require("passport"); 
+const passport = require("passport");
 const Board = require("../models/Board");
 
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
+
 // ----------------------------
-// Multer Disk Storage
+// Cloudinary Config
 // ----------------------------
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(process.cwd(), "uploads"));
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
-  }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (file && !file.mimetype.startsWith("image/")) {
-      return cb(new Error("Only image uploads allowed"));
-    }
-    cb(null, true);
+// ----------------------------
+// Cloudinary Storage via Multer
+// ----------------------------
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "boards",               // Cloudinary folder name
+    allowedFormats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 1200, crop: "limit" }],
   },
 });
 
-// helper to delete uploaded file if we don't want to keep it
-function deleteUploadedFile(file) {
-  if (!file || !file.path) return;
-  fs.unlink(file.path, (err) => {
-    if (err) {
-      console.warn("[UPLOAD CLEANUP ERROR]", err.message);
-    }
-  });
-}
+const upload = multer({ storage });
 
 // ----------------------------
-// CREATE BOARD 
+// CREATE BOARD (cloud hosted photo)
 // ----------------------------
 router.post(
   "/",
-  passport.authenticate("jwt", { session: false }), // ⬅️ must be authenticated
+  passport.authenticate("jwt", { session: false }),
   upload.single("photo"),
   async (req, res) => {
     try {
@@ -52,38 +43,37 @@ router.post(
       const descriptionLong = (req.body.descriptionLong || "").trim();
 
       if (!title) {
-        deleteUploadedFile(req.file);
         return res.status(400).json({
           status: "error",
-          message: "Title is required."
+          message: "Title is required.",
         });
       }
 
       if (!req.file) {
         return res.status(400).json({
           status: "error",
-          message: "A cover photo is required."
+          message: "A cover photo is required.",
         });
       }
 
-      // passport-jwt should have put the user document into req.user
       if (!req.user) {
-        deleteUploadedFile(req.file);
         return res.status(401).json({
           status: "error",
           message: "Not authenticated.",
         });
       }
 
-      const ownerId = String(req.user._id || req.user.id);
-      const coverPhotoURL = `http://localhost:4000/uploads/${req.file.filename}`;
+      const ownerId = req.user._id.toString();
+
+      // Cloudinary URL returned by multer-storage-cloudinary
+      const coverPhotoURL = req.file.path;
 
       const createdBoard = await Board.create({
         title,
         descriptionLong,
         owner: ownerId,
         members: [ownerId],
-        coverPhotoURL,
+        coverPhotoURL, // stored in cloud!
       });
 
       const response = {
@@ -93,11 +83,10 @@ router.post(
         memberCount: createdBoard.members.length,
       };
 
-      console.log("[BOARD CREATE]", {
+      console.log("[BOARD CREATE CLOUDINARY]", {
         boardId: createdBoard._id,
         owner: ownerId,
         title,
-        descriptionLong,
       });
 
       return res.status(201).json({
@@ -106,8 +95,6 @@ router.post(
       });
 
     } catch (err) {
-      deleteUploadedFile(req.file);
-
       console.error("[BOARD CREATE ERROR]", err);
       return res.status(500).json({
         status: "error",
