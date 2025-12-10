@@ -102,7 +102,7 @@ router.get(
 
       // 6) Get possible invitees
       const users = await User.find(userQuery)
-        .select("_id username name email")
+        .select("_id username name email avatar")
         .limit(50)
         .lean();
 
@@ -113,6 +113,11 @@ router.get(
           username: u.username,
           name: u.name,
           email: u.email,
+          avatar:
+            u.avatar ||
+            `https://picsum.photos/seed/${encodeURIComponent(
+              u.username || u._id.toString()
+            )}/200/200`,
         })),
         meta: {
           count: users.length,

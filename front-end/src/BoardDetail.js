@@ -53,13 +53,13 @@ const BoardDetail = () => {
       return;
     }
   
-    if (board.isOwner && board.memberCount === 1) {
-      const confirmDelete = window.confirm(
-        "You are the only member of this board. " +
-          "If you leave, the entire board and its content will be permanently deleted.\n\n" +
-          "Do you still want to leave?"
-      );
-      if (!confirmDelete) return;
+    if (board.isOwner) {
+      const message =
+        board.memberCount === 1
+          ? "You are the only member of this board. If you leave, the entire board and its content will be permanently deleted.\n\nDo you still want to leave?"
+          : "You're the owner of this board about to leave. Are you sure? This cannot be undone.";
+      const confirmLeave = window.confirm(message);
+      if (!confirmLeave) return;
     }
   
     setLeaving(true);
