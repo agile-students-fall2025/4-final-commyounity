@@ -130,10 +130,34 @@ const FriendsList = () => {
     };
   }, []);
 
-  const handleUnfriend = (friendId) => {
-    setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendId)
-    );
+  const handleUnfriend = async (friendId) => {
+    const isMongoId =
+      typeof friendId === "string" && /^[a-fA-F0-9]{24}$/.test(friendId);
+
+    // If this came from fallback/mock data, just remove locally
+    if (!isMongoId) {
+      setFriends((prevFriends) =>
+        prevFriends.filter((friend) => friend.id !== friendId)
+      );
+      return;
+    }
+
+    try {
+      const res = await fetchWithAuth(`${FRIENDS_ENDPOINT}/${friendId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server responded with status ${res.status}`);
+      }
+
+      setFriends((prevFriends) =>
+        prevFriends.filter((friend) => friend.id !== friendId)
+      );
+    } catch (err) {
+      console.warn("Unable to remove friend.", err);
+      setError("Unable to remove that friend right now. Please try again.");
+    }
   };
 
   const filteredFriends = useMemo(() => {

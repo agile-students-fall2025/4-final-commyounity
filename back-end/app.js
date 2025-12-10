@@ -23,7 +23,7 @@ const joinBoardRouter = require("./routes/joinBoard");
 const User = require("./models/User");
 const Friend = require("./models/Friend");
 const FriendRequest = require("./models/FriendRequest");
-const ViewProfile = require("./routes/users");
+
 
 const {
   ensureFriendsCache,
@@ -35,6 +35,7 @@ const {
   findFriendRequest,
   removeFriendRequest,
   addFriendFromRequest,
+  removeFriendship,
   invalidateFriendRequestsCache,
 } = require("./services/friendsService");
 const { param, validationResult, body } = require("express-validator");
@@ -207,6 +208,31 @@ const requireJwt = passport.authenticate("jwt", { session: false });
       res.status(500).json({ error: "Unable to load friends list." });
     }
   });
+
+  app.delete(
+    "/api/friends/:id",
+    requireJwt,
+    param("id").isMongoId().withMessage("Invalid friend id."),
+    async (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      try {
+        const ownerId = req.user?._id;
+        const contactId = req.params.id;
+        const removed = await removeFriendship(ownerId, contactId);
+        if (!removed) {
+          return res.status(404).json({ error: "Friend not found." });
+        }
+        res.json({ status: "unfriended", removed: contactId });
+      } catch (error) {
+        console.error("Unable to remove friend.", error);
+        res.status(500).json({ error: "Unable to remove friend." });
+      }
+    }
+  );
 
   app.get("/api/friend-requests", requireJwt, async (req, res) => {
     try {
@@ -464,9 +490,6 @@ app.use("/api/boards", kickMemberRouter);
 
 //find members
 app.use("/api/searches", findMembersRouter);
-
-//view profile
-app.use("/api/users", ViewProfile);
 
 // export the express app we created to make it available to other modules
 module.exports = app

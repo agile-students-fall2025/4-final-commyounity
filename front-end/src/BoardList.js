@@ -53,41 +53,62 @@ const BoardList = props => {
 
   return (
     <div className="BoardList">
-      <h3 style={{ paddingLeft: '20px' }}>Your Boards:</h3>
-      <SearchBar 
-        onSearch={setYourBoardsSearch}
-        placeholder="Search your boards..."
-      />
-      <section className="yourBoards">
-        {filteredYourBoards.length > 0 ? (
-          filteredYourBoards.map(item => (
-            <BoardThumb key={item.id || item._id} details={item} />
-          ))
-        ) : (
-          <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
-            {yourBoardsSearch ? 'No boards found matching your search.' : 'No boards available.'}
-          </p>
-        )}
-      </section>
-
-      <h3 style={{ paddingLeft: '20px' }}>Boards You Are a Member Of:</h3>
-      <SearchBar 
-        onSearch={setNotYourBoardsSearch}
-        placeholder="Search member boards..."
-      />
-      <section className="NotYourBoards">
-        {filteredNotYourBoards.length > 0 ? (
-          filteredNotYourBoards.map(item => (
-            <BoardThumb key={item.id || item._id} details={item} />
-          ))
-        ) : (
-          <p style={{ padding: '20px', color: '#999', textAlign: 'center', width: '100%' }}>
-            {notYourBoardsSearch ? 'No boards found matching your search.' : 'No boards available.'}
-          </p>
-        )}
-      </section>
+  
+        {/* ===== YOUR BOARDS ===== */}
+        <h3>Your Boards:</h3>
+  
+        <div className="search-wrapper">
+          <SearchBar 
+            onSearch={setYourBoardsSearch}
+            placeholder="Search your boards ..."
+          />
+        </div>
+  
+        <section className="board-grid">
+          {filteredYourBoards.length > 0 ? (
+            filteredYourBoards.map(item => (
+              <div className="board-card" key={item.id || item._id}>
+                <BoardThumb details={item} />
+              </div>
+            ))
+          ) : (
+            <p className="empty-msg">
+              {yourBoardsSearch
+                ? 'No boards found matching your search.'
+                : 'No boards available.'}
+            </p>
+          )}
+        </section>
+  
+        {/* ===== MEMBER BOARDS ===== */}
+        <h3>Boards You Are a Member Of:</h3>
+  
+        <div className="search-wrapper">
+          <SearchBar 
+            onSearch={setNotYourBoardsSearch}
+            placeholder="Search member boards..."
+          />
+        </div>
+  
+        <section className="board-grid">
+          {filteredNotYourBoards.length > 0 ? (
+            filteredNotYourBoards.map(item => (
+              <div className="board-card" key={item.id || item._id}>
+                <BoardThumb details={item} />
+              </div>
+            ))
+          ) : (
+            <p className="empty-msg">
+              {notYourBoardsSearch
+                ? 'No boards found matching your search.'
+                : 'No boards available.'}
+            </p>
+          )}
+        </section>
+  
     </div>
   )
+  
 }
 
 export default BoardList
