@@ -15,14 +15,19 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     try {
-      const userId = new mongoose.Types.ObjectId(req.user._id);
+      const rawId = req.user?._id || req.user?.id;
+      if (!rawId || !mongoose.isValidObjectId(rawId)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const userId = new mongoose.Types.ObjectId(rawId);
 
       // stricter filter:
       //  - owner is not current user
       //  - members array does not contain current user (if members exist)
       const boards = await Board.find({
         owner: { $ne: userId },
-        members: { $exists: true, $nin: [userId] },
+        members: { $not: { $elemMatch: { $eq: userId } } },
       })
         .sort({ createdAt: -1 })
         .limit(20)
