@@ -53,23 +53,24 @@
   max-width: 420px;
 }
 
-/* ===== Buttons ===== */
+/* ===== Buttons - Black, blue when hover ===== */
 .menu-button {
   width: 100%;
   padding: 16px 22px;
   font-size: 1.05rem;
   font-weight: 700;
   color: #fff;
-  background: var(--brand);
+  background: #111;
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
-  box-shadow: 0 8px 20px rgba(47, 109, 246, 0.25);
+  transition: transform 0.15s ease, color 0.15s ease, background 0.15s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .menu-button:hover {
-  background: var(--brand-dark);
+  background: #111;
+  color: var(--brand);
   transform: translateY(-2px);
 }
 
