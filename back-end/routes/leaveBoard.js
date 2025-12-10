@@ -67,26 +67,23 @@ router.post(
 
       // --- CASE 2: Owner leaves but others exist
       if (isOwner && memberCount > 1) {
-        if (!newOwnerId) {
+        // Automatically pick the next owner from current members (excluding the leaving owner)
+        const candidates = members.filter((m) => String(m) !== userId);
+        const nextOwnerId =
+          newOwnerId && candidates.includes(newOwnerId.toString())
+            ? newOwnerId
+            : candidates[0];
+
+        if (!nextOwnerId) {
           return res.status(400).json({
             status: "error",
-            message: "newOwnerId is required before owner can leave",
+            message: "No eligible member found to transfer ownership.",
           });
         }
 
-        const newOwnerIsMember = members.some(
-          (m) => String(m) === String(newOwnerId)
-        );
-        if (!newOwnerIsMember) {
-          return res.status(400).json({
-            status: "error",
-            message: "New owner must be an existing member",
-          });
-        }
-
-        board.owner = newOwnerId;
+        board.owner = nextOwnerId;
         console.log(
-          `[NEW OWNER SET] Board ${boardId}: ${userId} → ${newOwnerId}`
+          `[NEW OWNER SET] Board ${boardId}: ${userId} → ${nextOwnerId}`
         );
       }
 
