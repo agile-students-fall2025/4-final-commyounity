@@ -9,31 +9,42 @@
 }
 
 /* ===== Section Headers ===== */
-.BoardList h1 {
+.BoardList h1,
+.BoardList h3 {
   font-size: clamp(18px, 2.2vw, 22px);
-  margin-top: 32px;
-  margin-bottom: 12px;
+  margin-top: 28px;
+  margin-bottom: 10px;
   font-weight: 700;
   color: #111;
   text-align: left;
 }
 
-/* ===== Section Grid ===== */
-.BoardList section {
+/* ===== Search Bar Wrapper ===== */
+.search-wrapper {
+  margin-bottom: 14px;
+  max-width: 300px;      /* reduces horizontal width */
+  margin: 0 auto 14px auto;
+  display: flex;
+  justify-content: center;
+  width: 100%;                
+}
+
+.search-wrapper input {
+  padding: 6px 10px !important;  /* reduces height */
+  font-size: 14px !important;    /* reduces text size */
+  border-radius: 6px !important; /* smaller, cleaner look */
+}
+
+/* ===== Section Grid (Board Cards Only) ===== */
+.board-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
-  padding: 20px 0;
-  border-top: 2px solid #eee;
-  transition: all 0.2s ease-in-out;
+  padding: 12px 0;
 }
 
-.BoardList section:first-of-type {
-  border-top: none;
-}
-
-/* ===== Board Card ===== */
-.BoardList section > * {
+/* ===== Board Card (BoardThumb wrapper) ===== */
+.board-card {
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -43,90 +54,63 @@
   cursor: pointer;
 }
 
-.BoardList section > *:hover {
+.board-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
 }
 
-/* ===== Board Image ===== */
-.BoardList section img {
+/* ===== Inside Board Card (Optional Image Style) ===== */
+.board-card img {
   width: 100%;
   height: 160px;
   object-fit: cover;
   border-radius: 8px;
 }
 
-/* ===== Board Title Link ===== */
-.BoardList section a {
-  display: block;
-  margin-top: 12px;
-  font-size: clamp(15px, 1.8vw, 17px);
-  font-weight: 600;
-  color: #1a1a1a;
-  text-decoration: none;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.BoardList section a:hover {
-  color: #0073e6;
-  text-decoration: underline;
-}
-
-/* ===== First Heading Adjustment ===== */
-.BoardList h1:first-of-type {
-  margin-top: 0;
-}
-
-/* ===== Background ===== */
-body {
-  background-color: #fafafa;
+/* ===== Empty-State Message ===== */
+.empty-msg {
+  padding: 20px 0;
+  color: #777;
+  font-size: 0.95rem;
+  text-align: center;
+  width: 100%;
 }
 
 /* ===== Responsive Design ===== */
-
-/* Medium Screens (Tablets) */
 @media (max-width: 900px) {
   .BoardList {
     padding: 20px;
   }
 
-  .BoardList section {
+  .board-grid {
     gap: 20px;
   }
 
-  .BoardList section img {
+  .board-card img {
     height: 140px;
   }
 }
 
-/* Small Screens (Phones) */
 @media (max-width: 600px) {
   .BoardList {
     padding: 16px;
   }
 
-  .BoardList h1 {
+  .BoardList h3 {
     text-align: center;
-    margin-bottom: 16px;
   }
 
-  .BoardList section {
+  .board-grid {
     grid-template-columns: 1fr;
     gap: 18px;
-    padding: 12px 0;
   }
 
-  .BoardList section > * {
-    padding: 12px;
+  .board-card {
+    padding: 14px;
     border-radius: 10px;
   }
 
-  .BoardList section img {
+  .board-card img {
     height: 180px;
-  }
-
-  .BoardList section a {
-    font-size: 1rem;
   }
 }
