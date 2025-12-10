@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import Header from "./Header";
+import HomeFooter from "./HomeFooter";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const Home = () => {
         </button>
       </div>
     </div>
+    <HomeFooter backToHome />
     </>
   );
 };
