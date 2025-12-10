@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import "./NotificationSettingsPage.css";
 import Header from "./Header";
+import API_BASE from "./utils/apiBase";
+import Footer from "./Footer";
 
 export default function NotificationSettingsPage() {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ export default function NotificationSettingsPage() {
     try {
       console.log('[NotificationSettings] Fetching from backend...');
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile", {
+      const response = await fetch(`${API_BASE}/api/profile`, {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -65,7 +67,7 @@ export default function NotificationSettingsPage() {
       
       const token = localStorage.getItem('token');
       
-      const response = await fetch("http://localhost:4000/api/profile/notifications", {
+      const response = await fetch(`${API_BASE}/api/profile/notifications`, {
         method: "PUT",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -135,12 +137,6 @@ export default function NotificationSettingsPage() {
     <>
       <Header title="Notifications Settings" />
       <div className="NotifPage">
-        {/* Back Button */}
-        <div className="notif-header">
-          <button className="notif-back" onClick={() => navigate("/settings")}>
-            ← Back
-          </button>
-        </div>
 
         {/* Row: Board Updates */}
         <div className="notif-row">
@@ -175,6 +171,7 @@ export default function NotificationSettingsPage() {
           </button>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

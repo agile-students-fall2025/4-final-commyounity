@@ -1,5 +1,9 @@
 # CommYOUnity
 
+## Deployment
+CommYOUnity has been deployed on
+https://octopus-app-mnshq.ondigitalocean.app/
+
 ## Extra-credit
 
 This team has completed extra credit assignment `Continuous Integration` for Sprint 3.

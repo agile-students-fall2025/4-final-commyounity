@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Footer.css";
+import API_BASE from "./utils/apiBase";
 
 const HomeFooter = ({ backToHome = false }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:4000/auth/logout", { method: "GET" });
+      await fetch(`${API_BASE}/auth/logout`, { method: "GET" });
     } catch (err) {
       console.error("Logout request to backend failed (ignoring):", err);
     }

@@ -6,10 +6,9 @@ import Footer from "./Footer";
 import { fetchWithAuth, getStoredToken } from "./utils/authFetch";
 import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 
-const BACKEND_BASE =
-  (process.env.REACT_APP_BACKEND_URL &&
-    process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
-  "http://localhost:4000";
+import API_BASE from "./utils/apiBase";
+
+const BACKEND_BASE = API_BASE;
 
 const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
 const BOARD_INVITES_BASE = `${BACKEND_BASE}/api/boardinvites`;

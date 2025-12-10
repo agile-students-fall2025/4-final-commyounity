@@ -6,6 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 import BoardFeed from "./BoardFeed";
 import Header from "./Header";
 import Footer from "./Footer";
+import API_BASE from "./utils/apiBase";
 
 const BoardDetail = () => {
   const { id } = useParams();            
@@ -25,7 +26,7 @@ const BoardDetail = () => {
       return;
     }
 
-    axios.get(`http://localhost:4000/api/boards/${id}`, {
+    axios.get(`${API_BASE}/api/boards/${id}`, {
       headers: {
         Authorization: `JWT ${token}`,
       },
@@ -53,20 +54,20 @@ const BoardDetail = () => {
       return;
     }
   
-    if (board.isOwner && board.memberCount === 1) {
-      const confirmDelete = window.confirm(
-        "You are the only member of this board. " +
-          "If you leave, the entire board and its content will be permanently deleted.\n\n" +
-          "Do you still want to leave?"
-      );
-      if (!confirmDelete) return;
+    if (board.isOwner) {
+      const message =
+        board.memberCount === 1
+          ? "You are the only member of this board. If you leave, the entire board and its content will be permanently deleted.\n\nDo you still want to leave?"
+          : "You're the owner of this board about to leave. Are you sure? This cannot be undone.";
+      const confirmLeave = window.confirm(message);
+      if (!confirmLeave) return;
     }
   
     setLeaving(true);
   
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/boards/${id}/leave`,
+        `${API_BASE}/api/boards/${id}/leave`,
         {},
         {
           headers: {

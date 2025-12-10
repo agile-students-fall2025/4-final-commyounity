@@ -23,7 +23,7 @@ export default function PrivacySettingsPage() {
     try {
       console.log('[PrivacySettings] Fetching from backend...');
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile", {
+      const response = await fetch(`${API_BASE}/api/profile`, {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -64,7 +64,7 @@ export default function PrivacySettingsPage() {
       console.log('[PrivacySettings] Saving settings:', newSettings);
       
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile/privacy", {
+      const response = await fetch(`${API_BASE}/api/profile/privacy`, {
         method: "PUT",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -135,12 +135,6 @@ export default function PrivacySettingsPage() {
     <>
       <Header title="Privacy Settings" />
       <div className="PrivacyPage">
-        {/* Back Button */}
-        <div className="privacy-header">
-          <button className="privacy-back" onClick={() => navigate("/settings")}>
-            ← Back
-          </button>
-        </div>
 
         {/* Row: Profile Visibility */}
         <div className="privacy-row">
@@ -175,6 +169,7 @@ export default function PrivacySettingsPage() {
           </button>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

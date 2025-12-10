@@ -2,6 +2,7 @@
 import React from "react";
 import "./FriendThumb.css";
 import axios from "axios";
+import API_BASE from "./utils/apiBase";
 
 const FriendThumb = ({
   details,
@@ -13,10 +14,9 @@ const FriendThumb = ({
   // Backend now returns: { id, username, name, email }
   const displayName = details.name || details.username || "Unknown User";
   const secondaryLabel =
-    details.email || (details.username ? `@${details.username}` : "");
+    details.username || (details.username ? `@${details.username}` : "");
   const imgSrc =
-    details.avatar ||
-    `https://i.pravatar.cc/100?u=${details.id || details.email || details.username}`;
+    details.avatar;
 
   const isOnline = Boolean(details.online); // if you ever add real online status
   const statusText = isOnline ? "Online" : "Offline";
@@ -42,7 +42,7 @@ const FriendThumb = ({
       console.log(`[FRONTEND] Inviting ${displayName} to board ${boardId}…`);
 
       const response = await axios.post(
-        `http://localhost:4000/api/boardinvites/${boardId}/invite`,
+        `${API_BASE}/api/boardinvites/${boardId}/invite`,
         {
           invitedUserId: details.id, 
         },
@@ -93,14 +93,6 @@ const FriendThumb = ({
       <div className="FriendThumb-actions">
         {variant === "list" ? (
           <>
-            <button
-              className="view-profile-button"
-              onClick={() =>
-                alert(`Viewing ${displayName}'s profile (pretend)!`)
-              }
-            >
-              View Profile
-            </button>
             <button className="unfriend-button" onClick={handleUnfriendClick}>
               Unfriend
             </button>

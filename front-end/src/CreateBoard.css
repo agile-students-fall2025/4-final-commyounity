@@ -140,11 +140,12 @@
 }
 
 .primary-button {
-  background: var(--brand);
+  background: #000;
   color: #fff;
 }
 .primary-button:hover {
-  background: var(--brand-dark);
+  background: #111;
+  color: #2f6df6;
   transform: translateY(-2px);
 }
 
