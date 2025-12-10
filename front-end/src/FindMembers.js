@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import "./FindMembers.css";
 import Header from "./Header";
 import Footer from "./Footer";
+import API_BASE from "./utils/apiBase";
 
 const FindMembers = () => {
   const { id: boardId } = useParams();   // ← board ID from URL
@@ -34,7 +35,7 @@ const FindMembers = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:4000/api/searches", {
+      const res = await fetch(`${API_BASE}/api/searches`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: trimmed }),
@@ -67,7 +68,7 @@ const FindMembers = () => {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://localhost:4000/api/boardinvites/${boardId}/invite`,
+        `${API_BASE}/api/boardinvites/${boardId}/invite`,
         {
           method: "POST",
           headers: {

@@ -3,6 +3,7 @@ import axios from 'axios'
 import "./BrowseBoardList.css"
 import BoardThumb from './BoardThumb'
 import SearchBar from './SearchBar'
+import API_BASE from "./utils/apiBase";
 
 const BrowseBoardList = () => {
   const [data, setData] = useState([])
@@ -19,7 +20,7 @@ const BrowseBoardList = () => {
       return
     }
 
-    axios.get('http://localhost:4000/api/browse/boards', {
+    axios.get(`${API_BASE}/api/browse/boards`, {
       headers: {
         Authorization: `JWT ${token}`,
       },

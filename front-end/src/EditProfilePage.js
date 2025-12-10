@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import Cropper from "react-easy-crop";
+import API_BASE from "./utils/apiBase";
 
 // Helper function to create cropped image
 const createImage = (url) =>
@@ -72,7 +73,7 @@ export default function EditProfilePage() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile", {
+      const response = await fetch(`${API_BASE}/api/profile`, {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -142,7 +143,7 @@ export default function EditProfilePage() {
       formDataUpload.append('profilePhoto', croppedBlob, 'profile.jpg');
 
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile/photo", {
+      const response = await fetch(`${API_BASE}/api/profile/photo`, {
         method: "POST",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -179,7 +180,7 @@ export default function EditProfilePage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile", {
+      const response = await fetch(`${API_BASE}/api/profile`, {
         method: "PUT",
         headers: {
           "Authorization": `JWT ${token}`,

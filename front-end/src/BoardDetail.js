@@ -6,6 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 import BoardFeed from "./BoardFeed";
 import Header from "./Header";
 import Footer from "./Footer";
+import API_BASE from "./utils/apiBase";
 
 const BoardDetail = () => {
   const { id } = useParams();            
@@ -25,7 +26,7 @@ const BoardDetail = () => {
       return;
     }
 
-    axios.get(`http://localhost:4000/api/boards/${id}`, {
+    axios.get(`${API_BASE}/api/boards/${id}`, {
       headers: {
         Authorization: `JWT ${token}`,
       },
@@ -66,7 +67,7 @@ const BoardDetail = () => {
   
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/boards/${id}/leave`,
+        `${API_BASE}/api/boards/${id}/leave`,
         {},
         {
           headers: {

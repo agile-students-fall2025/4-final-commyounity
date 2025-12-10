@@ -4,6 +4,7 @@ import axios from 'axios'
 import './EditScreen.css'
 import Header from "./Header";
 import Footer from "./Footer";
+import API_BASE from "./utils/apiBase";
 
 const EditScreen = () => {
   const { id } = useParams();  
@@ -27,7 +28,7 @@ const EditScreen = () => {
     }
 
     axios
-      .get("http://localhost:4000/api/boards", {
+      .get(`${API_BASE}/api/boards`, {
         headers: {
           Authorization: `jwt ${token}`,  
         },
@@ -78,7 +79,7 @@ const EditScreen = () => {
       }
 
       const res = await axios.post(
-        `http://localhost:4000/api/boards/${id}/edit`, 
+        `${API_BASE}/api/boards/${id}/edit`, 
         formData,
         { 
           headers: { 

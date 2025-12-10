@@ -6,6 +6,7 @@ import "./MemberList.css";
 import MemberThumb from "./MemberThumb";
 import Header from "./Header";
 import Footer from "./Footer";
+import API_BASE from "./utils/apiBase";
 
 const MembersList = () => {
   const { id } = useParams();
@@ -30,7 +31,7 @@ const MembersList = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:4000/api/members/${initialBoardId}`,
+          `${API_BASE}/api/members/${initialBoardId}`,
           {
             headers: {
               Authorization: `jwt ${token}`, // keep same scheme as other calls
