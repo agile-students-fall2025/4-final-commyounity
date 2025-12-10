@@ -32,6 +32,35 @@
   background: var(--bg);
 }
 
+/* ===== Header: Back Button Row ===== */
+.privacy-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 32px;
+}
+
+.privacy-back {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 18px;
+  background: #111;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-back:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
 /* ===== Privacy Row ===== */
 .privacy-row {
   display: flex;
