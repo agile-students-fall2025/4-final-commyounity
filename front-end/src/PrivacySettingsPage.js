@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import "./PrivacySettingsPage.css";
 import Header from "./Header";
 
@@ -141,6 +140,7 @@ export default function PrivacySettingsPage() {
             ← Back
           </button>
         </div>
+
         {/* Row: Profile Visibility */}
         <div className="privacy-row">
           <div className="privacy-label">Profile Visibility</div>

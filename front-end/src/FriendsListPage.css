@@ -8,6 +8,8 @@
   --card: #ffffff;
   --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   --radius: 16px;
+  --gray: #6b7280;
+  --gray-light: #9ca3af;
 }
 
 /* ===== Main Container ===== */
@@ -40,8 +42,6 @@
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.1));
 }
 
-
-
 /* ===== Search + Filter Controls ===== */
 .friendslist-controls {
   margin-top: 32px;
@@ -55,29 +55,29 @@
   flex: 1 1 280px;
   min-width: 220px;
   padding: 12px 16px;
-  border: 1px solid rgba(47, 109, 246, 0.45);
+  border: 1px solid rgba(107, 114, 128, 0.45);
   border-radius: 12px;
   font-size: 1rem;
   background-color: #fff;
   color: var(--text);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: inset 0 1px 2px rgba(47, 109, 246, 0.12);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .friendslist-search::placeholder {
-  color: #9aa4c2;
+  color: #9ca3af;
 }
 
 .friendslist-search:focus-visible {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 4px rgba(47, 109, 246, 0.15);
+  border-color: var(--gray);
+  box-shadow: 0 0 0 4px rgba(107, 114, 128, 0.15);
   outline: none;
 }
 
 .friendslist-filter {
   flex: 0 0 200px;
   padding: 12px 16px;
-  border: 1px solid rgba(47, 109, 246, 0.45);
+  border: 1px solid rgba(107, 114, 128, 0.45);
   border-radius: 12px;
   font-size: 1rem;
   background-color: #fff;
@@ -87,8 +87,8 @@
 }
 
 .friendslist-filter:focus-visible {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 4px rgba(47, 109, 246, 0.15);
+  border-color: var(--gray);
+  box-shadow: 0 0 0 4px rgba(107, 114, 128, 0.15);
   outline: none;
 }
 
@@ -109,9 +109,9 @@
 .friendslist-empty {
   margin-top: 40px;
   padding: 48px 30px;
-  border: 1px dashed rgba(47, 109, 246, 0.35);
+  border: 1px dashed rgba(107, 114, 128, 0.35);
   border-radius: 16px;
-  background: linear-gradient(145deg, rgba(47, 109, 246, 0.07), rgba(47, 109, 246, 0.02));
+  background: linear-gradient(145deg, rgba(107, 114, 128, 0.07), rgba(107, 114, 128, 0.02));
   font-size: 1.1rem;
   color: #43527c;
   display: flex;
@@ -124,21 +124,21 @@
 /* ===== "Find Friends" Button ===== */
 .find-friends-btn {
   padding: 12px 26px;
-  background: var(--brand);
+  background: var(--gray);
   color: #fff;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 10px 24px rgba(47, 109, 246, 0.3);
+  box-shadow: 0 10px 24px rgba(107, 114, 128, 0.2);
 }
 
 .find-friends-btn:hover,
 .find-friends-btn:focus-visible {
-  background: var(--brand-dark);
+  background: #4b5563;
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(47, 109, 246, 0.32);
+  box-shadow: 0 14px 28px rgba(107, 114, 128, 0.25);
   outline: none;
 }
 
@@ -148,9 +148,9 @@
   padding: 36px 26px;
   color: #44557d;
   font-size: 1rem;
-  background: rgba(47, 109, 246, 0.08);
+  background: rgba(107, 114, 128, 0.08);
   border-radius: 14px;
-  border: 1px solid rgba(47, 109, 246, 0.2);
+  border: 1px solid rgba(107, 114, 128, 0.2);
 }
 
 .friendslist-loading,
@@ -165,30 +165,8 @@
 }
 
 .friendslist-loading {
-  background: rgba(47, 109, 246, 0.08);
-  color: var(--brand-dark);
-}
-
-.friendslist-error {
-  background: #fdf2f2;
-  color: #b91c1c;
-  border: 1px solid rgba(185, 28, 28, 0.25);
-}
-
-.friendslist-loading,
-.friendslist-error {
-  margin-top: 36px;
-  padding: 18px 22px;
-  border-radius: 12px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.friendslist-loading {
-  background: rgba(47, 109, 246, 0.08);
-  color: var(--brand-dark);
+  background: rgba(107, 114, 128, 0.08);
+  color: var(--gray);
 }
 
 .friendslist-error {

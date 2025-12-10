@@ -7,6 +7,8 @@
   --card: #ffffff;
   --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   --radius: 16px;
+  --gray: #6b7280;
+  --gray-dark: #4b5563;
 }
 
 /* ===== Page layout ===== */
@@ -33,7 +35,7 @@
   padding: 0 24px;
 }
 
-/* ===== Back button ===== */
+/* ===== Back button - Remain Black ===== */
 .settings-back {
   display: inline-flex;
   align-items: center;
@@ -42,7 +44,7 @@
   padding: 10px 16px;
   border: none;
   border-radius: 10px;
-  background: #000;
+  background: #111;
   color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
@@ -53,7 +55,8 @@
 }
 
 .settings-back:hover {
-  background: #222;
+  background: #111;
+  color: var(--brand);
   transform: translateY(-2px);
 }
 .settings-back:active {
@@ -69,7 +72,7 @@
   margin-top: 40px;
 }
 
-/* ===== Individual setting blocks ===== */
+/* ===== Individual setting blocks - Grey ===== */
 .settings-block {
   display: inline-flex;
   align-items: center;
@@ -82,24 +85,24 @@
   font-weight: 700;
   font-size: 16px;
   color: #fff;
-  background: var(--brand);
+  background: var(--gray);
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 8px 20px rgba(47, 109, 246, 0.25);
+  box-shadow: 0 8px 20px rgba(107, 114, 128, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
 .settings-block:hover {
-  background: var(--brand-dark);
+  background: var(--gray-dark);
   transform: translateY(-2px);
   opacity: 0.95;
-  box-shadow: 0 10px 26px rgba(47, 109, 246, 0.35);
+  box-shadow: 0 10px 26px rgba(107, 114, 128, 0.25);
 }
 
 .settings-block:focus-visible,
 .settings-back:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.3);
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.3);
 }
 
 /* ===== Responsive adjustments ===== */
