@@ -79,7 +79,7 @@
 /* ===== Kick Button ===== */
 .MemberThumb .kick-button {
   padding: 10px 16px;
-  background: var(--danger);
+  background: black;
   color: #fff;
   border: none;
   border-radius: var(--radius-sm);
@@ -91,7 +91,8 @@
 }
 
 .MemberThumb .kick-button:hover {
-  background: var(--danger-dark);
+  background: black;
+  color: #2f6df6;
   transform: translateY(-2px);
 }
 .role-label {

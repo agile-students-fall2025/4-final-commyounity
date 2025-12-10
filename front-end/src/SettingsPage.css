@@ -85,7 +85,7 @@
   font-weight: 700;
   font-size: 16px;
   color: #fff;
-  background: var(--gray);
+  background: black;
   cursor: pointer;
   text-decoration: none;
   box-shadow: 0 8px 20px rgba(107, 114, 128, 0.2);
@@ -93,7 +93,8 @@
 }
 
 .settings-block:hover {
-  background: var(--gray-dark);
+  background: black;
+  color: #2f6df6;
   transform: translateY(-2px);
   opacity: 0.95;
   box-shadow: 0 10px 26px rgba(107, 114, 128, 0.25);
