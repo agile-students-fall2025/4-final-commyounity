@@ -6,6 +6,11 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 const User = require("../models/User");
+const Friend = require("../models/Friend");
+const FriendRequest = require("../models/FriendRequest");
+const Board = require("../models/Board");
+const BoardInvite = require("../models/BoardInvite");
+const BoardFeed = require("../models/BoardFeed");
 
 // ----------------------------
 // Cloudinary Config
