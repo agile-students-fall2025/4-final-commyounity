@@ -20,10 +20,10 @@
 /* ===== Composer (New Post Input) ===== */
 .BoardFeed .composer {
   display: grid;
-  grid-template-columns: 48px 1fr;
+  grid-template-columns: minmax(40px, 48px) minmax(0, 1fr); /* Allows textarea column to shrink */
   gap: 12px;
   align-items: start;
-  padding: 12px 0 16px;
+  padding: 12px 4px 16px;
   border-bottom: 1px solid #eee;
 }
 
@@ -36,6 +36,8 @@
 
 .BoardFeed .composer textarea {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* Prevent overflow */
   min-height: 80px;
   resize: vertical;
   padding: 10px 12px;
@@ -52,7 +54,7 @@
   box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.12);
 }
 
-/* ===== Composer Footer (Actions) ===== */
+/* ===== Composer Footer ===== */
 .BoardFeed .composer .composer-actions {
   grid-column: 2 / 3;
   display: flex;
@@ -79,10 +81,12 @@
   transition: background 0.15s ease, transform 0.15s ease;
   font-size: clamp(14px, 2vw, 15px);
 }
+
 .BoardFeed .composer button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
 .BoardFeed .composer button:not(:disabled):hover {
   background: #2057cc;
   transform: translateY(-1px);
@@ -103,6 +107,7 @@
   padding: 14px 0;
   border-bottom: 1px solid #f0f0f0;
 }
+
 .BoardFeed .post:last-child {
   border-bottom: 0;
 }
@@ -123,6 +128,7 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+
 .BoardFeed .post .meta .dot {
   opacity: 0.6;
 }
@@ -134,7 +140,7 @@
   font-size: clamp(14px, 1.8vw, 15px);
 }
 
-/* ===== Post Actions (Like/Delete) ===== */
+/* ===== Post Actions ===== */
 .BoardFeed .post .actions {
   display: flex;
   gap: 10px;
@@ -150,13 +156,16 @@
   font-size: 14px;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
+
 .BoardFeed .post .actions .like {
   background: #f3f4f8;
 }
+
 .BoardFeed .post .actions .delete {
   background: #ffe6e6;
   color: #b00020;
 }
+
 .BoardFeed .post .actions button:hover {
   transform: translateY(-1px);
   opacity: 0.9;
@@ -178,11 +187,13 @@
   }
 
   .BoardFeed .composer {
-    grid-template-columns: 40px 1fr;
+    grid-template-columns: minmax(32px, 40px) minmax(0, 1fr);
     gap: 10px;
+    padding: 10px 4px 14px;
   }
 
-  .BoardFeed .composer .avatar {
+  .BoardFeed .composer .avatar,
+  .BoardFeed .post .avatar {
     width: 40px;
     height: 40px;
   }
@@ -190,11 +201,6 @@
   .BoardFeed .post {
     grid-template-columns: 40px 1fr;
     gap: 10px;
-  }
-
-  .BoardFeed .post .avatar {
-    width: 40px;
-    height: 40px;
   }
 
   .BoardFeed .composer .composer-actions {
@@ -205,13 +211,5 @@
 
   .BoardFeed .composer button {
     width: 100%;
-  }
-
-  .BoardFeed .post .message {
-    text-align: left;
-  }
-
-  .BoardFeed .post .actions {
-    justify-content: flex-end;
   }
 }
