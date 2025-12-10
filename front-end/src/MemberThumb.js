@@ -50,7 +50,7 @@ const MemberThumb = (props) => {
       setKicking(true);
 
       const res = await fetch(
-        `http://localhost:4000/api/boards/${boardId}/kick-member`,
+        `http://178.128.70.142/api/api/boards/${boardId}/kick-member`,
         {
           method: "POST",
           headers: {

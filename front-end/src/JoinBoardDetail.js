@@ -33,7 +33,7 @@ const JoinBoardDetail = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:4000/api/boards/${id}`,
+          `http://178.128.70.142/api/api/boards/${id}`,
           {
             signal: controller.signal,
             headers: {
@@ -68,7 +68,7 @@ const JoinBoardDetail = () => {
       }
   
       const res = await axios.get(
-        `http://localhost:4000/api/members/${id}`,   // ✅ note the /:boardId
+        `http://178.128.70.142/api/api/members/${id}`,   // ✅ note the /:boardId
         {
           headers: {
             Authorization: `JWT ${token}`,          // ✅ matches your backend passport JWT
@@ -110,7 +110,7 @@ const JoinBoardDetail = () => {
       }
 
       const res = await axios.post(
-        `http://localhost:4000/api/boards/${id}/join`,
+        `http://178.128.70.142/api/api/boards/${id}/join`,
         {}, 
         {
           headers: {

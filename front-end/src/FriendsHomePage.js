@@ -8,7 +8,7 @@ import { fetchWithAuth, getStoredToken } from "./utils/authFetch";
 const BACKEND_BASE =
   (process.env.REACT_APP_BACKEND_URL &&
     process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "")) ||
-  "http://localhost:4000";
+  "http://178.128.70.142/api";
 const FRIENDS_ENDPOINT = `${BACKEND_BASE}/api/friends`;
 const FRIEND_REQUESTS_ENDPOINT = `${BACKEND_BASE}/api/friend-requests`;
 

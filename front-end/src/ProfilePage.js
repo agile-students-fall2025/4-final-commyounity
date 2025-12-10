@@ -40,7 +40,7 @@ export default function ProfilePage() {
         return;
       }
       
-      const response = await fetch("http://localhost:4000/api/profile", {
+      const response = await fetch("http://178.128.70.142/api/api/profile", {
         method: "GET",
         headers: {
           "Authorization": `JWT ${token}`,
@@ -70,7 +70,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:4000/logout", {
+      await fetch("http://178.128.70.142/api/logout", {
         method: "GET",
         credentials: "include",
       });
@@ -115,7 +115,7 @@ export default function ProfilePage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch("http://localhost:4000/api/profile", {
+      const response = await fetch("http://178.128.70.142/api/api/profile", {
         method: "DELETE",
         headers: {
           "Authorization": `JWT ${token}`,

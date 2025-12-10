@@ -25,7 +25,7 @@ const BoardDetail = () => {
       return;
     }
 
-    axios.get(`http://localhost:4000/api/boards/${id}`, {
+    axios.get(`http://178.128.70.142/api/api/boards/${id}`, {
       headers: {
         Authorization: `JWT ${token}`,
       },
@@ -66,7 +66,7 @@ const BoardDetail = () => {
   
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/boards/${id}/leave`,
+        `http://178.128.70.142/api/api/boards/${id}/leave`,
         {},
         {
           headers: {

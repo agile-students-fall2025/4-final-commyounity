@@ -25,7 +25,7 @@ const SignUpPage = () => {
     setLoading(true);
   
     try {
-      const res = await fetch('http://localhost:4000/auth/signup', {
+      const res = await fetch('http://178.128.70.142/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -78,7 +78,7 @@ const SignUpPage = () => {
 //goole auth disabled for now!!!
   // --- Google signup redirect ---
   const handleGoogleSignup = () => {
-    window.location.href = 'http://localhost:4000/auth/google';
+    window.location.href = 'http://178.128.70.142/api/auth/google';
   };
 
   return (

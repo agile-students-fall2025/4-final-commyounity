@@ -27,7 +27,7 @@ const EditScreen = () => {
     }
 
     axios
-      .get("http://localhost:4000/api/boards", {
+      .get("http://178.128.70.142/api/api/boards", {
         headers: {
           Authorization: `jwt ${token}`,  
         },
@@ -78,7 +78,7 @@ const EditScreen = () => {
       }
 
       const res = await axios.post(
-        `http://localhost:4000/api/boards/${id}/edit`, 
+        `http://178.128.70.142/api/api/boards/${id}/edit`, 
         formData,
         { 
           headers: { 
