@@ -1,1 +1,4 @@
 
+.browse-board-content {
+    padding-bottom: 120px; /* enough to clear footer height */
+  }
