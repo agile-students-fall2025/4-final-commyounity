@@ -13,10 +13,9 @@ const FriendThumb = ({
   // Backend now returns: { id, username, name, email }
   const displayName = details.name || details.username || "Unknown User";
   const secondaryLabel =
-    details.email || (details.username ? `@${details.username}` : "");
+    details.username || (details.username ? `@${details.username}` : "");
   const imgSrc =
-    details.avatar ||
-    `https://i.pravatar.cc/100?u=${details.id || details.email || details.username}`;
+    details.avatar;
 
   const isOnline = Boolean(details.online); // if you ever add real online status
   const statusText = isOnline ? "Online" : "Offline";

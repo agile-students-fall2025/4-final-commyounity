@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PrivacySettingsPage.css";
 import Header from "./Header";
+import Footer from "./Footer";
 
 export default function PrivacySettingsPage() {
   const navigate = useNavigate();
@@ -134,12 +135,6 @@ export default function PrivacySettingsPage() {
     <>
       <Header title="Privacy Settings" />
       <div className="PrivacyPage">
-        {/* Back Button */}
-        <div className="privacy-header">
-          <button className="privacy-back" onClick={() => navigate("/settings")}>
-            ← Back
-          </button>
-        </div>
 
         {/* Row: Profile Visibility */}
         <div className="privacy-row">
@@ -174,6 +169,7 @@ export default function PrivacySettingsPage() {
           </button>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

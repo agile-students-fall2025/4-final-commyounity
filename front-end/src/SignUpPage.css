@@ -103,7 +103,7 @@
   font-size: 15px;
   font-weight: 800;
   color: #fff;
-  background: var(--brand);
+  background: black;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -111,7 +111,7 @@
   box-shadow: 0 8px 20px rgba(47, 109, 246, 0.25);
   margin-top: 6px;
 }
-.signup-button:hover { background: var(--brand-dark); transform: translateY(-1px); }
+.signup-button:hover { background: black; color:#2f6df6; transform: translateY(-1px); }
 .signup-button:active { transform: scale(0.98); }
 
 /* ===== Divider (matches Login page) ===== */
