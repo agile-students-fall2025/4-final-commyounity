@@ -13,30 +13,30 @@ const BACKEND_BASE =
 const FRIENDS_ENDPOINT = `${BACKEND_BASE}/api/friends`;
 
 const FALLBACK_FRIENDS = [
-  {
-    id: "fallback-1",
-    first_name: "Jordan",
-    last_name: "Ramirez",
-    username: "jordan.r",
-    avatar: "https://picsum.photos/seed/jordan/200/200",
-    online: true,
-  },
-  {
-    id: "fallback-2",
-    first_name: "Morgan",
-    last_name: "Lee",
-    username: "morganlee",
-    avatar: "https://picsum.photos/seed/morgan/200/200",
-    online: false,
-  },
-  {
-    id: "fallback-3",
-    first_name: "Skylar",
-    last_name: "Nguyen",
-    username: "skylar.ng",
-    avatar: "https://picsum.photos/seed/skylar/200/200",
-    online: true,
-  },
+  // {
+  //   id: "fallback-1",
+  //   first_name: "Jordan",
+  //   last_name: "Ramirez",
+  //   username: "jordan.r",
+  //   avatar: "https://picsum.photos/seed/jordan/200/200",
+  //   online: true,
+  // },
+  // {
+  //   id: "fallback-2",
+  //   first_name: "Morgan",
+  //   last_name: "Lee",
+  //   username: "morganlee",
+  //   avatar: "https://picsum.photos/seed/morgan/200/200",
+  //   online: false,
+  // },
+  // {
+  //   id: "fallback-3",
+  //   first_name: "Skylar",
+  //   last_name: "Nguyen",
+  //   username: "skylar.ng",
+  //   avatar: "https://picsum.photos/seed/skylar/200/200",
+  //   online: true,
+  // },
 ];
 
 const normalizeFriend = (friend, index) => {

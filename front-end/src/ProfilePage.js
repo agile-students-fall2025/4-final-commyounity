@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import { FRIENDS_STORAGE_KEY } from "./storageKeys";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -81,6 +82,28 @@ export default function ProfilePage() {
     }
   };
 
+  // Helper function to clear all profile-related localStorage data
+  const clearAllProfileData = () => {
+    // Clear authentication token
+    localStorage.removeItem('token');
+    
+    // Clear friends list
+    localStorage.removeItem(FRIENDS_STORAGE_KEY);
+    
+    // Clear friend requests
+    localStorage.removeItem('friend-requests');
+    
+    // Clear all board feed caches (format: board:${boardId}:feed)
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('board:') && key.endsWith(':feed')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+  };
+
   const handleDeleteProfile = async () => {
     const confirmed = window.confirm(
       "Are you sure you want to delete your profile?\n\nThis action cannot be undone."
@@ -103,7 +126,8 @@ export default function ProfilePage() {
 
       if (response.ok) {
         alert("Profile deleted successfully. You will now be logged out.");
-        localStorage.removeItem('token');
+        // Clear all profile-related localStorage data
+        clearAllProfileData();
         navigate("/");
       } else {
         alert(data.error || "Failed to delete profile. Please try again.");
