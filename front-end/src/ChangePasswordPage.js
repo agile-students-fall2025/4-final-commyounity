@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./ChangePasswordPage.css";
 import Footer from "./Footer";
 import Header from "./Header";
+import API_BASE from "./utils/apiBase";
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
