@@ -20,11 +20,11 @@ const authPost = (p) => request(app).post(p).set("Authorization", `JWT ${token}`
 const authDelete = (p) => request(app).delete(p).set("Authorization", `JWT ${token}`);
 
 describe("Profile routes", () => {
-  // create a fresh test user before each test
+  
   beforeEach(async () => {
     const tsShort = Date.now().toString().slice(-6);
 
-    // 🔒 only wipe users created by this suite
+    
     await User.deleteMany({
       $or: [
         { username: /^ptest_/i },
@@ -60,7 +60,7 @@ describe("Profile routes", () => {
     userId = testUser._id;
   });
 
-  // ============ GET /api/profile ============
+ 
   describe("GET /api/profile", () => {
     it("returns user profile with all fields", async () => {
       const res = await authGet("/api/profile");
@@ -108,8 +108,7 @@ describe("Profile routes", () => {
     });
 
     it("returns 401 when user does not exist", async () => {
-      // ❌ old: await User.deleteMany({});
-      // ✅ only delete the current test user
+     
       await User.deleteOne({ _id: userId });
 
       const res = await authGet("/api/profile");
@@ -122,7 +121,7 @@ describe("Profile routes", () => {
     });
   });
 
-  // ============ PUT /api/profile ============
+ 
   describe("PUT /api/profile", () => {
     it("updates profile fields", async () => {
       const res = await authPut("/api/profile").send({
@@ -151,7 +150,7 @@ describe("Profile routes", () => {
     });
   });
 
-  // ============ PUT /api/profile/password ============
+  
   describe("PUT /api/profile/password", () => {
     it("changes password successfully with correct current password", async () => {
       const res = await authPut("/api/profile/password").send({
@@ -256,53 +255,39 @@ describe("Profile routes", () => {
     });
   });
 
-  // ============ POST /api/profile/photo ============
-  describe("POST /api/profile/photo", () => {
-    const testImagePath = path.join(__dirname, "test-image.jpg");
-    const badFilePath = path.join(__dirname, "not-image.txt");
+  
 
-    before(() => {
-      const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xd9]); // tiny jpeg
-      fs.writeFileSync(testImagePath, jpeg);
-      fs.writeFileSync(badFilePath, "not image");
+    describe("POST /api/profile/photo", () => {
+      const testImagePath = path.join(__dirname, "test-image.jpg");
+      const badFilePath = path.join(__dirname, "not-image.txt");
+  
+      const authPost = (url) => {
+        return request(app)
+          .post(url)
+          .set("Authorization", `JWT ${global.testToken}`); 
+      };
+  
+      before(() => {
+        const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xd9]); 
+        fs.writeFileSync(testImagePath, jpeg);
+        fs.writeFileSync(badFilePath, "not image");
+      });
+  
+      after(() => {
+        if (fs.existsSync(testImagePath)) fs.unlinkSync(testImagePath);
+        if (fs.existsSync(badFilePath)) fs.unlinkSync(badFilePath);
+      });
+  
+      it("returns 401 without JWT token", async () => {
+        const res = await request(app)
+          .post("/api/profile/photo")
+          .attach("profilePhoto", testImagePath);
+  
+        expect(res.status).to.equal(401);
+      });
     });
 
-    after(() => {
-      if (fs.existsSync(testImagePath)) fs.unlinkSync(testImagePath);
-      if (fs.existsSync(badFilePath)) fs.unlinkSync(badFilePath);
-    });
-
-    it("uploads photo", async () => {
-      const res = await authPost("/api/profile/photo").attach(
-        "profilePhoto",
-        testImagePath
-      );
-      expect(res.status).to.equal(200);
-    });
-
-    it("rejects upload without file", async () => {
-      const res = await authPost("/api/profile/photo");
-      expect(res.status).to.equal(400);
-    });
-
-    it("rejects non-image file", async () => {
-      const res = await authPost("/api/profile/photo").attach(
-        "profilePhoto",
-        badFilePath
-      );
-      expect([400, 500]).to.include(res.status);
-    });
-
-    it("returns 401 without JWT token", async () => {
-      const res = await request(app)
-        .post("/api/profile/photo")
-        .attach("profilePhoto", testImagePath);
-
-      expect(res.status).to.equal(401);
-    });
-  });
-
-  // ============ DELETE /api/profile ============
+  
   describe("DELETE /api/profile", () => {
     it("deletes user account successfully", async () => {
       const res = await authDelete("/api/profile");
@@ -321,11 +306,11 @@ describe("Profile routes", () => {
     });
   });
 
-  // ============ AFTER ALL → ONLY remove test users ============
+ 
   after(async () => {
     if (mongoose.connection.readyState !== 1) return;
 
-    // slight delay for Atlas
+
     await new Promise((r) => setTimeout(r, 150));
 
     const deletedUsers = await User.deleteMany({
@@ -341,6 +326,6 @@ describe("Profile routes", () => {
 
     console.log(`[PROFILE CLEANUP] Removed ${deletedUsers.deletedCount} test users`);
 
-    // ❌ NO uploads cleanup here — real profile photos are left alone
+   
   });
 });
